@@ -43,14 +43,14 @@
   a{color:inherit; text-decoration:none;}
   .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
   ::selection{ background:var(--lime); color:var(--ink);}
-
+ 
   /* focus visibility */
   a:focus-visible, button:focus-visible{ outline:2px solid var(--lime); outline-offset:3px; border-radius:4px;}
-
+ 
   @media(prefers-reduced-motion: reduce){
     *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
   }
-
+ 
   /* ---------- NAV ---------- */
   .nav{
     position:sticky; top:0; z-index:50; backdrop-filter:blur(14px);
@@ -67,12 +67,12 @@
     background:var(--lime); color:var(--ink); white-space:nowrap;
   }
   .navtoggle{ display:none; }
-
+ 
   @media(max-width:760px){
     .navlinks{ display:none; }
     .nav-cta{ padding:8px 12px; font-size:11px;}
   }
-
+ 
   /* ---------- HERO ---------- */
   .hero{ padding:90px 0 70px; position:relative;}
   .hero-eyebrow{
@@ -88,7 +88,7 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
   .hero .sub{ font-family:var(--display); font-weight:500; font-size:clamp(18px,2.4vw,24px); color:var(--muted); margin-top:14px;}
-
+ 
   /* signature: flip-decode quote */
   .decode-box{
     margin-top:44px; padding:30px 28px; border-radius:20px; background:var(--ink-2); border:1px solid var(--line);
@@ -110,7 +110,7 @@
   .tok.flip .back{ transform:rotateX(360deg); }
   .decode-caption{ margin-top:16px; font-family:var(--mono); font-size:11.5px; color:var(--muted); letter-spacing:.02em;}
   .decode-caption b{ color:var(--cyan);}
-
+ 
   .hero-meta{
     margin-top:30px; display:flex; flex-wrap:wrap; gap:10px 22px; font-family:var(--mono); font-size:12.5px; color:var(--muted);
   }
@@ -121,19 +121,19 @@
     transition:transform .2s ease, box-shadow .2s ease;
   }
   .hero-cta:hover{ transform:translateY(-2px); box-shadow:0 10px 24px -8px rgba(182,255,61,.5); }
-
+ 
   /* ---------- SECTION SHARED ---------- */
   section{ padding:70px 0; position:relative;}
   .sec-head{ max-width:680px; margin-bottom:36px;}
   .eyebrow{ font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--lime); margin-bottom:12px;}
   .sec-head h2{ font-family:var(--display); font-weight:700; font-size:clamp(26px,3.6vw,38px); line-height:1.15;}
   .sec-head p{ color:var(--muted); font-size:15.5px; margin-top:12px;}
-
+ 
   /* ---------- WELCOME ---------- */
   #welcome .body-text{ max-width:660px; font-size:16.5px; color:#EDE7FB; }
   #welcome .body-text p{ margin-bottom:16px; }
   #welcome .body-text strong{ color:var(--lime); }
-
+ 
   /* ---------- INSTRUCTOR ---------- */
   .instructor{ display:grid; grid-template-columns:220px 1fr; gap:44px; align-items:start;}
   @media(max-width:700px){ .instructor{ grid-template-columns:1fr; } }
@@ -160,7 +160,7 @@
     font-family:var(--mono); font-size:12.5px; padding:8px 14px; border-radius:100px; background:var(--ink-2);
     border:1px solid var(--line); color:var(--muted);
   }
-
+ 
   /* ---------- LEARN CHECKLIST ---------- */
   .learn-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px;}
   .learn-item{
@@ -168,7 +168,7 @@
     border-radius:14px; padding:16px 18px; font-size:14.5px;
   }
   .learn-item .ck{ color:var(--lime); font-weight:700; font-family:var(--mono);}
-
+ 
   /* ---------- UNITS ---------- */
   .units-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px;}
   .unit-card{
@@ -197,7 +197,7 @@
   .unit-topics{ font-family:var(--mono); font-size:11.5px; color:#DCD4F5; line-height:1.9;}
   .unit-hours{ margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--muted);}
   .unit-go{ margin-top:16px; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--u-accent);}
-
+ 
   /* ---------- BOOKS ---------- */
   .books-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px;}
   .book-card{
@@ -206,34 +206,34 @@
   .book-card .icon{ font-size:22px; margin-bottom:10px;}
   .book-card h4{ font-family:var(--display); font-size:15.5px; margin-bottom:4px;}
   .book-card .auth{ font-family:var(--mono); font-size:12px; color:var(--muted);}
-
+ 
   /* ---------- FACTS ---------- */
   .facts-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;}
   .fact{
     background:var(--ink-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; font-size:14px; color:#EDE7FB;
     display:flex; gap:10px; align-items:flex-start;
   }
-
+ 
   /* ---------- QUOTE ---------- */
   .big-quote{
     text-align:center; padding:60px 24px; max-width:760px; margin:0 auto;
     font-family:var(--display); font-weight:700; font-size:clamp(22px,3.4vw,32px); line-height:1.4;
   }
   .big-quote span{ color:var(--lime); }
-
+ 
   /* ---------- FOOTER ---------- */
   footer{ border-top:1px solid var(--line); padding:40px 0 60px; text-align:center;}
   footer .name{ font-family:var(--display); font-weight:700; font-size:16px; margin-top:6px;}
   footer .role{ font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:4px;}
   footer .made{ font-family:var(--mono); font-size:11.5px; color:var(--muted); margin-top:16px;}
   footer .credit-label{ font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;}
-
+ 
   .reveal{ opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease;}
   .reveal.in{ opacity:1; transform:none;}
 </style>
 </head>
 <body>
-
+ 
 <nav class="nav">
   <div class="nav-inner">
     <div class="brand"><span class="dot"></span> BTIT14706 · NLP</div>
@@ -247,14 +247,14 @@
     <a class="nav-cta" href="unit1.html">Start Learning →</a>
   </div>
 </nav>
-
+ 
 <!-- HERO -->
 <section id="home" class="hero">
   <div class="wrap">
     <div class="hero-eyebrow">BTIT14706 · B.Tech. Semester VII · Professional Elective</div>
     <h1>Natural Language<br>Processing<br><span class="hl">Teaching Machines to Understand Humans.</span></h1>
     <div class="sub">Seven units. One very messy language. One very literal machine.</div>
-
+ 
     <div class="decode-box">
       <div class="decode-line" id="decodeLine">
         <span class="tok"><span class="face front">We</span><span class="face back">[7091]</span></span>
@@ -270,7 +270,7 @@
       </div>
       <div class="decode-caption">NLP is where they finally meet <b>· hover any word to see how a machine reads it</b></div>
     </div>
-
+ 
     <div class="hero-meta">
       <span><b>Sarvajanik College of Engineering & Technology</b></span>
       <span><b>Sarvajanik University</b></span>
@@ -278,7 +278,7 @@
     <a href="unit1.html" class="hero-cta">Start Learning →</a>
   </div>
 </section>
-
+ 
 <!-- WELCOME -->
 <section id="welcome">
   <div class="wrap">
@@ -293,7 +293,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- INSTRUCTOR -->
 <section id="about">
   <div class="wrap">
@@ -327,7 +327,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- WHAT YOU'LL LEARN -->
 <section id="outcomes">
   <div class="wrap">
@@ -346,7 +346,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- UNITS -->
 <section id="units">
   <div class="wrap">
@@ -355,9 +355,9 @@
       <h2>Seven units. Each one teaches the machine a little more.</h2>
       <p>The hour count next to each unit is straight from the syllabus — it's how much of the semester that idea actually earns.</p>
     </div>
-
+ 
     <div class="units-grid reveal">
-
+ 
       <a href="unit1.html" class="unit-card" style="--u-accent:var(--lime); --u-glow:radial-gradient(circle at 90% 0%, rgba(182,255,61,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🚀</div><div class="unit-status live">Live now</div></div>
         <div class="unit-n">Unit 01 · 08 hrs</div>
@@ -366,7 +366,7 @@
         <div class="unit-topics">NLP pipeline · Language models · Applications · Ambiguity, synonyms & homonyms</div>
         <div class="unit-go">Explore Unit 1 →</div>
       </a>
-
+ 
       <a href="unit2.html" class="unit-card locked" style="--u-accent:var(--cyan); --u-glow:radial-gradient(circle at 90% 0%, rgba(0,227,255,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">📝</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 02 · 06 hrs</div>
@@ -375,7 +375,7 @@
         <div class="unit-topics">Character / language / corpus / application dependence · Tokenization · Sentence segmentation</div>
         <div class="unit-go">Notify me →</div>
       </a>
-
+ 
       <a href="unit3.html" class="unit-card locked" style="--u-accent:var(--violet-soft); --u-glow:radial-gradient(circle at 90% 0%, rgba(255,62,201,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🧩</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 03 · 07 hrs</div>
@@ -384,7 +384,7 @@
         <div class="unit-topics">Finite state morphology · LR parsing · POS tagging · Constraint-based grammars</div>
         <div class="unit-go">Notify me →</div>
       </a>
-
+ 
       <a href="unit4.html" class="unit-card locked" style="--u-accent:var(--butter); --u-glow:radial-gradient(circle at 90% 0%, rgba(255,199,0,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🧠</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 04 · 05 hrs</div>
@@ -393,7 +393,7 @@
         <div class="unit-topics">Semantic representation · Relational issues in lexical semantics</div>
         <div class="unit-go">Notify me →</div>
       </a>
-
+ 
       <a href="unit5.html" class="unit-card locked" style="--u-accent:var(--coral); --u-glow:radial-gradient(circle at 90% 0%, rgba(255,59,105,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">📊</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 05 · 07 hrs</div>
@@ -402,7 +402,7 @@
         <div class="unit-topics">Corpus & treebank creation · HMM & Viterbi · Word sense disambiguation</div>
         <div class="unit-go">Notify me →</div>
       </a>
-
+ 
       <a href="unit6.html" class="unit-card locked" style="--u-accent:var(--mint); --u-glow:radial-gradient(circle at 90% 0%, rgba(0,255,168,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">💬</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 06 · 05 hrs</div>
@@ -411,7 +411,7 @@
         <div class="unit-topics">Discourse & dialogue · NLG · Reference & pronoun resolution</div>
         <div class="unit-go">Notify me →</div>
       </a>
-
+ 
       <a href="unit7.html" class="unit-card locked" style="--u-accent:var(--violet); --u-glow:radial-gradient(circle at 90% 0%, rgba(157,78,255,.16), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🤖</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 07 · 07 hrs</div>
@@ -420,11 +420,11 @@
         <div class="unit-topics">Chatbots · Machine translation · Q&A · Spam filtering · Search engines</div>
         <div class="unit-go">Notify me →</div>
       </a>
-
+ 
     </div>
   </div>
 </section>
-
+ 
 <!-- BOOKS -->
 <section id="books">
   <div class="wrap">
@@ -451,7 +451,7 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- RESOURCES / FUN FACTS -->
 <section id="resources">
   <div class="wrap">
@@ -469,28 +469,28 @@
     </div>
   </div>
 </section>
-
+ 
 <!-- QUOTE -->
 <section>
   <div class="big-quote reveal">
     "Language is humanity's <span>operating system.</span><br>Natural Language Processing is how we teach computers to use it."
   </div>
 </section>
-
+ 
 <footer>
   <div class="credit-label">Designed and developed by</div>
   <div class="name">Prof. Bhumika Shah</div>
   <div class="role">Assistant Professor · Department of Information Technology</div>
   <div class="made">Made with ☕, curiosity, and lots of HTML.</div>
 </footer>
-
+ 
 <script>
   // scroll reveal
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
   },{threshold:0.15});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
+ 
   // signature: hero words flip to their "token id" on a loop, hover flips instantly
   const toks = document.querySelectorAll('.tok');
   toks.forEach((t,i)=>{
@@ -505,6 +505,17 @@
   }
   setInterval(ambientFlip, 1400);
 </script>
-
+ 
 </body>
 </html>
+ 
+
+
+
+
+
+
+
+
+
+
