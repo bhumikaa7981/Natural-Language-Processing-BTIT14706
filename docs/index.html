@@ -206,52 +206,6 @@
   .book-card .icon{ font-size:22px; margin-bottom:10px;}
   .book-card h4{ font-family:var(--display); font-size:15.5px; margin-bottom:4px;}
   .book-card .auth{ font-family:var(--mono); font-size:12px; color:var(--muted);}
-  /* ---------- DOWNLOADS ---------- */
-
-.download-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:20px;
-}
-
-.download-card{
-    background:var(--ink-2);
-    border:1px solid var(--line);
-    border-radius:18px;
-    padding:24px;
-    transition:.3s;
-}
-
-.download-card:hover{
-    transform:translateY(-5px);
-    border-color:var(--lime);
-}
-
-.download-card h3{
-    font-family:var(--display);
-    margin-bottom:10px;
-    font-size:20px;
-}
-
-.download-card p{
-    color:var(--muted);
-    margin-bottom:18px;
-}
-
-.download-btn{
-    display:inline-block;
-    background:var(--lime);
-    color:var(--ink);
-    padding:12px 20px;
-    border-radius:100px;
-    font-weight:700;
-    font-family:var(--display);
-    transition:.25s;
-}
-
-.download-btn:hover{
-    transform:translateY(-2px);
-}
  
   /* ---------- FACTS ---------- */
   .facts-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;}
@@ -281,15 +235,16 @@
 <body>
  
 <nav class="nav">
-  <div class="navlinks">
-  <a href="#home">Home</a>
-  <a href="#about">About</a>
-  <a href="#units">Units</a>
-  <a href="#books">Books</a>
-  <a href="#downloads">Downloads</a>
-  <a href="#resources">Resources</a>
-</div>
-    <a class="nav-cta" href="/#units">Start Learning →</a>
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span> BTIT14706 · NLP</div>
+    <div class="navlinks">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#units">Units</a>
+      <a href="#books">Books</a>
+      <a href="#resources">Resources</a>
+    </div>
+    <a class="nav-cta" href="unit1.html">Start Learning →</a>
   </div>
 </nav>
  
@@ -320,7 +275,7 @@
       <span><b>Sarvajanik College of Engineering & Technology</b></span>
       <span><b>Sarvajanik University</b></span>
     </div>
-    <a href="/#units" class="hero-cta">Start Learning →</a>
+    <a href="unit1.html" class="hero-cta">Start Learning →</a>
   </div>
 </section>
  
@@ -403,7 +358,7 @@
  
     <div class="units-grid reveal">
  
-      <a href="unit01/Introduction/" class="unit-card" style="--u-accent:var(--lime); --u-glow:radial-gradient(circle at 90% 0%, rgba(182,255,61,.14), transparent 60%);">
+      <a href="unit1.html" class="unit-card" style="--u-accent:var(--lime); --u-glow:radial-gradient(circle at 90% 0%, rgba(182,255,61,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🚀</div><div class="unit-status live">Live now</div></div>
         <div class="unit-n">Unit 01 · 08 hrs</div>
         <h3>Introduction to NLP</h3>
@@ -496,93 +451,7 @@
     </div>
   </div>
 </section>
- <!-- DOWNLOADS -->
-
-<section id="downloads">
-
-<div class="wrap">
-
-<div class="sec-head reveal">
-
-<div class="eyebrow">Downloads</div>
-
-<h2>Course Material & E-Books</h2>
-
-<p>Download the official syllabus and recommended textbooks.</p>
-
-</div>
-
-<div class="download-grid reveal">
-
-<div class="download-card">
-
-<h3>📄 Course Syllabus</h3>
-
-<p>BTIT14706 Natural Language Processing syllabus.</p>
-
-<a class="download-btn"
-href="downloads/syllabus.pdf"
-download>
-
-Download PDF
-
-</a>
-
-</div>
-
-<div class="download-card">
-
-<h3>📘 Speech and Language Processing</h3>
-
-<p>Daniel Jurafsky & James H. Martin</p>
-
-<a class="download-btn"
-href="downloads/Speech_and_Language_Processing.pdf"
-download>
-
-Download Book
-
-</a>
-
-</div>
-
-<div class="download-card">
-
-<h3>📘 Natural Language Understanding</h3>
-
-<p>James Allen</p>
-
-<a class="download-btn"
-href="downloads/Natural_Language_Understanding.pdf"
-download>
-
-Download Book
-
-</a>
-
-</div>
-
-<div class="download-card">
-
-<h3>📘 Handbook of NLP</h3>
-
-<p>Nitin Indurkhya & Fred Damerau</p>
-
-<a class="download-btn"
-href="downloads/Handbook_of_NLP.pdf"
-download>
-
-Download Book
-
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
+ 
 <!-- RESOURCES / FUN FACTS -->
 <section id="resources">
   <div class="wrap">
@@ -640,13 +509,3 @@ Download Book
 </body>
 </html>
  
-
-
-
-
-
-
-
-
-
-
