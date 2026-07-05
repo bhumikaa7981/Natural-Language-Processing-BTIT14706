@@ -206,6 +206,52 @@
   .book-card .icon{ font-size:22px; margin-bottom:10px;}
   .book-card h4{ font-family:var(--display); font-size:15.5px; margin-bottom:4px;}
   .book-card .auth{ font-family:var(--mono); font-size:12px; color:var(--muted);}
+  /* ---------- DOWNLOADS ---------- */
+
+.download-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:20px;
+}
+
+.download-card{
+    background:var(--ink-2);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:24px;
+    transition:.3s;
+}
+
+.download-card:hover{
+    transform:translateY(-5px);
+    border-color:var(--lime);
+}
+
+.download-card h3{
+    font-family:var(--display);
+    margin-bottom:10px;
+    font-size:20px;
+}
+
+.download-card p{
+    color:var(--muted);
+    margin-bottom:18px;
+}
+
+.download-btn{
+    display:inline-block;
+    background:var(--lime);
+    color:var(--ink);
+    padding:12px 20px;
+    border-radius:100px;
+    font-weight:700;
+    font-family:var(--display);
+    transition:.25s;
+}
+
+.download-btn:hover{
+    transform:translateY(-2px);
+}
  
   /* ---------- FACTS ---------- */
   .facts-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;}
