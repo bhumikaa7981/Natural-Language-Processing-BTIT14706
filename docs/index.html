@@ -1,7 +1,435 @@
+```html
 <!DOCTYPE html>
-<html>
-<body>
-<h1>Natural Language Processing</h1>
-<a href="unit01/Introduction/">Unit 1 - Introduction</a>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTIT14706 | Introduction to NLP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        :root {
+            --primary: #22d3ee;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .heading-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .hero-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e2937 100%);
+            background-image: 
+                radial-gradient(circle at 25% 30%, rgba(34, 211, 238, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 75% 70%, rgba(167, 139, 250, 0.15) 0%, transparent 50%);
+        }
+
+        .nav-link {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .nav-link:hover {
+            color: #67e8f9;
+            transform: translateY(-2px);
+        }
+
+        .unit-card {
+            transition: all 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .unit-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 25px 50px -12px rgb(34 211 238 / 0.25);
+        }
+
+        .glow {
+            text-shadow: 0 0 20px rgb(34 211 238);
+        }
+
+        .section-header {
+            position: relative;
+        }
+        
+        .section-header:after {
+            content: '';
+            position: absolute;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, #22d3ee, #a5b4fc);
+            bottom: -8px;
+            left: 0;
+        }
+    </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full bg-zinc-950/80 backdrop-blur-md border-b border-zinc-800 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-cyan-400 rounded-2xl flex items-center justify-center text-zinc-950 font-bold text-xl">N</div>
+                <div>
+                    <span class="heading-font text-2xl font-semibold tracking-tight">NLP Mastery</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-8 text-sm font-medium">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#course" class="nav-link">Course</a>
+                <a href="#units" class="nav-link">Units</a>
+                <a href="#instructor" class="nav-link">Instructor</a>
+            </div>
+            <a href="#units" 
+               class="px-6 py-3 bg-cyan-400 hover:bg-cyan-300 transition-colors text-zinc-950 font-semibold rounded-2xl flex items-center gap-2">
+                Start Learning
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-bg min-h-screen flex items-center pt-20">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-8">
+                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-3xl text-sm border border-white/20">
+                    <span class="px-3 py-1 bg-emerald-400 text-emerald-950 rounded-2xl text-xs font-bold">NEW SEMESTER</span>
+                    <span>BTIT14706 • B.Tech VII</span>
+                </div>
+                
+                <h1 class="heading-font text-7xl md:text-8xl font-semibold leading-none tracking-tighter glow">
+                    NATURAL LANGUAGE<br>PROCESSING
+                </h1>
+                
+                <p class="text-2xl text-zinc-400 max-w-lg">
+                    Teaching Machines to Understand Humans
+                </p>
+                
+                <div class="max-w-md text-lg text-zinc-300">
+                    <p class="italic">"We speak in words. Machines speak in numbers. NLP is where they finally meet."</p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <a href="#units" 
+                       class="px-8 py-4 bg-white text-zinc-900 hover:bg-cyan-300 transition-all font-semibold text-lg rounded-3xl flex items-center gap-3 group">
+                        Begin Your Journey
+                        <span class="block group-active:rotate-45 transition-transform">→</span>
+                    </a>
+                    
+                    <a href="#instructor" 
+                       class="px-8 py-4 border border-zinc-400 hover:border-white transition-all font-medium rounded-3xl">
+                        Meet Your Professor
+                    </a>
+                </div>
+
+                <div class="flex items-center gap-8 pt-6">
+                    <div>
+                        <div class="text-cyan-400 text-4xl font-mono font-bold">07</div>
+                        <div class="text-sm uppercase tracking-widest">Semesters</div>
+                    </div>
+                    <div class="h-12 w-px bg-zinc-700"></div>
+                    <div>
+                        <div class="flex -space-x-4">
+                            <div class="w-8 h-8 bg-zinc-700 border-2 border-zinc-900 rounded-2xl flex items-center justify-center text-xs">🤖</div>
+                            <div class="w-8 h-8 bg-zinc-700 border-2 border-zinc-900 rounded-2xl flex items-center justify-center text-xs">💬</div>
+                            <div class="w-8 h-8 bg-zinc-700 border-2 border-zinc-900 rounded-2xl flex items-center justify-center text-xs">🌐</div>
+                        </div>
+                    </div>
+                    <div class="text-sm">
+                        Sarvajanik College of Engineering &amp; Technology<br>
+                        <span class="text-zinc-500">Sarvajanik University</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Element -->
+            <div class="hidden md:flex justify-center relative">
+                <div class="w-96 h-96 bg-gradient-to-br from-cyan-400 via-violet-400 to-fuchsia-400 rounded-[4rem] rotate-12 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
+                    <div class="w-80 h-80 bg-zinc-900 rounded-3xl p-8 flex flex-col items-center justify-center text-center -rotate-12">
+                        <div class="text-6xl mb-6">🧠</div>
+                        <div class="text-cyan-400 font-mono text-sm tracking-[4px]">PROCESSING...</div>
+                        <div class="mt-8 h-2 w-48 bg-zinc-800 rounded-full overflow-hidden">
+                            <div class="h-full w-3/4 bg-gradient-to-r from-cyan-400 to-violet-400 animate-pulse"></div>
+                        </div>
+                        <p class="text-xs text-zinc-500 mt-10">Machines are learning our language.<br>You will learn to teach them.</p>
+                    </div>
+                </div>
+                
+                <!-- Floating badges -->
+                <div class="absolute -top-6 -left-6 bg-zinc-900 border border-cyan-400 text-cyan-400 text-xs px-4 py-2 rounded-2xl flex items-center gap-2 shadow-xl">
+                    <i class="fas fa-bolt"></i>
+                    <span>Real-time</span>
+                </div>
+                <div class="absolute -bottom-8 right-12 bg-zinc-900 border border-violet-400 text-violet-400 text-xs px-4 py-2 rounded-2xl flex items-center gap-2 shadow-xl">
+                    <i class="fas fa-language"></i>
+                    <span>Multilingual</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-1/2 flex flex-col items-center">
+            <div class="text-xs tracking-widest opacity-60 mb-2">SCROLL TO EXPLORE</div>
+            <i class="fas fa-chevron-down animate-bounce text-cyan-400"></i>
+        </div>
+    </header>
+
+    <!-- Course Intro -->
+    <section id="course" class="py-24 bg-zinc-900">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid md:grid-cols-12 gap-16 items-center">
+                <div class="md:col-span-5">
+                    <div class="sticky top-28">
+                        <span class="inline-block px-4 py-1.5 text-xs font-mono tracking-widest border border-cyan-300 text-cyan-300 rounded-3xl">BTIT14706</span>
+                        <h2 class="heading-font text-5xl font-semibold mt-6 leading-tight">
+                            Bridging Human<br>Language &amp; Machines
+                        </h2>
+                        <p class="mt-8 text-lg text-zinc-400">
+                            In this course, you will discover how machines understand, generate, and respond to human language — the technology powering Siri, ChatGPT, Google Translate, and the intelligent systems of tomorrow.
+                        </p>
+                        <div class="mt-10 flex gap-3">
+                            <div class="px-5 py-3 bg-zinc-800 rounded-2xl text-sm flex items-center gap-3">
+                                <i class="fas fa-users text-emerald-400"></i>
+                                <span>7th Semester</span>
+                            </div>
+                            <div class="px-5 py-3 bg-zinc-800 rounded-2xl text-sm flex items-center gap-3">
+                                <i class="fas fa-clock text-amber-400"></i>
+                                <span>Full Semester</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:col-span-7">
+                    <div class="prose prose-invert max-w-none text-zinc-300 text-lg leading-relaxed">
+                        <p>Natural Language Processing (NLP) sits at the exciting intersection of computer science, linguistics, and artificial intelligence. From autocorrect on your phone to real-time translation and sentiment analysis that powers businesses, NLP is transforming how we interact with technology.</p>
+                        
+                        <p class="mt-6">Through hands-on projects, real-world case studies, movie references, and cutting-edge tools, you will gain both theoretical depth and practical skills that will make you industry-ready.</p>
+                    </div>
+                    
+                    <div class="mt-12 grid grid-cols-3 gap-6">
+                        <div class="bg-zinc-800/50 p-6 rounded-3xl border border-white/5">
+                            <div class="text-cyan-400 text-3xl font-bold">01</div>
+                            <div class="mt-4 font-medium">Daily Life Applications</div>
+                            <div class="text-sm text-zinc-500 mt-1">Voice assistants, search, translation</div>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-3xl border border-white/5">
+                            <div class="text-violet-400 text-3xl font-bold">02</div>
+                            <div class="mt-4 font-medium">Industry Impact</div>
+                            <div class="text-sm text-zinc-500 mt-1">Healthcare, Finance, E-commerce</div>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-3xl border border-white/5">
+                            <div class="text-fuchsia-400 text-3xl font-bold">03</div>
+                            <div class="mt-4 font-medium">Future Ready</div>
+                            <div class="text-sm text-zinc-500 mt-1">Multimodal AI &amp; Agents</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Instructor -->
+    <section id="instructor" class="py-24 border-t border-b border-zinc-800">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row gap-16 items-center">
+                <div class="md:w-1/3">
+                    <div class="w-64 h-64 mx-auto bg-gradient-to-br from-amber-300 to-pink-400 rounded-3xl flex items-center justify-center text-8xl shadow-2xl">
+                        👩‍🏫
+                    </div>
+                </div>
+                <div class="md:w-2/3 space-y-6">
+                    <div>
+                        <div class="uppercase text-xs tracking-widest text-amber-400">Your Guide</div>
+                        <h2 class="heading-font text-5xl font-semibold mt-2">Prof. Bhumika Shah</h2>
+                        <p class="text-xl text-zinc-400">Assistant Professor, Department of Information Technology</p>
+                    </div>
+                    
+                    <p class="text-lg text-zinc-300 leading-relaxed">
+                        With deep expertise in AI &amp; Machine Learning, Prof. Bhumika Shah brings years of academic excellence and industry insight to make complex NLP concepts accessible, exciting, and directly applicable to your career.
+                    </p>
+                    
+                    <div class="flex gap-6 text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-book text-cyan-400"></i>
+                            <span>Passionate Educator</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-flask text-cyan-400"></i>
+                            <span>Hands-on Mentor</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-6 border-t border-zinc-700 text-xs uppercase tracking-widest">
+                        Designed &amp; Developed by Prof. Bhumika Shah<br>
+                        <span class="text-zinc-500">Made with ☕, curiosity, and lots of HTML</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Units / Curriculum -->
+    <section id="units" class="py-24 bg-black">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="px-5 py-2 bg-white/5 text-cyan-300 text-sm font-medium rounded-3xl">CURRICULUM</span>
+                <h2 class="heading-font text-5xl font-semibold mt-6">Journey Through NLP</h2>
+                <p class="max-w-md mx-auto mt-4 text-zinc-400">Interactive modules designed to build strong foundations and advanced skills</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="units-container">
+                <!-- Units populated by JS -->
+            </div>
+
+            <div class="text-center mt-16">
+                <a href="#" onclick="alert('Course content portal would open here in a real deployment. Happy Learning! 🎉')" 
+                   class="inline-flex items-center gap-3 px-10 py-6 bg-gradient-to-r from-cyan-400 to-violet-400 text-zinc-950 font-semibold text-xl rounded-3xl hover:scale-105 transition-transform">
+                    Access Full Course Materials
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-zinc-950 border-t border-zinc-800 py-16">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <div class="flex justify-center mb-6">
+                <div class="flex items-center gap-2 text-cyan-400">
+                    <span class="text-3xl">🧠</span>
+                    <span class="heading-font text-3xl tracking-tighter">NLP</span>
+                </div>
+            </div>
+            <p class="text-zinc-500 text-sm">
+                Sarvajanik College of Engineering &amp; Technology • Sarvajanik University<br>
+                Empowering the next generation of AI engineers
+            </p>
+            <p class="text-[10px] text-zinc-600 mt-12">
+                © 2026 Prof. Bhumika Shah • Made with passion for teaching
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Tailwind script already included via CDN
+        
+        // Sample Units Data
+        const units = [
+            {
+                number: "01",
+                title: "Introduction to NLP",
+                icon: "🌐",
+                desc: "What is NLP? History, core challenges, and why it matters in 2026.",
+                color: "cyan"
+            },
+            {
+                number: "02",
+                title: "Day-to-Day Magic",
+                icon: "📱",
+                desc: "Autocorrect, voice assistants, search engines, translation — applications you use every day.",
+                color: "emerald"
+            },
+            {
+                number: "03",
+                title: "Core Techniques",
+                icon: "🔧",
+                desc: "Tokenization, POS tagging, Named Entity Recognition, and basic models.",
+                color: "violet"
+            },
+            {
+                number: "04",
+                title: "Real-World Power",
+                icon: "🏭",
+                desc: "Sentiment analysis, chatbots, industry use cases in healthcare, finance &amp; more.",
+                color: "amber"
+            },
+            {
+                number: "05",
+                title: "NLP in Pop Culture",
+                icon: "🎥",
+                desc: "From 'Her' to Black Mirror — how movies predicted today's reality.",
+                color: "rose"
+            },
+            {
+                number: "06",
+                title: "The Future Ahead",
+                icon: "🚀",
+                desc: "Multimodal AI, LLMs, ethical challenges, and your role in shaping tomorrow.",
+                color: "fuchsia"
+            }
+        ];
+
+        // Render Units
+        function renderUnits() {
+            const container = document.getElementById('units-container');
+            container.innerHTML = '';
+            
+            units.forEach(unit => {
+                const cardHTML = `
+                    <div onclick="showUnitModal(${unit.number})" class="unit-card bg-zinc-900 border border-zinc-700 hover:border-${unit.color}-400 rounded-3xl p-8 cursor-pointer group">
+                        <div class="flex justify-between items-start">
+                            <div class="text-5xl mb-6 transition-transform group-hover:scale-110">${unit.icon}</div>
+                            <div class="text-6xl font-mono font-bold text-zinc-700 group-hover:text-${unit.color}-400 transition-colors">${unit.number}</div>
+                        </div>
+                        <h3 class="heading-font text-2xl font-semibold mb-3">${unit.title}</h3>
+                        <p class="text-zinc-400 text-[15px] leading-relaxed">${unit.desc}</p>
+                        <div class="mt-8 text-xs uppercase tracking-widest inline-flex items-center gap-2 text-${unit.color}-400">
+                            <span class="block w-2 h-px bg-current"></span>
+                            EXPLORE MODULE
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // Simple Modal for Unit Click
+        function showUnitModal(num) {
+            const unit = units.find(u => u.number === num);
+            if (!unit) return;
+            
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-6";
+            modal.innerHTML = `
+                <div class="bg-zinc-900 max-w-lg w-full rounded-3xl p-10 relative">
+                    <button onclick="this.closest('.fixed').remove()" class="absolute top-6 right-6 text-zinc-400 hover:text-white">
+                        ✕
+                    </button>
+                    <div class="text-7xl mb-6">${unit.icon}</div>
+                    <div class="text-4xl font-mono text-zinc-600">${unit.number}</div>
+                    <h3 class="heading-font text-4xl font-semibold mt-2">${unit.title}</h3>
+                    <p class="mt-6 text-zinc-300">${unit.desc}</p>
+                    <div class="mt-12 text-xs bg-black/50 p-6 rounded-2xl">
+                        In a full course site, this would expand into detailed lecture notes, videos, assignments, and code notebooks.
+                    </div>
+                    <button onclick="this.closest('.fixed').remove()" 
+                            class="mt-8 w-full py-4 bg-white text-zinc-900 rounded-2xl font-semibold">
+                        Continue to Module →
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        // Initialize
+        window.onload = function() {
+            renderUnits();
+            
+            // Smooth scroll for nav links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') === '#') return;
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        };
+    </script>
 </body>
 </html>
+```
