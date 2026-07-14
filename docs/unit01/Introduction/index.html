@@ -74,8 +74,42 @@
   .navlinks button:hover{color:var(--paper); border-color:var(--line);}
   .navlinks button.active{ background:var(--violet); color:var(--paper); border-color:var(--violet);}
 
+  /* ---------- DEMO BANNER (signature top highlight) ---------- */
+  .demo-banner-wrap{
+    position:fixed; top:62px; left:0; right:0; z-index:190;
+    display:flex; justify-content:center; padding:10px 16px 0;
+    pointer-events:none;
+  }
+  .demo-banner{
+    pointer-events:auto;
+    display:inline-flex; align-items:center; gap:12px;
+    background:linear-gradient(100deg, var(--lime), var(--cyan) 55%, var(--violet-soft));
+    background-size:200% auto;
+    animation:bannerShift 5s ease infinite;
+    color:var(--ink); font-family:var(--display); font-weight:700; font-size:14px;
+    padding:11px 20px; border-radius:100px; box-shadow:0 10px 30px -8px rgba(182,255,61,.45);
+    transition:transform .2s ease, box-shadow .2s ease;
+    max-width:92vw;
+  }
+  .demo-banner:hover{ transform:translateY(-2px) scale(1.015); box-shadow:0 14px 34px -6px rgba(0,227,255,.55); }
+  .demo-banner .spark{ font-size:16px; }
+  .demo-banner .txt{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .demo-banner .arrow{ font-family:var(--mono); }
+  @keyframes bannerShift{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  @media(max-width:640px){
+    .demo-banner{ font-size:12px; padding:9px 14px; gap:8px;}
+    .demo-banner .txt{ max-width:62vw; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .demo-banner{ animation:none; }
+  }
+
   /* ---------- HERO ---------- */
-  .hero{ padding:170px 0 90px; }
+  .hero{ padding:230px 0 90px; }
   .hero-grid{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:60px; align-items:start;}
   .hero h1{ font-size:clamp(38px,6vw,76px); line-height:0.98; margin-bottom:22px;}
   .hero h1 .hl{
@@ -299,6 +333,7 @@
     .faceoff{ grid-template-columns:1fr; gap:16px;}
     .fo-vs{ margin:0 auto;}
     section{ padding:80px 0;}
+    .hero{ padding-top:250px; }
   }
   @media (prefers-reduced-motion: reduce){
     *{ transition:none !important; animation:none !important;}
@@ -322,6 +357,15 @@
     </div>
   </div>
 </nav>
+
+<div class="demo-banner-wrap">
+  <a class="demo-banner" href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/nlp-phases/" target="_blank" rel="noopener">
+    <span class="spark">⚡</span>
+    <span class="txt">Live Lab: Watch the NLP Phases Actually Run</span>
+    <span class="arrow">→</span>
+  </a>
+</div>
+
 <!-- HERO / HOOK -->
  <section class="hero" id="hook">
   <div class="wrap hero-grid">
