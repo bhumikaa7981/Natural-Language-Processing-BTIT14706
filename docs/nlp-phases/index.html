@@ -1,1 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The NLP Pipeline Playground · Unit 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#2B2640;
+  --ink-soft:#665F80;
+  --bg:#FBF7FF;
+  --card:#FFFFFF;
+  --lavender:#E7DCFF;
+  --lavender-deep:#C9AFFF;
+  --mint:#C3F5E1;
+  --mint-deep:#7FE0BC;
+  --peach:#FFDAC3;
+  --peach-deep:#FFB48A;
+  --sky:#CDE7FF;
+  --sky-deep:#8FC4FF;
+  --sun:#FFEEA6;
+  --sun-deep:#FFD859;
+  --pink:#FFC1DD;
+  --pink-deep:#FF8FC1;
+  --accent:#7C5CFF;
+  --accent-deep:#5C3BE0;
+  --line:#EAE1FF;
+  --radius:22px;
+  --shadow: 0 10px 30px -12px rgba(90,60,180,0.22);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  line-height:1.5;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4,.display{font-family:'Baloo 2',cursive;}
+code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+a{color:var(--accent-deep);}
+img{max-width:100%;}
+
+/* ---------- background blobs ---------- */
+.blobs{position:fixed;inset:0;z-index:-1;overflow:hidden;}
+.blob{position:absolute;border-radius:50%;filter:blur(40px);opacity:.55;animation:float 22s ease-in-out infinite;}
+.blob.b1{width:420px;height:420px;background:var(--lavender);top:-120px;left:-100px;animation-duration:26s;}
+.blob.b2{width:360px;height:360px;background:var(--mint);top:20%;right:-140px;animation-duration:30s;animation-delay:-6s;}
+.blob.b3{width:300px;height:300px;background:var(--peach);bottom:-80px;left:15%;animation-duration:24s;animation-delay:-3s;}
+.blob.b4{width:260px;height:260px;background:var(--sky);bottom:10%;right:10%;animation-duration:28s;animation-delay:-10s;}
+@keyframes float{
+  0%,100%{transform:translate(0,0) scale(1);}
+  33%{transform:translate(30px,-40px) scale(1.08);}
+  66%{transform:translate(-25px,25px) scale(0.95);}
+}
+@media (prefers-reduced-motion: reduce){ .blob{animation:none;} html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+
+/* ---------- top course bar ---------- */
+.coursebar{
+  background:var(--ink);
+  color:#fff;
+  font-size:12.5px;
+  padding:8px 20px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px 18px;
+  justify-content:center;
+  text-align:center;
+  letter-spacing:.2px;
+}
+.coursebar b{color:var(--sun-deep);}
+.coursebar span{opacity:.85;}
+
+/* ---------- header/hero ---------- */
+header.hero{
+  max-width:1080px;
+  margin:0 auto;
+  padding:56px 24px 30px;
+  text-align:center;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--lavender);
+  border:1px solid var(--lavender-deep);
+  color:var(--accent-deep);
+  padding:7px 16px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:.4px;
+  margin-bottom:20px;
+}
+.hero h1{
+  font-size:clamp(34px,6vw,58px);
+  margin:0 0 12px;
+  font-weight:800;
+  line-height:1.05;
+}
+.hero h1 span{color:var(--accent);}
+.hero p.sub{
+  max-width:640px;margin:0 auto;
+  color:var(--ink-soft);
+  font-size:17px;
+}
+
+/* ---------- conveyor belt ---------- */
+.belt-wrap{
+  max-width:1080px;margin:34px auto 0;padding:0 24px;
+}
+.belt{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px 18px 26px;
+  position:relative;
+}
+.belt-title{font-size:13px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.6px;margin-bottom:14px;text-align:center;}
+.belt-track{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  position:relative;
+  padding:6px 4px;
+}
+.belt-track::before{
+  content:"";position:absolute;top:50%;left:26px;right:26px;height:4px;
+  background:repeating-linear-gradient(90deg,var(--line) 0 10px, transparent 10px 20px);
+  transform:translateY(-50%);z-index:0;
+}
+.gate{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  flex:1;
+  min-width:0;
+}
+.gate .dot{
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-family:'Baloo 2';font-size:18px;
+  background:var(--bg);border:3px solid var(--line);color:var(--ink-soft);
+  transition:all .4s cubic-bezier(.4,0,.2,1);
+}
+.gate.active .dot{transform:scale(1.14);color:#fff;box-shadow:0 6px 16px -4px rgba(0,0,0,.25);}
+.gate small{font-size:10.5px;font-weight:700;color:var(--ink-soft);text-align:center;letter-spacing:.2px;}
+.gate.active small{color:var(--ink);}
+.gate[data-c="1"].active .dot{background:var(--sky-deep);border-color:var(--sky-deep);}
+.gate[data-c="2"].active .dot{background:var(--mint-deep);border-color:var(--mint-deep);}
+.gate[data-c="3"].active .dot{background:var(--sun-deep);border-color:var(--sun-deep);color:var(--ink);}
+.gate[data-c="4"].active .dot{background:var(--peach-deep);border-color:var(--peach-deep);}
+.gate[data-c="5"].active .dot{background:var(--pink-deep);border-color:var(--pink-deep);}
+
+.belt-chip{
+  position:absolute;top:-14px;left:26px;
+  background:var(--accent);color:#fff;font-size:11px;font-weight:700;
+  padding:4px 10px;border-radius:999px;white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;
+  transition:left 1.1s cubic-bezier(.65,0,.35,1);
+  box-shadow:0 6px 14px -4px rgba(124,92,255,.6);
+  opacity:0;
+}
+.belt-chip.show{opacity:1;}
+
+/* ---------- input console ---------- */
+.console{
+  max-width:1080px;margin:26px auto 0;padding:0 24px;
+}
+.console-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:var(--shadow);padding:22px;
+}
+.console-card label{font-weight:700;font-size:14px;display:block;margin-bottom:8px;}
+textarea{
+  width:100%;min-height:96px;resize:vertical;
+  border:2px solid var(--line);border-radius:14px;
+  padding:14px 16px;font-family:'Inter';font-size:15.5px;color:var(--ink);
+  background:#FCFAFF;
+  transition:border-color .2s;
+}
+textarea:focus{outline:none;border-color:var(--accent);}
+.chips-row{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;}
+.sample-chip{
+  background:var(--sky);border:1px solid var(--sky-deep);color:var(--ink);
+  font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px;cursor:pointer;
+  transition:transform .15s;
+}
+.sample-chip:hover{transform:translateY(-2px);}
+.run-row{display:flex;align-items:center;gap:14px;margin-top:16px;flex-wrap:wrap;}
+.run-btn{
+  background:var(--accent);color:#fff;border:none;border-radius:14px;
+  padding:13px 26px;font-weight:800;font-family:'Baloo 2';font-size:16px;letter-spacing:.3px;
+  cursor:pointer;box-shadow:0 10px 22px -8px rgba(124,92,255,.65);
+  transition:transform .15s, background .2s;
+}
+.run-btn:hover{transform:translateY(-2px);background:var(--accent-deep);}
+.run-hint{font-size:12.5px;color:var(--ink-soft);}
+
+/* ---------- pipeline nav ---------- */
+.pipe-nav{
+  position:sticky;top:0;z-index:40;
+  background:rgba(251,247,255,.9);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+  padding:10px 0;margin-top:34px;
+}
+.pipe-nav-inner{
+  max-width:1080px;margin:0 auto;padding:0 24px;
+  display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;
+}
+.pipe-nav-inner::-webkit-scrollbar{display:none;}
+.pnav-btn{
+  flex:none;
+  border:2px solid var(--line);background:#fff;color:var(--ink-soft);
+  font-weight:700;font-size:12.5px;padding:8px 14px;border-radius:999px;cursor:pointer;
+  white-space:nowrap;transition:all .2s;
+}
+.pnav-btn.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+
+/* ---------- stage sections ---------- */
+.stage{
+  max-width:1080px;margin:46px auto 0;padding:0 24px;
+  scroll-margin-top:70px;
+}
+.stage-head{display:flex;align-items:center;gap:16px;margin-bottom:18px;}
+.stage-num{
+  width:54px;height:54px;border-radius:16px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2';font-weight:800;font-size:22px;color:var(--ink);
+}
+.stage h2{font-size:clamp(24px,4vw,32px);margin:0 0 2px;}
+.stage .stage-kicker{font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-soft);}
+
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  box-shadow:var(--shadow);padding:20px 22px;margin-bottom:16px;
+}
+.card h4{margin:0 0 8px;font-size:14.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-soft);}
+.card p{margin:0;color:var(--ink);}
+.def-card{border-left:6px solid var(--accent);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media (max-width:760px){.grid-2{grid-template-columns:1fr;}}
+
+.tag-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.tag-list li{
+  background:var(--bg);border:1px dashed var(--lavender-deep);
+  border-radius:10px;padding:9px 12px;font-size:14px;
+}
+.why-card{background:linear-gradient(135deg,var(--sun) 0%, #fff 120%);border-left:6px solid var(--sun-deep);}
+.why-card ul{margin:8px 0 0;padding-left:20px;}
+.why-card li{margin-bottom:6px;font-size:14.5px;}
+
+/* live demo */
+.demo{
+  background:linear-gradient(160deg,#fff, var(--bg));
+  border:2px dashed var(--lavender-deep);border-radius:18px;padding:18px 20px;margin-bottom:16px;
+}
+.demo h4{color:var(--accent-deep);font-size:13.5px;text-transform:uppercase;letter-spacing:.4px;margin:0 0 10px;display:flex;align-items:center;gap:8px;}
+.demo h4::before{content:"▶";font-size:10px;}
+.tokens{display:flex;flex-wrap:wrap;gap:6px;}
+.tok{
+  background:var(--card);border:1.5px solid var(--line);border-radius:8px;
+  padding:5px 9px;font-family:'JetBrains Mono';font-size:12.5px;
+  animation:pop .35s ease backwards;
+}
+@keyframes pop{from{opacity:0;transform:translateY(6px) scale(.9);}to{opacity:1;transform:translateY(0) scale(1);}}
+.tok.punct{opacity:.55;}
+table.demo-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+table.demo-table th,table.demo-table td{border:1px solid var(--line);padding:7px 10px;text-align:left;}
+table.demo-table th{background:var(--lavender);}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;margin-right:4px;}
+.pill.NOUN{background:#7FA7FF;} .pill.VERB{background:#FF8FA3;} .pill.PROPN{background:#B98BFF;}
+.pill.DET{background:#9AA0B4;} .pill.PREP{background:#5FC6A8;} .pill.PRON{background:#FFB25F;}
+.pill.ADJ{background:#5FD1D8;} .pill.ADV{background:#E28CFF;} .pill.CONJ{background:#C4C4C4;}
+.badge{display:inline-block;background:var(--mint);color:#0B5E43;font-weight:700;font-size:11.5px;padding:3px 9px;border-radius:8px;margin:3px 4px 3px 0;}
+.badge.date{background:var(--sky);color:#0B4A8F;}
+.badge.money{background:var(--sun);color:#8F6A00;}
+.badge.org{background:var(--pink);color:#8F0B4A;}
+.badge.loc{background:var(--peach);color:#8F4600;}
+.empty-note{color:var(--ink-soft);font-style:italic;font-size:14px;}
+
+/* code block */
+.code-toggle{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  background:var(--ink);color:#fff;border:none;border-radius:10px;
+  padding:9px 15px;font-weight:700;font-size:13px;font-family:'Inter';margin-bottom:10px;
+}
+.code-toggle:hover{background:#413A63;}
+pre.codebox{
+  background:#221E33;color:#E4DBFF;border-radius:14px;padding:18px 18px;
+  overflow-x:auto;font-size:13px;line-height:1.6;display:none;position:relative;
+}
+pre.codebox.open{display:block;}
+pre.codebox .cmt{color:#8A82B0;}
+pre.codebox .kw{color:#FF9EC4;}
+pre.codebox .str{color:#B9F5D0;}
+pre.codebox .fn{color:#8FC4FF;}
+.copy-btn{
+  position:absolute;top:10px;right:12px;background:#3A3358;color:#fff;border:none;
+  border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;
+}
+
+.importance-strip{
+  display:flex;align-items:center;gap:12px;
+  background:var(--ink);color:#fff;border-radius:16px;padding:14px 18px;margin:22px 0;
+  font-size:13.5px;
+}
+.importance-strip .icon{font-size:20px;}
+
+/* comparison / summary sections */
+.section-block{max-width:1080px;margin:60px auto 0;padding:0 24px;}
+.section-block h2{font-size:clamp(24px,4vw,30px);text-align:center;margin-bottom:8px;}
+.section-block .lead{text-align:center;color:var(--ink-soft);max-width:620px;margin:0 auto 26px;}
+
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media (max-width:760px){.trio{grid-template-columns:1fr;}}
+.trio .card{margin-bottom:0;}
+.trio .letter{
+  width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2';font-weight:800;color:#fff;margin-bottom:10px;
+}
+
+.bigidea{
+  max-width:1080px;margin:60px auto 0;padding:34px 30px;
+  background:linear-gradient(120deg,var(--lavender),var(--pink));
+  border-radius:28px;text-align:center;box-shadow:var(--shadow);
+}
+.bigidea h3{font-size:clamp(20px,3.4vw,28px);margin:0 0 6px;}
+.bigidea p{color:var(--ink);font-size:15.5px;max-width:640px;margin:0 auto;}
+
+.homework{max-width:1080px;margin:50px auto 0;padding:0 24px 10px;}
+.hw-list{display:grid;gap:12px;}
+.hw-item{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;}
+.hw-num{
+  flex:none;width:32px;height:32px;border-radius:9px;background:var(--sun);
+  display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:800;
+}
+
+footer{
+  margin-top:70px;background:var(--ink);color:#EDE7FF;padding:34px 24px 26px;
+}
+.footer-inner{max-width:1080px;margin:0 auto;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.footer-inner h4{margin:0 0 6px;font-family:'Baloo 2';color:#fff;}
+.footer-inner p{margin:2px 0;font-size:13px;color:#C9BEEC;}
+.footer-note{margin-top:22px;text-align:center;font-size:12px;color:#9C8FCB;border-top:1px solid #3F3760;padding-top:16px;}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1;transform:translateY(0);}
+
+/* ---------- sub-demo blocks ---------- */
+.subdemo{margin-bottom:22px;}
+.subdemo:last-child{margin-bottom:0;}
+.subdemo-title{
+  display:flex;align-items:center;gap:8px;font-weight:800;font-family:'Baloo 2';
+  font-size:15.5px;color:var(--ink);margin-bottom:4px;
+}
+.subdemo-title .num{
+  width:24px;height:24px;border-radius:7px;background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:12px;flex:none;
+}
+.subdemo-desc{font-size:13px;color:var(--ink-soft);margin:0 0 12px;}
+.sent-block{
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:12px;
+}
+.sent-label{font-size:12px;font-weight:700;color:var(--accent-deep);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px;}
+.sent-quote{font-size:13.5px;color:var(--ink-soft);font-style:italic;margin-bottom:10px;}
+
+/* algorithm tab switcher (syntactic stage) */
+.algo-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.algo-tab{
+  border:2px solid var(--line);background:#fff;color:var(--ink-soft);font-weight:700;font-size:12.5px;
+  padding:8px 14px;border-radius:12px;cursor:pointer;transition:all .2s;
+}
+.algo-tab.on{background:var(--sun-deep);border-color:var(--sun-deep);color:var(--ink);}
+.algo-note{
+  background:var(--bg);border:1px dashed var(--lavender-deep);border-radius:12px;padding:10px 14px;
+  font-size:13px;color:var(--ink-soft);margin-bottom:14px;
+}
+
+/* constituency bracket tree */
+.tree-box{border:2px solid; border-radius:10px;padding:8px 10px;margin:4px 0;display:inline-block;}
+.tree-box.S{border-color:var(--accent);background:rgba(124,92,255,.06);}
+.tree-box.NP{border-color:var(--sky-deep);background:rgba(143,196,255,.12);}
+.tree-box.VP{border-color:var(--peach-deep);background:rgba(255,180,138,.14);}
+.tree-box.PP{border-color:var(--mint-deep);background:rgba(127,224,188,.14);}
+.tree-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-soft);display:block;margin-bottom:4px;}
+.tree-words{font-family:'JetBrains Mono';font-size:13px;}
+.tree-row{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;}
+
+/* dependency list */
+.dep-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line);font-size:13.5px;flex-wrap:wrap;}
+.dep-row:last-child{border-bottom:none;}
+.dep-word{font-family:'JetBrains Mono';font-weight:700;background:var(--bg);padding:3px 9px;border-radius:7px;}
+.dep-rel{font-size:11px;font-weight:700;background:var(--lavender);color:var(--accent-deep);padding:3px 9px;border-radius:999px;}
+.dep-arrow{color:var(--ink-soft);}
+.dep-head{font-family:'JetBrains Mono';font-weight:700;color:var(--accent-deep);}
+
+/* rule trace */
+.rule-trace{list-style:none;margin:0;padding:0;counter-reset:rule;}
+.rule-trace li{
+  counter-increment:rule;
+  background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px 9px 40px;margin-bottom:7px;font-size:13.5px;position:relative;
+}
+.rule-trace li::before{
+  content:counter(rule);position:absolute;left:10px;top:8px;
+  width:20px;height:20px;border-radius:6px;background:var(--sun-deep);color:var(--ink);
+  font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;
+}
+.rule-code{font-family:'JetBrains Mono';font-size:12px;color:var(--accent-deep);}
+
+/* confidence bars (statistical parser) */
+.conf-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12.5px;}
+.conf-pair{width:150px;flex:none;font-family:'JetBrains Mono';}
+.conf-bar-bg{flex:1;height:10px;background:var(--line);border-radius:999px;overflow:hidden;}
+.conf-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--sky-deep),var(--accent));}
+.conf-val{width:44px;flex:none;text-align:right;font-weight:700;}
+.conf-total{
+  margin-top:10px;padding:10px 14px;border-radius:12px;background:var(--ink);color:#fff;
+  font-weight:700;font-size:13.5px;text-align:center;
+}
+
+/* morphology chips */
+.morph-chain{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
+.morph-piece{
+  padding:4px 9px;border-radius:8px;font-family:'JetBrains Mono';font-size:12px;font-weight:700;
+}
+.morph-piece.prefix{background:var(--peach);color:#8F4600;}
+.morph-piece.root{background:var(--sky);color:#0B4A8F;}
+.morph-piece.suffix{background:var(--mint);color:#0B5E43;}
+.morph-plus{color:var(--ink-soft);font-size:12px;}
+
+/* literal vs actual (pragmatics) */
+.prag-compare{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+@media (max-width:600px){.prag-compare{grid-template-columns:1fr;}}
+.prag-col{padding:10px 14px;font-size:13px;}
+.prag-col.literal{background:#fff;border-right:1px solid var(--line);}
+.prag-col.actual{background:var(--mint);}
+.prag-col b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;color:var(--ink-soft);margin-bottom:4px;}
+.prag-col.actual b{color:#0B5E43;}
+
+/* discourse event list */
+.event-list{list-style:none;margin:0;padding:0;}
+.event-list li{
+  display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;font-size:13.5px;
+}
+.event-dot{width:22px;height:22px;border-radius:50%;background:var(--pink-deep);color:#fff;flex:none;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'Baloo 2';}
+</style>
+</head>
+<body>
+
+<div class="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+
+<div class="coursebar">
+  <span><b>BTIT14706</b> · Natural Language Processing</span>
+  <span>B.Tech IV · Semester VII</span>
+  <span>Professional Elective</span>
+  <span>Prof. Bhumika · Sarvajanik College of Engineering &amp; Technology</span>
+</div>
+
+<header class="hero">
+  <div class="eyebrow">🧪 Unit 1 · Lab Edition</div>
+  <h1>Feed it a sentence.<br>Watch <span>five brains</span> fight over it.</h1>
+  <p class="sub">This is the NLP pipeline from your slides — but alive. Type anything, hit run, and watch tokenization, lexical, syntactic, semantic and pragmatic analysis argue about what your sentence actually means.</p>
+</header>
+
+<div class="belt-wrap">
+  <div class="belt">
+    <div class="belt-title">Live Pipeline Tracker</div>
+    <div class="belt-track" id="beltTrack">
+      <div class="belt-chip" id="beltChip">your text</div>
+      <div class="gate" data-c="1"><div class="dot">1</div><small>Tokenize</small></div>
+      <div class="gate" data-c="2"><div class="dot">2</div><small>Lexical</small></div>
+      <div class="gate" data-c="3"><div class="dot">3</div><small>Syntactic</small></div>
+      <div class="gate" data-c="4"><div class="dot">4</div><small>Semantic</small></div>
+      <div class="gate" data-c="5"><div class="dot">5</div><small>Pragmatic</small></div>
+    </div>
+  </div>
+</div>
+
+<div class="console">
+  <div class="console-card">
+    <label for="inputText">Drop a sentence or paragraph here 👇</label>
+    <textarea id="inputText">Riya booked a flight to Mumbai on 15 August 2025. She can't wait — the bank near her office already deposited the refund.</textarea>
+    <div class="chips-row" id="sampleChips"></div>
+    <div class="run-row">
+      <button class="run-btn" id="runBtn">▶ Run the pipeline</button>
+      <span class="run-hint">No servers, no APIs — everything below runs live in your browser with simplified teaching versions of real algorithms.</span>
+    </div>
+  </div>
+</div>
+
+<nav class="pipe-nav">
+  <div class="pipe-nav-inner" id="pipeNav"></div>
+</nav>
+
+<main id="stages"></main>
+
+<section class="section-block" id="compare">
+  <h2>What each stage is even asking</h2>
+  <p class="lead">Same sentence, five completely different questions. This is the cheat-sheet your slide deck promised.</p>
+  <div class="card" style="overflow-x:auto;">
+    <table class="demo-table">
+      <tr><th>Stage</th><th>Core question</th><th>Fails if skipped</th></tr>
+      <tr><td>Tokenization</td><td>Where do words/sentences begin and end?</td><td>Everything downstream reads garbage.</td></tr>
+      <tr><td>Lexical Analysis</td><td>What's each word's root form &amp; grammatical role?</td><td>"studies" and "study" look unrelated.</td></tr>
+      <tr><td>Syntactic Analysis</td><td>How do words combine grammatically?</td><td>Can't tell who did what to whom.</td></tr>
+      <tr><td>Semantic Analysis</td><td>What does the sentence actually mean?</td><td>"bank" stays a coin-flip forever.</td></tr>
+      <tr><td>Pragmatic/Discourse</td><td>What does it mean in context, across sentences?</td><td>"Can you pass the salt?" gets answered "yes".</td></tr>
+    </table>
+  </div>
+  <div class="importance-strip">
+    <div class="icon">📖</div>
+    <div><b>From the Handbook:</b> Indurkhya &amp; Damerau open by noting natural languages are rich with ambiguity at every level — resolving it is the thread running through this entire pipeline, from David Palmer's tokenization chapter to David Yarowsky's word-sense chapter.</div>
+  </div>
+</section>
+
+<section class="section-block" id="ambiguity">
+  <h2>Ambiguity's three disguises</h2>
+  <p class="lead">Language didn't evolve for computers. It evolved for us — full of shortcuts, sarcasm and slang. Here's the lineup.</p>
+  <div class="trio">
+    <div class="card"><div class="letter" style="background:var(--sky-deep);">A</div><h4>Ambiguity</h4><p>"Visiting relatives can be annoying." Are the relatives annoying, or is the visiting?</p></div>
+    <div class="card"><div class="letter" style="background:var(--mint-deep);">S</div><h4>Synonymy</h4><p>"big", "large", "huge" — different words, overlapping meaning. Machines have to know they're cousins.</p></div>
+    <div class="card"><div class="letter" style="background:var(--peach-deep);">H</div><h4>Homonymy</h4><p>"bat" (animal) vs "bat" (cricket gear) — identical spelling, zero relation.</p></div>
+  </div>
+</section>
+
+<div class="bigidea reveal">
+  <h3>💡 One big idea to remember</h3>
+  <p>NLP isn't one algorithm. It's a pipeline of stages, each resolving a little more ambiguity than the last — until raw text becomes usable meaning.</p>
+</div>
+
+<section class="homework">
+  <h2 style="text-align:center;">Homework 📝</h2>
+  <div class="hw-list">
+    <div class="hw-item"><div class="hw-num">1</div><div>Grab any 3 sentences from a news article. Manually tokenize them, and flag the punctuation that tried to trick you.</div></div>
+    <div class="hw-item"><div class="hw-num">2</div><div>For each sentence, find one word whose POS tag changes with context — like our old friend "book".</div></div>
+    <div class="hw-item"><div class="hw-num">3</div><div>Find a real headline with an ambiguous phrase (structural or lexical) and explain both readings, PP-attachment style.</div></div>
+  </div>
+</section>
+
+<section class="section-block" id="next">
+  <div class="card" style="background:linear-gradient(120deg,var(--sun),#fff);border-left:6px solid var(--sun-deep);">
+    <h4>Next class preview</h4>
+    <p style="font-size:16px;"><b>Unit 2 dives deeper into Text Preprocessing</b> — sentence segmentation, normalization, and building your first tokenizer by hand. See you there!</p>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div>
+      <h4>NLP · Unit 1</h4>
+      <p>Introduction to Natural Language Processing</p>
+      <p>Prepared &amp; taught by Prof. Bhumika</p>
+    </div>
+    <div>
+      <p>Sarvajanik University</p>
+      <p>Sarvajanik College of Engineering and Technology</p>
+      <p>Bachelor of Technology</p>
+    </div>
+    <div>
+      <p>Year: B.Tech IV (Semester VII)</p>
+      <p>Subject Code: BTIT14706</p>
+      <p>Type: Professional Elective Course · w.e.f. AY 2024-25</p>
+    </div>
+  </div>
+  <div class="footer-note">Interactive lab built for classroom use · simplified rule-based demos, real algorithms explained via the Python snippets in each stage.</div>
+</footer>
+
+<script>
+/* ============================= DATA / NLP HELPERS ============================= */
+
+const AMBIG = {
+  spring:{senses:{season:"the season after winter",coil:"a metal coil",water:"a natural water source"},clues:{season:["flowers","warm","step","smiling","weather","bloom"],coil:["metal","bounce","mattress","wire"],water:["fresh","well","natural","mineral"]}},
+  match:{senses:{sports:"a sports contest",fire:"a stick used to light fire",fit:"something that pairs well"},clues:{sports:["team","win","play","game","championship","drained","stadium"],fire:["light","strike","burn","flame"],fit:["same","pair","color","perfectly"]}},
+  bank:{senses:{financial:"a financial institution",river:"the side of a river"},clues:{financial:["money","deposit","account","loan","cash","refund","cheque","atm"],river:["river","water","fish","shore","boat","flood"]}},
+  bat:{senses:{animal:"a flying nocturnal animal",sports:"a piece of sports equipment"},clues:{animal:["fly","cave","night","wings","dark"],sports:["ball","cricket","hit","game","wicket","swung"]}},
+  ring:{senses:{jewelry:"a piece of jewelry",sound:"a sound / phone call"},clues:{jewelry:["finger","diamond","wear","wedding","propose"],sound:["phone","bell","call","loud","alarm"]}},
+  drone:{senses:{tech:"an unmanned flying device",sound:"a continuous low humming sound"},clues:{tech:["fly","camera","engineer","test","storm","pilot"],sound:["hum","buzz","noise","monotone"]}}
+};
+const ORG_WORDS = ["stadium","bistro","google","microsoft","apple","amazon","nasa","university","college","institute","airlines","academy","studio"];
+const LOC_WORDS = ["mumbai","delhi","paris","london","india","tokyo","washington","york","gujarat","surat","vyara","bangalore","chennai","kolkata","usa","uk","sunset"];
+const PRONOUNS_ALL = ["he","she","it","they","him","her","them","his","its","their","hers","theirs"];
+const FUNC_POS = {
+  the:"DET",a:"DET",an:"DET",this:"DET",that:"DET",these:"DET",those:"DET",
+  is:"VERB",am:"VERB",are:"VERB",was:"VERB",were:"VERB",be:"VERB",been:"VERB",has:"VERB",have:"VERB",had:"VERB",
+  does:"VERB",did:"VERB",do:"VERB",can:"VERB",could:"VERB",would:"VERB",will:"VERB",shall:"VERB",should:"VERB",couldn:"VERB",
+  and:"CONJ",or:"CONJ",but:"CONJ",though:"CONJ",although:"CONJ",because:"CONJ",since:"CONJ",while:"CONJ",whereas:"CONJ",
+  in:"PREP",on:"PREP",at:"PREP",to:"PREP",of:"PREP",with:"PREP",for:"PREP",by:"PREP",from:"PREP",near:"PREP",into:"PREP",before:"PREP",after:"PREP",
+  i:"PRON",you:"PRON",he:"PRON",she:"PRON",it:"PRON",we:"PRON",they:"PRON",him:"PRON",them:"PRON",
+  his:"PRON",her:"PRON",its:"PRON",their:"PRON",
+  everyone:"PRON",everybody:"PRON",everything:"PRON",someone:"PRON",somebody:"PRON",something:"PRON",
+  anyone:"PRON",anybody:"PRON",anything:"PRON",nobody:"PRON",nothing:"PRON",
+  not:"ADV",already:"ADV",even:"ADV",still:"ADV",early:"ADV"
+};
+/* Contractions: mapped to the base word they shorten, so tagging + lemmatizing treats the whole
+   token as a single verb form instead of misreading the raw apostrophe string as a noun. */
+const CONTRACTIONS = {
+  "couldn't":"could","wouldn't":"would","shouldn't":"should","mustn't":"must","needn't":"need",
+  "isn't":"be","aren't":"be","wasn't":"be","weren't":"be",
+  "doesn't":"do","didn't":"do","don't":"do",
+  "hasn't":"have","haven't":"have","hadn't":"have",
+  "can't":"can","won't":"will","cannot":"can",
+  "it's":"be","that's":"be","there's":"be","he's":"be","she's":"be",
+  "i'm":"be","you're":"be","we're":"be","they're":"be",
+  "i've":"have","you've":"have","we've":"have","they've":"have",
+  "i'll":"will","you'll":"will","we'll":"will","they'll":"will","it'll":"will"
+};
+const LEMMA_DICT = {studies:"study",went:"go",ran:"run",mice:"mouse",children:"child",geese:"goose",
+  is:"be",am:"be",are:"be",was:"be",were:"be",been:"be",has:"have",had:"have",did:"do",does:"do",
+  men:"man",women:"woman",feet:"foot",teeth:"tooth",better:"good",best:"good",worse:"bad",worst:"bad",
+  swung:"swing",flew:"fly",trained:"train",grilled:"grill",tested:"test",drained:"drain",couldn:"could",
+  /* -ing/-ed forms whose base word ends in a silent "e" that a crude stemmer chops incorrectly —
+     a real dictionary lemmatizer (WordNetLemmatizer) knows these; we hardcode the common ones here */
+  smiling:"smile",smiled:"smile",tasting:"taste",tasted:"taste",arrived:"arrive",arriving:"arrive",
+  hoping:"hope",hoped:"hope",using:"use",used:"use",making:"make",closing:"close",closed:"close",
+  raising:"raise",raised:"raise",dancing:"dance",danced:"dance",writing:"write",driving:"drive",
+  riding:"ride",voicing:"voice",voiced:"voice",deciding:"decide",decided:"decide",
+  freezing:"freeze",froze:"freeze",frozen:"freeze",
+  /* common irregular past-tense verbs -> base form, so lemma differs correctly from the untouched stem */
+  said:"say",took:"take",taken:"take",made:"make",came:"come",saw:"see",seen:"see",gave:"give",given:"give",
+  found:"find",told:"tell",felt:"feel",left:"leave",kept:"keep",held:"hold",heard:"hear",sat:"sit",
+  stood:"stand",began:"begin",sang:"sing",drank:"drink",brought:"bring",bought:"buy",thought:"think",
+  caught:"catch",taught:"teach",wrote:"write",drove:"drive",rode:"ride",chose:"choose",broke:"break",
+  woke:"wake",ate:"eat",fell:"fall",blew:"blow",wore:"wear",bit:"bite",hid:"hide",rose:"rise",
+  got:"get",paid:"pay",sold:"sell",sent:"send",spent:"spend",built:"build",lost:"lose",meant:"mean",
+  met:"meet",shot:"shoot",slept:"sleep",struck:"strike",swore:"swear",understood:"understand",won:"win",
+  /* contraction lemmas — same base verbs as the CONTRACTIONS map above */
+  "couldn't":"could","wouldn't":"would","shouldn't":"should","mustn't":"must","needn't":"need",
+  "isn't":"be","aren't":"be","wasn't":"be","weren't":"be","doesn't":"do","didn't":"do","don't":"do",
+  "hasn't":"have","haven't":"have","hadn't":"have","can't":"can","won't":"will"};
+const MONTHS = new Set(["january","february","march","april","may","june","july","august","september","october","november","december"]);
+const PREFIXES = {un:"not",re:"again",dis:"opposite / not",mis:"wrongly",pre:"before",non:"not",anti:"against",over:"too much",under:"too little",im:"not",in:"not",ir:"not"};
+const SUFFIXES = {tion:"action / process",sion:"action / process",ment:"result of action",ness:"state of being",able:"capable of",ible:"capable of",ful:"full of",less:"without",ing:"ongoing action",ed:"past action",est:"most",ies:"plural",es:"plural",er:"one who / more",ity:"state of",al:"relating to",ive:"tending to",ous:"full of",ly:"in a manner",s:"plural / 3rd person",y:"characterized by"};
+const POS_BIGRAM_CONF = {
+  DET_ADJ:0.55,DET_NOUN:0.93,DET_PROPN:0.35,
+  ADJ_NOUN:0.90,ADJ_ADJ:0.32,
+  NOUN_VERB:0.86,PROPN_VERB:0.88,PRON_VERB:0.91,NOUN_NOUN:0.38,NOUN_PREP:0.52,NOUN_CONJ:0.30,
+  VERB_DET:0.80,VERB_NOUN:0.48,VERB_PROPN:0.55,VERB_PREP:0.60,VERB_ADV:0.42,VERB_VERB:0.28,VERB_PRON:0.5,
+  PREP_DET:0.88,PREP_PROPN:0.52,PREP_NOUN:0.58,PREP_PRON:0.4,
+  ADV_VERB:0.70,CONJ_PRON:0.6,CONJ_NOUN:0.5,CONJ_DET:0.55,
+  default:0.42
+};
+
+/* ---------- Stage 1: Tokenization ---------- */
+function splitSentences(text){
+  const raw = text.match(/[^.!?]+[.!?]+(\s+|$)|[^.!?]+$/g) || [text];
+  return raw.map(s=>s.trim()).filter(Boolean);
+}
+function naiveSplit(text){ return text.split(" ").filter(Boolean); }
+function smartWordTokenize(text){
+  const re = /[A-Za-z]+(?:['’][A-Za-z]+)*|[0-9]+(?:\.[0-9]+)?|[.,!?;:'"()]/g;
+  return text.match(re) || [];
+}
+
+/* words that happen to end in "-ing" but are ordinary nouns, not present-participle verbs —
+   without this, "spring" (the season) gets chopped into "spr"+"ing" */
+const NOUN_ING_EXCEPTIONS = ["spring","king","thing","ring","wing","string","building","ceiling",
+  "clothing","morning","evening","nothing","something","anything","darling","sibling","herring"];
+
+/* ---------- Stage 2: Lexical ---------- */
+function simpleStem(word){
+  let w = word.toLowerCase();
+  if (CONTRACTIONS[w]) return CONTRACTIONS[w]; // "couldn't" -> "could", not a chopped noun
+  if (NOUN_ING_EXCEPTIONS.includes(w)) return w;
+  if (w.length<=3) return w;
+  if (w.endsWith("ies") && w.length>4) return w.slice(0,-3)+"y";                 // studies -> study
+  if (w.endsWith("ing") && w.length>5) return w.slice(0,-3);                     // training -> train (crude, may need +e elsewhere)
+  if (w.endsWith("ed") && w.length>4) return w.slice(0,-2);                      // trained -> train
+  if (/(?:s|x|z|ch|sh)es$/.test(w) && w.length>4) return w.slice(0,-2);          // matches->match, boxes->box, dishes->dish
+  if (w.endsWith("es") && w.length>4) return w.slice(0,-1);                      // athletes->athlete, drones->drone (keep the silent "e")
+  if (w.endsWith("s") && !w.endsWith("ss") && w.length>3) return w.slice(0,-1);  // stadiums -> stadium
+  return w;
+}
+function lemmatize(word){
+  const w = word.toLowerCase();
+  if (CONTRACTIONS[w]) return CONTRACTIONS[w];
+  if (LEMMA_DICT[w]) return LEMMA_DICT[w];
+  return simpleStem(w);
+}
+function morphology(word){
+  let w = word.toLowerCase();
+  if (FUNC_POS[w] || PRONOUNS_ALL.includes(w)){
+    return [{m:w,mean:"closed-class function word — a small fixed set (pronouns, prepositions, etc.), not built from meaningful pieces",type:"root"}];
+  }
+  if (CONTRACTIONS[w]){
+    const base = CONTRACTIONS[w];
+    if (w.endsWith("n't")) return [{m:base,mean:"carries the core meaning",type:"root"},{m:"n't",mean:"negation — contraction of 'not'",type:"suffix"}];
+    return [{m:base,mean:"carries the core meaning",type:"root"},{m:w.slice(w.indexOf("'")),mean:"contracted auxiliary verb",type:"suffix"}];
+  }
+  if (NOUN_ING_EXCEPTIONS.includes(w)) return [{m:w,mean:"a whole root — the '-ing' here is part of the word itself, not a verb suffix",type:"root"}];
+  if (w.length<4) return [{m:w,mean:"whole word — too short to split further",type:"root"}];
+  let prefix=null, root=w, suffix=null;
+  for (const p in PREFIXES){
+    if (w.startsWith(p) && w.length-p.length>=3){ prefix=p; root=w.slice(p.length); break; }
+  }
+  const suffixKeys = Object.keys(SUFFIXES).sort((a,b)=>b.length-a.length);
+  for (const sfx of suffixKeys){
+    if (root.length-sfx.length>=2 && root.endsWith(sfx)){ suffix=sfx; root=root.slice(0,root.length-sfx.length); break; }
+  }
+  const out=[];
+  if (prefix) out.push({m:prefix,mean:PREFIXES[prefix],type:"prefix"});
+  out.push({m:root||w,mean:"carries the core meaning",type:"root"});
+  if (suffix) out.push({m:suffix,mean:SUFFIXES[suffix],type:"suffix"});
+  return out;
+}
+const ADJ_WORDS = ["new","young","old","bright","faulty","fresh","high","low","small","large","big","hot","cold","warm","easy","hard","good","bad","happy","sad","tired","excited","careless","useful","wonderful","exhausting","championship","national","late","straight"];
+const IRREGULAR_VERBS = ["flew","grew","threw","drew","knew","swung","rang","drained","smiling","couldn",
+  "said","took","taken","made","came","saw","seen","gave","given","found","told","felt","left","kept","held",
+  "heard","sat","stood","began","sang","drank","brought","bought","thought","caught","taught","wrote","drove",
+  "rode","chose","broke","woke","ate","fell","blew","wore","bit","hid","rose","got","paid","sold","sent",
+  "spent","built","lost","meant","met","shot","slept","struck","swore","understood","won"];
+/* common base-form (infinitive/present tense) verbs — without these, a bare verb like "stop" or "resist"
+   defaults to NOUN, which is wrong and cascades into wrong stem/lemma/morphology downstream */
+const VERB_WORDS = ["stop","resist","close","open","swim","eat","drink","sleep",
+  "talk","try","need","want","like","love","hate","seem",
+  "become","bring","tell","ask","move","turn","watch",
+  "listen","wait","arrive","leave","enter","exit","laugh","cry","jump"];
+function posTagSentence(tokens){
+  return tokens.map((tok,i)=>{
+    const w = tok.toLowerCase();
+    if (/^[.,!?;:'"()]$/.test(tok)) return {tok,pos:"PUNCT"};
+    if (/^\d+(\.\d+)?$/.test(tok)) return {tok,pos:"NUM"};
+    if (CONTRACTIONS[w]) return {tok,pos:"VERB"};            // couldn't, isn't, it's, ... — always a verb form
+    if (FUNC_POS[w]) return {tok,pos:FUNC_POS[w]};
+    if (ADJ_WORDS.includes(w)) return {tok,pos:"ADJ"};
+    if (IRREGULAR_VERBS.includes(w)) return {tok,pos:"VERB"};
+    if (VERB_WORDS.includes(w)) return {tok,pos:"VERB"};
+    if (/^[A-Z]/.test(tok) && i>0) return {tok,pos:"PROPN"};
+    if (w.endsWith("ly")) return {tok,pos:"ADV"};
+    if (NOUN_ING_EXCEPTIONS.includes(w)) return {tok,pos:"NOUN"};
+    if (w.endsWith("ing") || w.endsWith("ed")) return {tok,pos:"VERB"};
+    if (w.endsWith("ous") || w.endsWith("ful") || w.endsWith("ive") || w.endsWith("al")) return {tok,pos:"ADJ"};
+    return {tok,pos:"NOUN"};
+  });
+}
+
+/* ---------- Stage 3: Syntactic — shared chunker ---------- */
+function chunkTagged(tagged){
+  const chunks=[]; let i=0;
+  const isNounish = p=>["DET","ADJ","NOUN","PROPN","PRON","NUM"].includes(p);
+  while(i<tagged.length){
+    const t=tagged[i];
+    if (t.pos==="PUNCT"){ i++; continue; }
+    if (isNounish(t.pos)){
+      const toks=[]; while(i<tagged.length && isNounish(tagged[i].pos)){ toks.push(tagged[i]); i++; }
+      chunks.push({type:"NP",toks});
+    } else if (t.pos==="PREP"){
+      const prep=t; i++; const toks=[];
+      while(i<tagged.length && isNounish(tagged[i].pos)){ toks.push(tagged[i]); i++; }
+      chunks.push({type:"PP",prep,toks});
+    } else if (t.pos==="VERB"){
+      chunks.push({type:"V",tok:t}); i++;
+    } else if (t.pos==="ADV"){
+      chunks.push({type:"ADV",tok:t}); i++;
+    } else { chunks.push({type:"X",tok:t}); i++; }
+  }
+  return chunks;
+}
+function wordsOf(chunk){
+  if (chunk.type==="NP") return chunk.toks.map(t=>t.tok);
+  if (chunk.type==="PP") return [chunk.prep.tok,...chunk.toks.map(t=>t.tok)];
+  if (chunk.type==="V"||chunk.type==="ADV"||chunk.type==="X") return [chunk.tok.tok];
+  return [];
+}
+
+/* 3a. Constituency parsing */
+function renderConstituency(tagged){
+  const chunks = chunkTagged(tagged);
+  const npIdx = chunks.findIndex(c=>c.type==="NP");
+  const vIdx = chunks.findIndex(c=>c.type==="V");
+  let html = `<div class="tree-box S"><span class="tree-label">S — sentence</span><div class="tree-row">`;
+  if (npIdx>-1){
+    html += `<div class="tree-box NP"><span class="tree-label">NP subject</span><span class="tree-words">${chunks[npIdx].toks.map(t=>t.tok).join(" ")}</span></div>`;
+  }
+  if (vIdx>-1){
+    html += `<div class="tree-box VP"><span class="tree-label">VP predicate</span><div class="tree-row"><span class="tree-words">${chunks[vIdx].tok.tok}</span>`;
+    chunks.slice(vIdx+1).forEach(c=>{
+      if (c.type==="NP") html += `<div class="tree-box NP"><span class="tree-label">NP object</span><span class="tree-words">${c.toks.map(t=>t.tok).join(" ")}</span></div>`;
+      if (c.type==="PP") html += `<div class="tree-box PP"><span class="tree-label">PP</span><span class="tree-words">${c.prep.tok} ${c.toks.map(t=>t.tok).join(" ")}</span></div>`;
+      if (c.type==="ADV") html += `<span class="tree-words" style="margin-left:6px;">${c.tok.tok}</span>`;
+    });
+    html += `</div></div>`;
+  }
+  html += `</div></div>`;
+  return html;
+}
+
+/* 3b. Dependency parsing */
+function renderDependency(tagged){
+  const clean = tagged.filter(t=>t.pos!=="PUNCT");
+  const vIdx = clean.findIndex(t=>t.pos==="VERB");
+  const rows=[];
+  if (vIdx===-1){ return `<p class="empty-note">No verb anchor found — dependency parsing needs a predicate to hang everything on.</p>`; }
+  const verb = clean[vIdx];
+  rows.push({word:verb.tok, rel:"ROOT", head:"—"});
+  // subject side
+  let subjIdx=-1;
+  for(let i=vIdx-1;i>=0;i--){ if(["NOUN","PROPN","PRON"].includes(clean[i].pos)){ subjIdx=i; break; } }
+  if (subjIdx>-1){
+    rows.push({word:clean[subjIdx].tok, rel:"nsubj", head:verb.tok});
+    for(let i=0;i<subjIdx;i++){
+      if (clean[i].pos==="DET") rows.push({word:clean[i].tok, rel:"det", head:clean[subjIdx].tok});
+      if (clean[i].pos==="ADJ") rows.push({word:clean[i].tok, rel:"amod", head:clean[subjIdx].tok});
+    }
+  }
+  // object / PP side
+  let lastNounHead = verb.tok;
+  for(let i=vIdx+1;i<clean.length;i++){
+    const t = clean[i];
+    if (t.pos==="NOUN"||t.pos==="PROPN"){
+      const rel = (i===vIdx+1 || clean[i-1].pos==="DET" || clean[i-1].pos==="ADJ") && !rows.find(r=>r.rel==="dobj") ? "dobj":"conj";
+      rows.push({word:t.tok, rel: rel==="dobj"?"dobj":"nmod", head: rel==="dobj"?verb.tok:lastNounHead});
+      lastNounHead = t.tok;
+    } else if (t.pos==="DET"){
+      const next = clean.slice(i+1).find(x=>["NOUN","PROPN"].includes(x.pos));
+      rows.push({word:t.tok, rel:"det", head: next?next.tok:verb.tok});
+    } else if (t.pos==="ADJ"){
+      const next = clean.slice(i+1).find(x=>["NOUN","PROPN"].includes(x.pos));
+      rows.push({word:t.tok, rel:"amod", head: next?next.tok:verb.tok});
+    } else if (t.pos==="PREP"){
+      rows.push({word:t.tok, rel:"prep", head:verb.tok});
+      const next = clean.slice(i+1).find(x=>["NOUN","PROPN"].includes(x.pos));
+      if (next) rows.push({word:next.tok, rel:"pobj", head:t.tok});
+    } else if (t.pos==="ADV"){
+      rows.push({word:t.tok, rel:"advmod", head:verb.tok});
+    }
+  }
+  const seen=new Set();
+  const uniq = rows.filter(r=>{ const k=r.word+r.rel+r.head; if(seen.has(k)) return false; seen.add(k); return true; });
+  return `<div>${uniq.map(r=>`<div class="dep-row"><span class="dep-word">${r.word}</span><span class="dep-rel">${r.rel}</span><span class="dep-arrow">→</span><span class="dep-head">${r.head}</span></div>`).join("")}</div>`;
+}
+
+/* 3c. Rule-based CFG parser */
+function renderCFG(tagged){
+  const chunks = chunkTagged(tagged);
+  const trace=[]; let ok=true;
+  chunks.forEach(c=>{
+    if (c.type==="NP"){
+      const seq = c.toks.map(t=>t.pos).join(" ");
+      trace.push(`<b>NP → ${seq}</b> matches <span class="rule-code">"${c.toks.map(t=>t.tok).join(" ")}"</span>`);
+    } else if (c.type==="PP"){
+      trace.push(`<b>PP → PREP NP</b> matches <span class="rule-code">"${c.prep.tok} ${c.toks.map(t=>t.tok).join(" ")}"</span>`);
+    } else if (c.type==="V"){
+      trace.push(`<b>V → VERB</b> matches <span class="rule-code">"${c.tok.tok}"</span>`);
+    } else if (c.type==="X"){
+      ok=false;
+      trace.push(`⚠️ <b>No rule</b> covers <span class="rule-code">"${c.tok.tok}"</span> (${c.tok.pos}) — a real grammar would need more rules here.`);
+    }
+  });
+  const hasNP = chunks.some(c=>c.type==="NP");
+  const hasV = chunks.some(c=>c.type==="V");
+  trace.push(hasNP && hasV ? `<b>S → NP VP</b> — the chunks combine into a full sentence ✅ <b>Grammatical!</b>` : `⚠️ Could not reduce fully to <b>S → NP VP</b> with this mini grammar.`);
+  return `<ol class="rule-trace">${trace.map(t=>`<li>${t}</li>`).join("")}</ol>`;
+}
+
+/* 3d. Statistical / neural parser (simulated confidence) */
+function renderStatistical(tagged){
+  const clean = tagged.filter(t=>t.pos!=="PUNCT");
+  if (clean.length<2) return `<p class="empty-note">Too short to show bigram confidence.</p>`;
+  let rows=[]; let product=1;
+  for(let i=0;i<clean.length-1;i++){
+    const key = clean[i].pos+"_"+clean[i+1].pos;
+    const conf = POS_BIGRAM_CONF[key] ?? POS_BIGRAM_CONF.default;
+    product *= conf;
+    rows.push({pair:clean[i].tok+" → "+clean[i+1].tok, tagPair:clean[i].pos+"→"+clean[i+1].pos, conf});
+  }
+  const overall = Math.round(Math.pow(product, 1/rows.length)*100);
+  return `
+    ${rows.map(r=>`<div class="conf-row"><span class="conf-pair">${r.pair}</span><div class="conf-bar-bg"><div class="conf-bar-fill" style="width:${Math.round(r.conf*100)}%;"></div></div><span class="conf-val">${Math.round(r.conf*100)}%</span></div>`).join("")}
+    <div class="conf-total">Average structural confidence: ${overall}% — this is roughly the idea behind a trained neural parser: probabilities learned from millions of sentences, not hand-written rules.</div>
+  `;
+}
+
+/* ---------- Stage 4: Semantic ---------- */
+function runWSD(text){
+  const lower = text.toLowerCase();
+  const words = lower.match(/[a-z]+/g) || [];
+  const found = [];
+  for (const w of words){
+    if (AMBIG[w] && !found.find(f=>f.word===w)){
+      const entry = AMBIG[w];
+      let bestSense=null,bestScore=-1;
+      for (const k in entry.clues){
+        const score = entry.clues[k].filter(c=>lower.includes(c)).length;
+        if (score>bestScore){bestScore=score;bestSense=k;}
+      }
+      found.push({word:w,resolved:bestScore>0?entry.senses[bestSense]:null,options:Object.values(entry.senses)});
+    }
+  }
+  return found;
+}
+function runNER(text){
+  const ents=[];
+  const dateFull = text.match(/\b\d{1,2}\s(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4}\b/gi);
+  if (dateFull) dateFull.forEach(d=>ents.push({text:d,type:"DATE"}));
+  const money = text.match(/\$\d+(\.\d+)?|\b\d+\s?(dollars|rupees)\b/gi);
+  if (money) money.forEach(m=>ents.push({text:m,type:"MONEY"}));
+
+  const words = text.match(/[A-Za-z]+/g) || [];
+  const coveredByDateOrMoney = lw => ents.some(e=>e.text.toLowerCase().split(/\s+/).includes(lw));
+
+  let i=0;
+  while(i<words.length){
+    const w = words[i], lw = w.toLowerCase();
+    // skip: lowercase words, sentence-initial function words (e.g. "The", "They"), month names already inside a DATE
+    if (!/^[A-Z]/.test(w) || FUNC_POS[lw] || MONTHS.has(lw) || coveredByDateOrMoney(lw)){ i++; continue; }
+    // gather a run of consecutive capitalized, non-function, non-month words as ONE entity span
+    const span=[w]; let j=i+1;
+    while(j<words.length && /^[A-Z]/.test(words[j]) && !FUNC_POS[words[j].toLowerCase()] && !MONTHS.has(words[j].toLowerCase())){
+      span.push(words[j]); j++;
+    }
+    const lowSpan = span.map(s=>s.toLowerCase());
+    let type;
+    if (lowSpan.some(s=>ORG_WORDS.includes(s))) type="ORG";
+    else if (lowSpan.some(s=>LOC_WORDS.includes(s))) type="LOC";
+    else if (i===0) type="PERSON?";
+    else type="PERSON";
+    ents.push({text:span.join(" "), type});
+    i=j;
+  }
+  return ents;
+}
+function extractSRL(sentence){
+  const toks = smartWordTokenize(sentence).filter(t=>!/^[.,!?;:'"()]$/.test(t));
+  const tagged = posTagSentence(toks);
+  const chunks = chunkTagged(tagged);
+  const npIdx = chunks.findIndex(c=>c.type==="NP");
+  const vIdx = chunks.findIndex(c=>c.type==="V");
+  const who = npIdx>-1 ? chunks[npIdx].toks.map(t=>t.tok).join(" ") : "—";
+  const action = vIdx>-1 ? chunks[vIdx].tok.tok : "—";
+  let what="—", where="—";
+  chunks.slice(vIdx+1).forEach(c=>{
+    if (c.type==="NP" && what==="—") what = c.toks.map(t=>t.tok).join(" ");
+    if (c.type==="PP" && where==="—") where = c.prep.tok+" "+c.toks.map(t=>t.tok).join(" ");
+  });
+  const dates = sentence.match(/\b\d{1,2}\s(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4}\b/i);
+  const when = dates ? dates[0] : "—";
+  return {who,action,what,where,when};
+}
+
+/* ---------- Stage 5: Discourse + Pragmatics ---------- */
+function runCoref(sentences){
+  const links=[];
+  const history=[]; // {text, plural, kind: 'person'|'thing'|'org'|'place'}
+
+  sentences.forEach(sent=>{
+    const toks = smartWordTokenize(sent).filter(t=>!/^[.,!?;:'"()]$/.test(t));
+    const tagged = posTagSentence(toks);
+    let i=0;
+    while(i<tagged.length){
+      const t = tagged[i];
+      const lw = t.tok.toLowerCase();
+
+      // ---- pronoun: try to resolve against history using number + person/thing agreement ----
+      if (PRONOUNS_ALL.includes(lw)){
+        const plural = ["they","them","their","theirs"].includes(lw);
+        const isIt = ["it","its"].includes(lw);
+        let match=null;
+        if (plural){
+          for (let h=history.length-1; h>=0; h--){ if (history[h].plural){ match=history[h]; break; } }
+        } else if (isIt){
+          // prefer a concrete "thing" (object) over an org/place name — e.g. "the salmon" over "Sunset Bistro"
+          for (let h=history.length-1; h>=0; h--){ const c=history[h]; if (!c.plural && c.kind==="thing"){ match=c; break; } }
+          if (!match) for (let h=history.length-1; h>=0; h--){ const c=history[h]; if (!c.plural && c.kind!=="person"){ match=c; break; } }
+        } else {
+          for (let h=history.length-1; h>=0; h--){ const c=history[h]; if (!c.plural && c.kind==="person"){ match=c; break; } }
+        }
+        links.push({
+          pronoun:t.tok,
+          refersTo: match ? match.text : null,
+          note: match ? null : (isIt ? "no inanimate noun found nearby — likely a dummy 'it' (weather/time/situation)" : "no earlier matching noun found yet")
+        });
+        i++; continue;
+      }
+
+      // ---- candidate noun phrase: merge DET/ADJ prefix + NOUN/PROPN run, skip dates & numbers ----
+      if ((t.pos==="NOUN"||t.pos==="PROPN") && !MONTHS.has(lw) && !/^\d+$/.test(t.tok)){
+        const words=[t.tok]; let j=i+1;
+        while(j<tagged.length && (tagged[j].pos==="NOUN"||tagged[j].pos==="PROPN") && !MONTHS.has(tagged[j].tok.toLowerCase()) && !/^\d+$/.test(tagged[j].tok)){
+          words.push(tagged[j].tok); j++;
+        }
+        let k=i-1; const pre=[];
+        while(k>=0 && (tagged[k].pos==="DET"||tagged[k].pos==="ADJ")){ pre.unshift(tagged[k].tok); k--; }
+        const lastWord = words[words.length-1].toLowerCase();
+        const plural = /s$/.test(lastWord) && !["his","its","this"].includes(lastWord);
+        const isCapital = /^[A-Z]/.test(words[0]);
+        let kind = "thing";
+        if (isCapital){
+          if (words.some(w=>ORG_WORDS.includes(w.toLowerCase()))) kind="org";
+          else if (words.some(w=>LOC_WORDS.includes(w.toLowerCase()))) kind="place";
+          else kind="person";
+        }
+        history.push({text:[...pre,...words].join(" "), plural, kind});
+        i=j; continue;
+      }
+      i++;
+    }
+  });
+  return links;
+}
+function pragmaticRead(sentence){
+  const s = sentence.trim();
+  const low = s.toLowerCase();
+  if (/^(can|could|would) you\b/.test(low)) return {literal:"A yes/no question about ability.", actual:"An indirect REQUEST — they want the action done, not a 'yes'."};
+  if (/(cold|hot|freezing|warm)\s+in\s+here/.test(low) || /it'?s (cold|hot|freezing|warm)/.test(low)) return {literal:"A statement describing the room's temperature.", actual:"A polite nudge to DO something about it — close a window, turn on the heater/AC."};
+  if (/^(i'?m still waiting|still waiting)/.test(low)) return {literal:"A statement that something hasn't arrived yet.", actual:"A polite request to hurry it up."};
+  if (s.endsWith("!") && /(wonderful|amazing|great|fantastic)/.test(low)) return {literal:"The speaker is delighted about something.", actual:"Could be genuine — OR sarcasm if the context was actually bad. Tone/world knowledge decides, and that's exactly where machines still struggle."};
+  if (low.endsWith("?")) return {literal:"A direct information question.", actual:"Mostly matches the literal meaning — a straightforward question."};
+  return {literal:"A plain statement of fact or event.", actual:"Literal and intended meaning line up — no hidden request detected."};
+}
+
+/* ============================= STAGE CONTENT ============================= */
+const STAGES = [
+  {
+    id:"tok", num:1, color:"var(--sky-deep)", bg:"var(--sky)", name:"Tokenization",
+    kicker:"Stage 1 · Preprocessing",
+    def:"Splits raw text into meaningful units — tokens — typically words, numbers or punctuation marks, and (at sentence level) splits text into individual sentences.",
+    why:["Every later stage depends on this. Garbage tokens in, garbage meaning out.",
+         "Sounds trivial (\"just split on spaces!\") until you meet Dr. Patel, couldn't, and drone-strike.",
+         "Chinese/Japanese text has no spaces at all — tokenization there needs a dictionary, not a rulebook."],
+    tricky:["\"Dr. Patel arrived at 9 a.m. sharp.\" — which periods end a sentence?",
+            "\"couldn't\", \"it's\", \"co-pilot\" — does the apostrophe/hyphen split the word or not?",
+            "\"drone strike\" vs \"self-driving\" — one word, two, or hyphenated-one?"],
+    code:`import nltk
+from nltk.tokenize import sent_tokenize, word_tokenize
+nltk.download('punkt')
+
+text = "Coach Mehta trained the athletes. They couldn't stop smiling!"
+
+sentences = sent_tokenize(text)
+words = word_tokenize(text)
+
+print(sentences)
+# ["Coach Mehta trained the athletes.", "They couldn't stop smiling!"]
+print(words)
+# ['Coach','Mehta','trained','the','athletes','.','They','could',"n't",'stop','smiling','!']`,
+    demos:[{key:"main", title:"Tokenizing your whole text"}]
+  },
+  {
+    id:"lex", num:2, color:"var(--mint-deep)", bg:"var(--mint)", name:"Lexical Analysis",
+    kicker:"Stage 2 · Word-level meaning",
+    def:"Examines EVERY individual word to determine its base form and grammatical role — four separate lenses on the same token: stemming, lemmatization, POS tagging and morphology.",
+    why:["Without this, \"trained\" and \"train\" look like two unrelated strings to a machine.",
+         "POS context matters: \"drone\" is a NOUN in \"the drone flew\" but could be a VERB in \"bees drone on\".",
+         "Morphology is what lets a model guess the meaning of a word it has never seen — \"unflyable\" = not + fly + capable-of, even without a dictionary entry."],
+    code:`from nltk.stem import PorterStemmer, WordNetLemmatizer
+from nltk import pos_tag, word_tokenize
+import spacy
+
+stemmer = PorterStemmer()
+lemmatizer = WordNetLemmatizer()
+
+word = "trained"
+print(stemmer.stem(word))         # 'train'   (crude rule chopping)
+print(lemmatizer.lemmatize(word, pos='v'))  # 'train'  (dictionary-checked root)
+
+tokens = word_tokenize("The engineer tested the new drone")
+print(pos_tag(tokens))
+# [('The','DT'), ('engineer','NN'), ('tested','VBD'), ('the','DT'), ('new','JJ'), ('drone','NN')]
+
+# Morphology via spaCy's morphological features
+nlp = spacy.load("en_core_web_sm")
+doc = nlp("She tested unflyable drones")
+for tok in doc:
+    print(tok.text, tok.morph)   # e.g. tested -> Tense=Past|VerbForm=Fin`,
+    demos:[{key:"main", title:"Every token, four ways"}]
+  },
+  {
+    id:"syn", num:3, color:"var(--sun-deep)", bg:"var(--sun)", name:"Syntactic Analysis",
+    kicker:"Stage 3 · Parsing — 4 competing algorithms",
+    def:"Examines how words combine according to grammar rules. There isn't one way to do this — here are the four classic approaches, run side by side on your own text.",
+    why:["Classic PP-attachment trap: \"The engineer tested the drone with a faulty sensor.\" Did the sensor test it, or was the drone faulty? Same words, two valid trees.",
+         "Rule-based parsers are precise but brittle — they only know what you hand-wrote. Statistical/neural parsers generalize, but only ever give you a probability, never a certainty.",
+         "Constituency answers \"which words group into a phrase?\"; dependency answers \"which word controls which?\" — different questions, same sentence."],
+    code:`# 1) Constituency parsing — nltk.RegexpParser (rule-based chunker)
+import nltk
+grammar = r"""
+  NP: {<DT>?<JJ>*<NN.*>+}
+  PP: {<IN><NP>}
+  VP: {<VB.*><NP>?<PP>?}
+"""
+cp = nltk.RegexpParser(grammar)
+tagged = nltk.pos_tag(nltk.word_tokenize("The engineer tested the new drone"))
+print(cp.parse(tagged))
+# (S (NP The/DT engineer/NN) tested/VBD (NP the/DT new/JJ drone/NN))
+
+# 2) Dependency parsing — spaCy (statistical, trained on treebanks)
+import spacy
+nlp = spacy.load("en_core_web_sm")
+doc = nlp("The engineer tested the new drone")
+for t in doc:
+    print(t.text, "-->", t.dep_, "-->", t.head.text)
+
+# 3) Rule-based CFG parser — nltk.ChartParser with hand-written grammar
+grammar2 = nltk.CFG.fromstring("""
+  S -> NP VP
+  NP -> Det N | Det Adj N
+  VP -> V NP
+  Det -> 'the' | 'a'
+  N -> 'engineer' | 'drone'
+  Adj -> 'new'
+  V -> 'tested'
+""")
+parser = nltk.ChartParser(grammar2)
+for tree in parser.parse(['the','engineer','tested','the','new','drone']):
+    print(tree)
+
+# 4) Statistical / neural parser — Berkeley Neural Parser (constituency) via benepar
+import benepar
+nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+doc = nlp("The engineer tested the new drone")
+print(list(doc.sents)[0]._.parse_string)`,
+    demos:[{key:"algo", title:"Pick an algorithm, watch it parse your text"}]
+  },
+  {
+    id:"sem", num:4, color:"var(--peach-deep)", bg:"var(--peach)", name:"Semantic Analysis",
+    kicker:"Stage 4 · Three jobs, one goal: real-world meaning",
+    def:"Extracts the literal meaning of a sentence via three distinct sub-tasks — Word Sense Disambiguation, Named Entity Recognition, and Semantic Role Labeling.",
+    why:["\"The championship match drained everyone\" vs \"He struck a match\" — same word, opposite worlds. WSD is what tells them apart.",
+         "NER is why your calendar app knows \"3 June 2026\" is a date and \"National Stadium\" is a place, not just capitalised noise.",
+         "SRL answers Who? Did what? To whom? Where? When? — the backbone of every question-answering system."],
+    code:`import spacy
+nlp = spacy.load("en_core_web_sm")
+
+# 2) Named Entity Recognition
+doc = nlp("Coach Mehta trained the athletes at the National Stadium on 3 June 2026.")
+for ent in doc.ents:
+    print(ent.text, ent.label_)
+# Mehta            PERSON
+# National Stadium FAC
+# 3 June 2026      DATE
+
+# 1) Word Sense Disambiguation
+from nltk.wsd import lesk
+from nltk.tokenize import word_tokenize
+sense = lesk(word_tokenize("the championship match drained everyone"), "match")
+print(sense.definition())
+
+# 3) Semantic Role Labeling — AllenNLP's SRL model
+from allennlp.predictors.predictor import Predictor
+predictor = Predictor.from_path(
+  "https://storage.googleapis.com/allennlp-public-models/structured-prediction-srl-bert.2020.12.15.tar.gz")
+result = predictor.predict(sentence="Coach Mehta trained the athletes at the stadium.")
+print(result['verbs'][0]['description'])
+# [ARG0: Coach Mehta] [V: trained] [ARG1: the athletes] [ARGM-LOC: at the stadium]`,
+    demos:[{key:"wsd", title:"Word Sense Disambiguation"},{key:"ner", title:"Named Entity Recognition"},{key:"srl", title:"Semantic Role Labeling"}]
+  },
+  {
+    id:"prag", num:5, color:"var(--pink-deep)", bg:"var(--pink)", name:"Discourse & Pragmatic Analysis",
+    kicker:"Stage 5 · Reading between (and across) the lines",
+    def:"Two different jobs that both go beyond the single sentence: Discourse Integration links meaning ACROSS sentences (coreference, event order); Pragmatic Analysis figures out what the speaker actually INTENDS, beyond the literal words.",
+    why:["Discourse: \"Coach Mehta trained the athletes. They couldn't stop smiling.\" — without discourse integration, \"They\" is meaningless.",
+         "Pragmatics: \"It's freezing in the studio\" is literally a weather report, but functionally a request to shut the door.",
+         "Sarcasm and tone still humble state-of-the-art models — they need social context, not just grammar."],
+    code:`# Discourse Integration — coreference across sentences
+import spacy, coreferee
+nlp = spacy.load("en_core_web_sm")
+nlp.add_pipe("coreferee")
+doc = nlp("Coach Mehta trained the athletes. They couldn't stop smiling.")
+doc._.coref_chains.print()
+# They --> the athletes   (chain resolved across sentence boundary)
+
+# Pragmatic Analysis — speech-act heuristic (rule-based; LLMs now do this more robustly)
+def pragmatic_intent(sentence):
+    s = sentence.lower()
+    if s.startswith(("can you", "could you", "would you")):
+        return "indirect request"
+    if "cold in" in s or "hot in" in s:
+        return "implied request for action"
+    return "literal statement"
+
+print(pragmatic_intent("Could you close the door?"))  # indirect request`,
+    demos:[{key:"discourse", title:"5a · Discourse Integration"},{key:"pragmatics", title:"5b · Pragmatic Analysis"}]
+  },
+];
+
+/* ============================= RENDER STAGE SHELL ============================= */
+const stagesEl = document.getElementById("stages");
+const pipeNav = document.getElementById("pipeNav");
+
+STAGES.forEach(s=>{
+  const navBtn = document.createElement("button");
+  navBtn.className="pnav-btn";
+  navBtn.textContent = s.num+". "+s.name;
+  navBtn.onclick = ()=>document.getElementById(s.id).scrollIntoView({behavior:"smooth",block:"start"});
+  pipeNav.appendChild(navBtn);
+
+  const sec = document.createElement("section");
+  sec.className="stage reveal";
+  sec.id = s.id;
+
+  const demosHtml = s.demos.map(d=>`
+    <div class="subdemo" id="wrap-${s.id}-${d.key}">
+      <div class="subdemo-title"><span class="num">${s.demos.indexOf(d)+1}</span>${d.title}</div>
+      <div id="demoBody-${s.id}-${d.key}"><p class="empty-note">Hit "Run the pipeline" up top to see this light up.</p></div>
+    </div>`).join("");
+
+  sec.innerHTML = `
+    <div class="stage-head">
+      <div class="stage-num" style="background:${s.bg};">${s.num}</div>
+      <div><div class="stage-kicker">${s.kicker}</div><h2>${s.name}</h2></div>
+    </div>
+    <div class="card def-card"><h4>Definition</h4><p>${s.def}</p></div>
+    <div class="grid-2">
+      <div class="card why-card"><h4>Why this stage is critical</h4><ul>${s.why.map(w=>`<li>${w}</li>`).join("")}</ul></div>
+      ${s.tricky ? `<div class="card"><h4>Tricky real-world cases</h4><ul class="tag-list">${s.tricky.map(t=>`<li>${t}</li>`).join("")}</ul></div>` : `<div class="card"><h4>Golden rule</h4><p>${s.name} always leans on the stage before it — clean input in, clean output out.</p></div>`}
+    </div>
+    <div class="demo" id="demo-${s.id}"><h4>Live demo — powered by your ENTIRE text above</h4>${demosHtml}</div>
+    <button class="code-toggle" data-target="code-${s.id}">🐍 See the real Python implementation</button>
+    <pre class="codebox" id="code-${s.id}"><button class="copy-btn">copy</button><code></code></pre>
+  `;
+  stagesEl.appendChild(sec);
+  sec.querySelector(`#code-${s.id} code`).textContent = s.code;
+});
+
+/* sample chips — fresh examples, not from the slide deck */
+const SAMPLES = [
+  "Coach Mehta trained the young athletes at the National Stadium on 3 June 2026. They couldn't stop smiling — the spring in their step said it all, even though the match had drained everyone.",
+  "Chef Elena grilled the salmon at Sunset Bistro on 2 March 2026. She couldn't resist tasting it early.",
+  "Could you close the door? It's freezing in the studio.",
+  "The engineer tested the new drone before the storm arrived. It flew perfectly.",
+  "He swung the bat hard, but the ball flew straight into the bright spring sky."
+];
+const chipsRow = document.getElementById("sampleChips");
+SAMPLES.forEach(t=>{
+  const c = document.createElement("span");
+  c.className="sample-chip";
+  c.textContent = t.length>46? t.slice(0,46)+"…" : t;
+  c.onclick = ()=>{ document.getElementById("inputText").value = t; };
+  chipsRow.appendChild(c);
+});
+document.getElementById("inputText").value = SAMPLES[0];
+
+/* code toggles + copy */
+document.addEventListener("click",e=>{
+  if (e.target.classList.contains("code-toggle")){
+    document.getElementById(e.target.dataset.target).classList.toggle("open");
+  }
+  if (e.target.classList.contains("copy-btn")){
+    const code = e.target.nextElementSibling.textContent;
+    navigator.clipboard.writeText(code).then(()=>{
+      e.target.textContent="copied!"; setTimeout(()=>e.target.textContent="copy",1200);
+    });
+  }
+  if (e.target.classList.contains("algo-tab")){
+    const group = e.target.closest(".subdemo");
+    group.querySelectorAll(".algo-tab").forEach(b=>b.classList.remove("on"));
+    e.target.classList.add("on");
+    renderSynStage(document.getElementById("inputText").value.trim(), e.target.dataset.algo);
+  }
+});
+
+/* pipeline nav highlight on scroll */
+const navBtns = [...pipeNav.children];
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if (en.isIntersecting){
+      const idx = STAGES.findIndex(s=>s.id===en.target.id);
+      navBtns.forEach(b=>b.classList.remove("on"));
+      if (navBtns[idx]) navBtns[idx].classList.add("on");
+    }
+  });
+},{rootMargin:"-40% 0px -50% 0px"});
+STAGES.forEach(s=>observer.observe(document.getElementById(s.id)));
+
+const revealObs = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); revealObs.unobserve(en.target);} });
+},{threshold:.12});
+document.querySelectorAll(".reveal").forEach(el=>revealObs.observe(el));
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+/* ============================= STAGE RENDERERS (process ENTIRE text) ============================= */
+function renderTokStage(text){
+  const sentences = splitSentences(text);
+  const naive = naiveSplit(text);
+  const smart = smartWordTokenize(text);
+  const body = document.getElementById("demoBody-tok-main");
+  body.innerHTML = `
+    <p style="margin-bottom:10px;"><b>${sentences.length}</b> sentence(s) detected across your whole text, <b>${smart.length}</b> smart tokens vs <b>${naive.length}</b> naive tokens.</p>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;">Naive split(" ") — punctuation stays glued on:</p>
+    <div class="tokens" style="margin-bottom:14px;">${naive.map((t,i)=>`<span class="tok" style="animation-delay:${i*15}ms">${escapeHtml(t)}</span>`).join("")}</div>
+    <p style="font-size:12.5px;color:var(--ink-soft);margin-bottom:6px;">Smart tokenizer — punctuation peeled off, sentence-aware:</p>
+    <div class="tokens">${smart.map((t,i)=>`<span class="tok ${/^[.,!?;:'"()]$/.test(t)?'punct':''}" style="animation-delay:${i*15}ms">${escapeHtml(t)}</span>`).join("")}</div>
+  `;
+}
+
+function renderLexStage(text){
+  const sentences = splitSentences(text);
+  const body = document.getElementById("demoBody-lex-main");
+  let rows = "";
+  sentences.forEach((sent,si)=>{
+    const toks = smartWordTokenize(sent).filter(t=>!/^[.,!?;:'"()]$/.test(t));
+    const tagged = posTagSentence(toks);
+    rows += `<tr><td colspan="5" style="background:var(--bg);font-weight:700;font-size:12px;color:var(--accent-deep);">Sentence ${si+1}: "${escapeHtml(sent)}"</td></tr>`;
+    tagged.forEach(t=>{
+      const morphs = morphology(t.tok);
+      const morphHtml = morphs.map(m=>`<span class="morph-piece ${m.type}" title="${escapeHtml(m.mean)}">${escapeHtml(m.m)}</span>`).join('<span class="morph-plus">+</span>');
+      rows += `<tr>
+        <td><b>${escapeHtml(t.tok)}</b></td>
+        <td><span class="pill ${t.pos}">${t.pos}</span></td>
+        <td>${escapeHtml(simpleStem(t.tok))}</td>
+        <td>${escapeHtml(lemmatize(t.tok))}</td>
+        <td><div class="morph-chain">${morphHtml}</div></td>
+      </tr>`;
+    });
+  });
+  body.innerHTML = `
+    <p style="margin-bottom:10px;font-size:13px;color:var(--ink-soft);">Every word in your text, broken down 4 ways (heuristic teaching tagger — a trained model backs the Python tab):</p>
+    <div style="overflow-x:auto;"><table class="demo-table">
+      <tr><th>Token</th><th>① POS tag</th><th>② Stem</th><th>③ Lemma</th><th>④ Morphology</th></tr>
+      ${rows}
+    </table></div>
+  `;
+}
+
+function renderSynStage(text, algo){
+  algo = algo || "constituency";
+  const wrap = document.getElementById("wrap-syn-algo");
+  if (!wrap.querySelector(".algo-tabs")){
+    const bar = document.createElement("div");
+    bar.className="algo-tabs";
+    bar.innerHTML = `
+      <button class="algo-tab on" data-algo="constituency">🌳 Constituency</button>
+      <button class="algo-tab" data-algo="dependency">🔗 Dependency</button>
+      <button class="algo-tab" data-algo="cfg">📏 Rule-based CFG</button>
+      <button class="algo-tab" data-algo="statistical">📊 Statistical / Neural</button>
+    `;
+    wrap.querySelector(".subdemo-title").after(bar);
+  }
+  const notes = {
+    constituency:"Groups words into nested phrases (NP / VP / PP) — the classic bracket-tree view.",
+    dependency:"Links every word directly to the word it grammatically depends on — no phrase brackets, just arrows.",
+    cfg:"Follows explicit, hand-written grammar rules step by step. Precise, but brittle outside its rule set.",
+    statistical:"Learns structure probabilities from huge annotated treebanks — no hard rules, just confidence."
+  };
+  const body = document.getElementById("demoBody-syn-algo");
+  const sentences = splitSentences(text);
+  let html = `<div class="algo-note">${notes[algo]}</div>`;
+  sentences.forEach((sent,si)=>{
+    const toks = smartWordTokenize(sent).filter(t=>!/^[.,!?;:'"()]$/.test(t));
+    const tagged = posTagSentence(toks);
+    let inner="";
+    if (algo==="constituency") inner = renderConstituency(tagged);
+    else if (algo==="dependency") inner = renderDependency(tagged);
+    else if (algo==="cfg") inner = renderCFG(tagged);
+    else inner = renderStatistical(tagged);
+    html += `<div class="sent-block"><div class="sent-label">Sentence ${si+1}</div><div class="sent-quote">"${escapeHtml(sent)}"</div>${inner}</div>`;
+  });
+  body.innerHTML = html;
+}
+
+function renderSemStage(text){
+  const sentences = splitSentences(text);
+
+  const wsd = runWSD(text);
+  const wsdBody = document.getElementById("demoBody-sem-wsd");
+  wsdBody.innerHTML = wsd.length ? wsd.map(w=>`<div style="margin-bottom:8px;"><span class="badge" style="background:var(--lavender);color:var(--accent-deep);">${w.word}</span> could mean: <i>${w.options.join(" / ")}</i> ${w.resolved?`→ context says <b>${w.resolved}</b> ✅`:"→ not enough context clues, staying ambiguous 🤷"}</div>`).join("") : `<p class="empty-note">No classic ambiguous words (spring/match/bank/bat/ring/drone) spotted — try a sample chip!</p>`;
+
+  const ents = runNER(text);
+  const nerBody = document.getElementById("demoBody-sem-ner");
+  nerBody.innerHTML = ents.length ? ents.map(e=>`<span class="badge ${e.type.toLowerCase().replace('?','')}">${escapeHtml(e.text)} · ${e.type}</span>`).join(" ") : `<p class="empty-note">No obvious named entities detected by this simplified tagger.</p>`;
+
+  const srlBody = document.getElementById("demoBody-sem-srl");
+  let srlHtml = "";
+  sentences.forEach((sent,si)=>{
+    const r = extractSRL(sent);
+    srlHtml += `<div class="sent-block"><div class="sent-label">Sentence ${si+1}</div><div class="sent-quote">"${escapeHtml(sent)}"</div>
+      <table class="demo-table"><tr><th>Who?</th><th>Did what?</th><th>To what?</th><th>Where?</th><th>When?</th></tr>
+      <tr><td>${escapeHtml(r.who)}</td><td>${escapeHtml(r.action)}</td><td>${escapeHtml(r.what)}</td><td>${escapeHtml(r.where)}</td><td>${escapeHtml(r.when)}</td></tr></table>
+    </div>`;
+  });
+  srlBody.innerHTML = srlHtml;
+}
+
+function renderPragStage(text){
+  const sentences = splitSentences(text);
+
+  const discBody = document.getElementById("demoBody-prag-discourse");
+  const links = runCoref(sentences);
+  const eventsHtml = sentences.map((s,i)=>`<li><span class="event-dot">${i+1}</span><div>${escapeHtml(s)}</div></li>`).join("");
+  const corefHtml = links.length ? links.map(l=> l.refersTo
+    ? `<span class="badge" style="background:var(--pink);color:#8F0B4A;">${escapeHtml(l.pronoun)} → ${escapeHtml(l.refersTo)}</span>`
+    : `<span class="badge" style="background:var(--line);color:var(--ink-soft);" title="${escapeHtml(l.note||"")}">${escapeHtml(l.pronoun)} → unresolved 🤷</span>`
+  ).join(" ") : `<p class="empty-note">No pronouns to chase down — add a "she/he/it/they" and try again.</p>`;
+  discBody.innerHTML = `
+    <p style="font-weight:700;margin-bottom:6px;font-size:13px;">Event order across the whole text</p>
+    <ul class="event-list">${eventsHtml}</ul>
+    <p style="font-weight:700;margin:14px 0 6px;font-size:13px;">Coreference — pronouns linked back to a matching earlier noun</p>
+    <div>${corefHtml}</div>
+    <p class="empty-note" style="margin-top:10px;">Logic: the algorithm scans backward through every noun phrase mentioned so far and picks the nearest one that <b>agrees</b> — "they/their" needs a plural noun, "he/she" needs a singular person, "it/its" needs a singular non-person — instead of just grabbing the closest capitalized word (which is how "3 June 2026" used to get wrongly picked as the antecedent). Real systems add full gender tracking and world knowledge on top of this.</p>
+  `;
+
+  const pragBody = document.getElementById("demoBody-prag-pragmatics");
+  let pragHtml = "";
+  sentences.forEach((s,i)=>{
+    const r = pragmaticRead(s);
+    pragHtml += `<div class="sent-block"><div class="sent-label">Sentence ${i+1}</div><div class="sent-quote">"${escapeHtml(s)}"</div>
+      <div class="prag-compare"><div class="prag-col literal"><b>Literal meaning</b>${escapeHtml(r.literal)}</div><div class="prag-col actual"><b>Speaker's likely intent</b>${escapeHtml(r.actual)}</div></div>
+    </div>`;
+  });
+  pragBody.innerHTML = pragHtml;
+}
+
+/* ============================= RUN PIPELINE ============================= */
+const gates = [...document.querySelectorAll(".gate")];
+const beltChip = document.getElementById("beltChip");
+
+function runPipeline(){
+  const text = document.getElementById("inputText").value.trim();
+  if (!text) return;
+  beltChip.textContent = text.length>40 ? text.slice(0,40)+"…" : text;
+  beltChip.classList.add("show");
+  gates.forEach(g=>g.classList.remove("active"));
+
+  const renderers = [
+    ()=>renderTokStage(text),
+    ()=>renderLexStage(text),
+    ()=>renderSynStage(text,"constituency"),
+    ()=>renderSemStage(text),
+    ()=>renderPragStage(text)
+  ];
+  const positions = gates.map(g=>g.offsetLeft + g.offsetWidth/2 - 90);
+
+  renderers.forEach((fn,i)=>{
+    setTimeout(()=>{
+      gates.forEach(g=>g.classList.remove("active"));
+      gates[i].classList.add("active");
+      beltChip.style.left = positions[i]+"px";
+      fn();
+      document.getElementById(STAGES[i].id).scrollIntoView({behavior:"smooth", block:"center"});
+    }, i*950);
+  });
+}
+document.getElementById("runBtn").addEventListener("click", runPipeline);
+window.addEventListener("load", ()=>{ setTimeout(runPipeline, 500); });
+</script>
+</body>
+</html>
 
