@@ -196,7 +196,11 @@
   .unit-card .tag{ font-size:13.5px; color:var(--muted); margin-bottom:14px;}
   .unit-topics{ font-family:var(--mono); font-size:11.5px; color:#DCD4F5; line-height:1.9;}
   .unit-hours{ margin-top:14px; font-family:var(--mono); font-size:11px; color:var(--muted);}
-  .unit-go{ margin-top:16px; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--u-accent);}
+  .unit-go{ display:inline-block; margin-top:16px; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--u-accent);}
+  .unit-links{ display:flex; flex-direction:column; gap:8px; }
+  .unit-go.secondary{ margin-top:0; color:var(--paper); display:inline-flex; align-items:center; gap:6px; }
+  .unit-go.secondary::before{ content:'✦'; font-size:10px; color:var(--u-accent); }
+  .unit-go.secondary:hover{ color:var(--u-accent); }
  
   /* ---------- BOOKS ---------- */
   .books-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px;}
@@ -358,14 +362,17 @@
  
     <div class="units-grid reveal">
  
-      <a href="unit01/Introduction/" class="unit-card" style="--u-accent:var(--lime); --u-glow:radial-gradient(circle at 90% 0%, rgba(182,255,61,.14), transparent 60%);">
+      <div class="unit-card" style="--u-accent:var(--lime); --u-glow:radial-gradient(circle at 90% 0%, rgba(182,255,61,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🚀</div><div class="unit-status live">Live now</div></div>
         <div class="unit-n">Unit 01 · 08 hrs</div>
         <h3>Introduction to NLP</h3>
         <div class="tag">Why is language difficult for a machine in the first place?</div>
         <div class="unit-topics">NLP pipeline · Language models · Applications · Ambiguity, synonyms & homonyms</div>
-        <div class="unit-go">Explore Unit 1 →</div>
-      </a>
+        <div class="unit-links">
+          <a href="unit01/Introduction/" class="unit-go">Explore Unit 1 →</a>
+          <a href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/nlp-phases/" class="unit-go secondary" target="_blank" rel="noopener">NLP Phases Demo →</a>
+        </div>
+      </div>
  
       <a href="unit2.html" class="unit-card locked" style="--u-accent:var(--cyan); --u-glow:radial-gradient(circle at 90% 0%, rgba(0,227,255,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">📝</div><div class="unit-status soon">Coming soon</div></div>
@@ -508,4 +515,3 @@
  
 </body>
 </html>
- 
