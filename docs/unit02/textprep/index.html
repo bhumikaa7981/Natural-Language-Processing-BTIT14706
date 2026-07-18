@@ -1,1 +1,1439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text Preprocessing — Bits to Sentences | NLP Unit 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFDF9;
+    --lavender:#EAE1FF;
+    --lavender-deep:#D9C8FF;
+    --pink:#FFD9EA;
+    --pink-deep:#FFB8D9;
+    --mint:#CFFBE4;
+    --mint-deep:#A9F2CE;
+    --sky:#D7EEFF;
+    --sky-deep:#B7DFFF;
+    --butter:#FFF3B0;
+    --butter-deep:#FFE585;
+    --coral:#FF6F91;
+    --coral-deep:#F0466E;
+    --violet:#7C5CFF;
+    --violet-deep:#5F3DDB;
+    --ink:#241C3B;
+    --ink-soft:#544A70;
+    --white:#FFFFFF;
+    --shadow: 0 10px 30px rgba(124,92,255,0.12);
+    --radius-lg: 28px;
+    --radius-md: 18px;
+    --radius-sm: 12px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.55;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,h4{
+    font-family:'Baloo 2',cursive;
+    margin:0 0 .4em 0;
+    line-height:1.15;
+    color:var(--ink);
+  }
+  p{margin:0 0 1em 0;}
+  code, .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:var(--violet-deep);}
+  ::selection{background:var(--butter-deep);}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:99px;font-weight:700;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--violet);color:#fff;border:none;
+    padding:13px 26px;border-radius:99px;font-family:'Baloo 2';font-weight:700;font-size:1rem;
+    cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 8px 0 var(--violet-deep);
+    text-decoration:none;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(4px);box-shadow:0 4px 0 var(--violet-deep);}
+  .btn.secondary{background:#fff;color:var(--violet-deep);box-shadow:0 8px 0 var(--lavender-deep);border:2px solid var(--lavender-deep);}
+  .btn.coral{background:var(--coral);box-shadow:0 8px 0 var(--coral-deep);}
 
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky;top:0;z-index:100;
+    background:rgba(255,253,249,.88);backdrop-filter:blur(10px);
+    border-bottom:2px solid var(--lavender);
+  }
+  .navbar{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;max-width:1180px;margin:0 auto;gap:12px;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Baloo 2';font-weight:700;font-size:1.05rem;color:var(--ink);text-decoration:none;white-space:nowrap;}
+  .brand-badge{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--coral),var(--violet));display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0;}
+  .nav-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px;}
+  .nav-scroll::-webkit-scrollbar{display:none;}
+  .nav-link{white-space:nowrap;font-size:.82rem;font-weight:600;color:var(--ink-soft);padding:8px 13px;border-radius:99px;text-decoration:none;transition:.15s;border:2px solid transparent;}
+  .nav-link:hover{background:var(--lavender);color:var(--violet-deep);}
+  .nav-link.demo-link{background:var(--coral);color:#fff;}
+  .nav-link.demo-link:hover{background:var(--coral-deep);}
+
+  /* ---------- HERO ---------- */
+  header.hero{position:relative;padding:70px 0 40px;overflow:hidden;}
+  .blob{position:absolute;border-radius:50%;filter:blur(4px);opacity:.6;z-index:0;}
+  .hero-eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--white);border:2px solid var(--lavender-deep);padding:7px 16px;border-radius:99px;font-weight:700;font-size:.78rem;color:var(--violet-deep);margin-bottom:22px;}
+  .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:50px;align-items:center;position:relative;z-index:1;}
+  .hero h1{font-size:clamp(2.4rem,5vw,3.6rem);letter-spacing:-.01em;}
+  .hero h1 span{color:var(--coral);}
+  .hero p.lede{font-size:1.15rem;color:var(--ink-soft);max-width:52ch;}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-top:26px;}
+  .prof-card{background:var(--white);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow);border:2px solid var(--lavender);display:flex;gap:14px;align-items:center;margin-top:30px;max-width:460px;}
+  .prof-avatar{width:54px;height:54px;border-radius:16px;background:linear-gradient(135deg,var(--pink),var(--sky));display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+  .prof-card small{color:var(--ink-soft);display:block;font-weight:600;}
+  .prof-card strong{font-family:'Baloo 2';font-size:1.05rem;}
+  .prof-card a{font-size:.85rem;font-weight:700;text-decoration:none;}
+
+  /* pipeline visual */
+  .pipeline-card{background:var(--white);border-radius:var(--radius-lg);box-shadow:var(--shadow);padding:26px;border:2px solid var(--lavender);}
+  .pipeline-track{display:flex;flex-direction:column;gap:10px;}
+  .pipe-step{display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:var(--radius-md);background:var(--bg);border:2px solid transparent;transition:.25s;}
+  .pipe-step .num{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2';font-weight:700;color:#fff;flex-shrink:0;}
+  .pipe-step .txt strong{display:block;font-family:'Baloo 2';font-size:.98rem;}
+  .pipe-step .txt span{font-size:.8rem;color:var(--ink-soft);}
+  .pipe-step:nth-child(1) .num{background:var(--violet);}
+  .pipe-step:nth-child(2) .num{background:var(--coral);}
+  .pipe-step:nth-child(3) .num{background:#2FA36B;}
+  .pipe-step:nth-child(4) .num{background:#E0A200;}
+  .pipe-step.active{background:var(--butter);border-color:var(--butter-deep);transform:scale(1.03);}
+  .pipe-example{margin-top:16px;padding:14px;border-radius:var(--radius-sm);background:var(--ink);color:#fff;font-family:'JetBrains Mono';font-size:.82rem;min-height:46px;display:flex;align-items:center;word-break:break-all;}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:88px 0;position:relative;}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'Baloo 2';font-weight:700;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;color:var(--violet-deep);margin-bottom:10px;}
+  .eyebrow .dot{width:9px;height:9px;border-radius:50%;background:var(--coral);}
+  section h2{font-size:clamp(1.7rem,3.4vw,2.5rem);max-width:22ch;}
+  .section-sub{color:var(--ink-soft);font-size:1.05rem;max-width:65ch;margin-bottom:40px;}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* card grids */
+  .grid{display:grid;gap:20px;}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  @media(max-width:900px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}.hero-grid{grid-template-columns:1fr;}}
+
+  .card{background:var(--white);border-radius:var(--radius-md);padding:22px;border:2px solid var(--lavender);transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--violet);}
+  .card h4{font-size:1.05rem;margin-bottom:8px;}
+  .card p{font-size:.92rem;color:var(--ink-soft);margin-bottom:0;}
+  .card .tag{display:inline-block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:3px 10px;border-radius:99px;margin-bottom:10px;}
+
+  .tag-lav{background:var(--lavender);color:var(--violet-deep);}
+  .tag-pink{background:var(--pink);color:var(--coral-deep);}
+  .tag-mint{background:var(--mint);color:#1E7B4D;}
+  .tag-sky{background:var(--sky);color:#1465A6;}
+  .tag-butter{background:var(--butter);color:#8A6A00;}
+
+  /* flip card */
+  .flip-outer{perspective:1200px;height:200px;cursor:pointer;}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d;}
+  .flip-outer.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius-md);padding:20px;border:2px solid var(--lavender-deep);display:flex;flex-direction:column;justify-content:center;}
+  .flip-front{background:var(--white);}
+  .flip-back{background:var(--violet);color:#fff;transform:rotateY(180deg);}
+  .flip-back h4{color:#fff;}
+  .flip-hint{position:absolute;bottom:10px;right:14px;font-size:.7rem;opacity:.5;font-weight:600;}
+
+  /* tabs */
+  .tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px;}
+  .tabbtn{padding:11px 20px;border-radius:99px;border:2px solid var(--lavender-deep);background:#fff;font-family:'Baloo 2';font-weight:600;font-size:.92rem;cursor:pointer;color:var(--ink-soft);transition:.15s;}
+  .tabbtn.active{background:var(--violet);border-color:var(--violet);color:#fff;}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;animation:fadein .35s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+  table{width:100%;border-collapse:collapse;background:#fff;color:var(--ink);border-radius:var(--radius-md);overflow:hidden;border:2px solid var(--lavender);}
+  th,td{padding:12px 16px;text-align:left;font-size:.9rem;border-bottom:1px solid var(--lavender);color:var(--ink);}
+  th{background:var(--lavender);font-family:'Baloo 2';font-weight:600;color:var(--violet-deep);}
+  tr:last-child td{border-bottom:none;}
+  tr:hover td{background:var(--bg);}
+
+  .callout{background:var(--butter);border:2px solid var(--butter-deep);border-radius:var(--radius-md);padding:18px 22px;font-size:.94rem;}
+  .callout.mint{background:var(--mint);border-color:var(--mint-deep);}
+  .callout.pink{background:var(--pink);border-color:var(--pink-deep);}
+  .callout.sky{background:var(--sky);border-color:var(--sky-deep);}
+  .callout strong{font-family:'Baloo 2';}
+
+  .quote{font-family:'Baloo 2';font-size:1.25rem;background:var(--ink);color:#fff;padding:26px 30px;border-radius:var(--radius-md);position:relative;}
+  .quote .who{font-family:'Inter';font-size:.8rem;opacity:.7;margin-top:10px;font-weight:600;}
+
+  /* alternating band backgrounds */
+  .band-lav{background:var(--lavender);}
+  .band-pink{background:var(--pink);}
+  .band-mint{background:var(--mint);}
+  .band-sky{background:var(--sky);}
+  .band-butter{background:var(--butter);}
+  .band-ink{background:var(--ink);color:#fff;}
+  .band-ink h2,.band-ink h3,.band-ink h4{color:#fff;}
+  .band-ink .section-sub{color:#c9c1e6;}
+
+  /* progress stepper numbered (dependencies etc – legit sequences) */
+  .stepper{display:flex;gap:10px;margin-bottom:30px;flex-wrap:wrap;}
+  .step-chip{display:flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--lavender-deep);padding:8px 14px 8px 8px;border-radius:99px;font-size:.85rem;font-weight:700;}
+  .step-chip .n{width:24px;height:24px;border-radius:50%;background:var(--violet);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;}
+
+  /* accordion */
+  .accordion-item{border:2px solid var(--lavender);border-radius:var(--radius-md);margin-bottom:12px;overflow:hidden;background:#fff;}
+  .accordion-head{padding:16px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-family:'Baloo 2';font-weight:600;}
+  .accordion-body{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 20px;}
+  .accordion-item.open .accordion-body{max-height:600px;padding-bottom:18px;}
+  .accordion-item.open .chevron{transform:rotate(180deg);}
+  .chevron{transition:.3s;}
+
+  /* puzzle reveal */
+  .puzzle{background:#fff;border:2px dashed var(--violet);border-radius:var(--radius-md);padding:20px;}
+  .puzzle .answer{margin-top:12px;padding:12px;border-radius:var(--radius-sm);background:var(--mint);display:none;}
+  .puzzle.revealed .answer{display:block;}
+  .puzzle button{margin-top:10px;}
+
+  /* worked example animation - char stream */
+  .stream{font-family:'JetBrains Mono';font-size:.95rem;background:var(--ink);color:#DCD6F7;padding:16px;border-radius:var(--radius-sm);overflow-x:auto;white-space:pre;}
+
+  /* ---------- BIG DEMO ---------- */
+  .demo-section{background:linear-gradient(180deg,var(--violet) 0%,var(--violet-deep) 100%);color:#fff;border-radius:40px;margin:0 12px;padding:60px 40px;position:relative;overflow:hidden;}
+  .demo-section h2{color:#fff;}
+  .demo-section .section-sub{color:#E4DEFF;}
+  .demo-input-wrap{background:#fff;border-radius:var(--radius-lg);padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+  #demoInput{width:100%;min-height:100px;border:2px solid var(--lavender);border-radius:var(--radius-md);padding:16px;font-family:'Inter';font-size:1rem;resize:vertical;color:var(--ink);}
+  #demoInput:focus{outline:none;border-color:var(--violet);}
+  .demo-samples{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .sample-chip{background:var(--lavender);border:none;padding:8px 14px;border-radius:99px;font-size:.78rem;font-weight:600;cursor:pointer;color:var(--violet-deep);}
+  .sample-chip:hover{background:var(--lavender-deep);}
+  .demo-run{margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .demo-output{margin-top:26px;display:none;}
+  .demo-output.show{display:block;animation:fadein .4s ease;}
+  .demo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px;}
+  @media(max-width:900px){.demo-grid{grid-template-columns:1fr;}}
+  .demo-card{background:#fff;color:var(--ink);border-radius:var(--radius-md);padding:20px;}
+  .demo-card h4{display:flex;align-items:center;gap:8px;font-size:1rem;}
+  .token-pill{display:inline-flex;align-items:center;background:var(--lavender);color:var(--violet-deep);padding:4px 10px;border-radius:8px;margin:3px 3px 0 0;font-family:'JetBrains Mono';font-size:.8rem;font-weight:600;}
+  .token-pill.punct{background:var(--pink);color:var(--coral-deep);}
+  .token-pill.num{background:var(--sky);color:#1465A6;}
+  .sent-chip{display:block;background:var(--bg);border-left:4px solid var(--violet);padding:8px 12px;margin-bottom:6px;border-radius:8px;font-size:.87rem;}
+  .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .issue-badge{background:var(--butter);color:#8A6A00;font-size:.76rem;font-weight:700;padding:6px 12px;border-radius:99px;display:flex;align-items:center;gap:6px;}
+  .compare-table td:first-child{font-family:'JetBrains Mono';font-weight:600;}
+  .stem-lemma-diff{background:var(--pink);color:var(--coral-deep);}
+  .bpe-widget{background:#fff;color:var(--ink);border-radius:var(--radius-md);padding:20px;margin-top:18px;}
+  .bpe-merge-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--lavender);font-family:'JetBrains Mono';font-size:.85rem;}
+  .bpe-merge-row:last-child{border-bottom:none;}
+  input[type=range]{accent-color:var(--coral);}
+
+  /* eliza chat */
+  .chat-box{background:#fff;color:var(--ink);border-radius:var(--radius-md);padding:18px;margin-top:18px;}
+  .chat-log{height:220px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:12px;padding-right:4px;}
+  .msg{max-width:78%;padding:9px 14px;border-radius:16px;font-size:.88rem;}
+  .msg.user{align-self:flex-end;background:var(--violet);color:#fff;border-bottom-right-radius:4px;}
+  .msg.bot{align-self:flex-start;background:var(--lavender);color:var(--ink);border-bottom-left-radius:4px;}
+  .chat-form{display:flex;gap:8px;}
+  .chat-form input{flex:1;border:2px solid var(--lavender);border-radius:99px;padding:10px 16px;font-family:'Inter';}
+  .chat-form input:focus{outline:none;border-color:var(--violet);}
+  .chat-form button{background:var(--coral);color:#fff;border:none;width:42px;height:42px;border-radius:50%;cursor:pointer;font-size:1.1rem;flex-shrink:0;}
+
+  footer{padding:60px 0 40px;text-align:center;}
+  footer .prof-card{margin:24px auto 0;justify-content:center;}
+  .scrolltop{position:fixed;bottom:22px;right:22px;background:var(--violet);color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);text-decoration:none;font-size:1.2rem;opacity:0;pointer-events:none;transition:.3s;z-index:90;}
+  .scrolltop.show{opacity:1;pointer-events:auto;}
+
+  .kbd{font-family:'JetBrains Mono';background:var(--ink);color:#fff;padding:2px 7px;border-radius:6px;font-size:.82rem;}
+  ul.tight{margin:0;padding-left:20px;}
+  ul.tight li{margin-bottom:6px;font-size:.92rem;}
+
+  .method-card .rank{font-family:'Baloo 2';font-size:1.8rem;color:var(--lavender-deep);position:absolute;top:14px;right:18px;}
+  .method-card{position:relative;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="navbar">
+    <a href="#top" class="brand"><span class="brand-badge">📝</span> Text Preprocessing</a>
+    <div class="nav-scroll" id="navScroll">
+      <a class="nav-link" href="#bigpicture">Big picture</a>
+      <a class="nav-link" href="#dependencies">4 dependencies</a>
+      <a class="nav-link" href="#regex">Regex &amp; ELIZA</a>
+      <a class="nav-link" href="#tokenization">Tokenization</a>
+      <a class="nav-link" href="#nospace">No-space languages</a>
+      <a class="nav-link" href="#bpe">BPE</a>
+      <a class="nav-link" href="#sentseg">Sentences</a>
+      <a class="nav-link" href="#beyond">Beyond English</a>
+      <a class="nav-link demo-link" href="#livedemo">🚀 Try the demo</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="blob" style="width:340px;height:340px;background:var(--pink);top:-100px;right:-80px;"></div>
+  <div class="blob" style="width:260px;height:260px;background:var(--mint);bottom:-80px;left:-60px;"></div>
+  <div class="blob" style="width:180px;height:180px;background:var(--sky);top:220px;right:40%;opacity:.4;"></div>
+  <div class="wrap hero-grid">
+    <div>
+      <div class="hero-eyebrow">✨ NLP · Unit 2 · BTIT14706</div>
+      <h1>Turning digital <span>bits</span> into words your machine actually understands</h1>
+      <p class="lede">Before a chatbot can chat or a translator can translate, raw 0s and 1s have to become characters, then words, then sentences. This is that journey — click, type, and play your way through every pillar, challenge, and "wait, that's harder than it looks" moment of text preprocessing.</p>
+      <div class="hero-ctas">
+        <a href="#livedemo" class="btn coral">🚀 Try the live demo</a>
+        <a href="#bigpicture" class="btn secondary">Start from the top ↓</a>
+      </div>
+      <div class="prof-card">
+        <div class="prof-avatar">👩‍🏫</div>
+        <div style="flex:1">
+          <strong>Prof. Bhumika Shah</strong>
+          <small>Dept. of Information Technology · Sarvajanik University</small>
+        </div>
+        <a href="https://bhumikaa7981.github.io/meet-bhumika/" target="_blank" rel="noopener">Meet your professor →</a>
+      </div>
+    </div>
+    <div class="pipeline-card">
+      <p style="font-family:'Baloo 2';font-weight:600;margin-bottom:16px;">Watch one sentence travel the whole pipeline 👇</p>
+      <div class="pipeline-track" id="heroPipeline">
+        <div class="pipe-step" data-stage="0"><div class="num">1</div><div class="txt"><strong>Bits</strong><span>Raw 0s and 1s — no meaning yet</span></div></div>
+        <div class="pipe-step" data-stage="1"><div class="num">2</div><div class="txt"><strong>Characters</strong><span>Bytes decoded via UTF‑8</span></div></div>
+        <div class="pipe-step" data-stage="2"><div class="num">3</div><div class="txt"><strong>Tokens</strong><span>Characters grouped into words</span></div></div>
+        <div class="pipe-step" data-stage="3"><div class="num">4</div><div class="txt"><strong>Sentences</strong><span>Tokens grouped into sentences</span></div></div>
+      </div>
+      <div class="pipe-example" id="pipeExample">01001110 01001100 01010000 …</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= BIG PICTURE ================= -->
+<section id="bigpicture">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>The big picture</div>
+      <h2>From digital soup to linguistic meaning</h2>
+      <p class="section-sub">Text preprocessing is everything that happens <em>above the dotted line</em> that most NLP courses skip past. Four dependencies decide what counts as "correct" here — and every later stage (grammar checking, translation, sentiment analysis, chatbots) inherits whatever mistakes get made in this pipeline.</p>
+    </div>
+
+    <div class="grid grid-4 reveal">
+      <div class="card"><span class="tag tag-lav">Stage 1</span><h4>💾 Bits</h4><p>A raw sequence of 0s and 1s in a file. Pure storage — the machine doesn't yet know these bits mean "N", "L", "P".</p></div>
+      <div class="card"><span class="tag tag-pink">Stage 2</span><h4>🔤 Characters</h4><p>Bits get mapped to graphemes via a <strong>character encoding</strong> like UTF‑8. Now we have letters.</p></div>
+      <div class="card"><span class="tag tag-mint">Stage 3</span><h4>🧩 Tokens</h4><p>Characters are grouped into words — this grouping process is called <strong>tokenization</strong>.</p></div>
+      <div class="card"><span class="tag tag-butter">Stage 4</span><h4>📄 Sentences</h4><p>Tokens are grouped into sentences — this is <strong>sentence segmentation</strong>.</p></div>
+    </div>
+
+    <div class="reveal" style="margin-top:34px;">
+      <h3 style="font-size:1.3rem;">Worked example: "NLP is amazing. It helps students."</h3>
+      <p class="section-sub" style="margin-bottom:16px;">Three examples of the same idea, so you see the pattern, not just one instance:</p>
+      <div class="grid grid-3">
+        <div class="card"><span class="tag tag-lav">Example A</span><p><strong>Input text:</strong> "cats" → as bits it's an unreadable byte string; as characters "c‑a‑t‑s"; as one token <code>cats</code>; inside its own one-word sentence.</p></div>
+        <div class="card"><span class="tag tag-pink">Example B</span><p><strong>Input text:</strong> "I'm fine." → bits → characters → tokens <code>["I'm","fine","."]</code> → one sentence, showing tokenization must decide whether <code>I'm</code> splits into two.</p></div>
+        <div class="card"><span class="tag tag-mint">Example C</span><p><strong>Input text:</strong> "NLP is amazing. It helps students." → tokens <code>["NLP","is","amazing",".","It","helps","students","."]</code> → <strong>two</strong> sentences, split at the first period.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Two-stage pipeline -->
+<section class="band-lav">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Two stages, one pipeline</div>
+      <h2>Document triage, then text segmentation</h2>
+      <p class="section-sub">"Triage" just means sorting/prioritizing. Three triage steps clean the document; three segmentation steps carve it into usable units.</p>
+    </div>
+    <div class="grid grid-3 reveal">
+      <div class="card"><span class="tag tag-sky">Triage · 1</span><h4>Character encoding ID</h4><p>Which byte pattern maps to which character?</p></div>
+      <div class="card"><span class="tag tag-sky">Triage · 2</span><h4>Language ID</h4><p>What natural language is this document even written in?</p></div>
+      <div class="card"><span class="tag tag-sky">Triage · 3</span><h4>Text sectioning</h4><p>Strip headers, ads, nav links, HTML — keep the real content.</p></div>
+      <div class="card"><span class="tag tag-mint">Segment · 4</span><h4>Word segmentation</h4><p>Locate word boundaries. The units found are called <strong>tokens</strong>.</p></div>
+      <div class="card"><span class="tag tag-mint">Segment · 5</span><h4>Text normalization</h4><p>Merge variants ("Mr.", "Mr", "Mister") into one canonical form.</p></div>
+      <div class="card"><span class="tag tag-mint">Segment · 6</span><h4>Sentence segmentation</h4><p>Identify sentence boundaries between the tokens you just found.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOUR DEPENDENCIES ================= -->
+<section id="dependencies">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>What makes this hard</div>
+      <h2>Four things "correct" preprocessing depends on</h2>
+      <p class="section-sub">Click each tab. Every dependency gets three-plus verified examples — these are exactly the kind of thing that shows up in a viva.</p>
+    </div>
+
+    <div class="tabbar reveal" id="depTabs">
+      <button class="tabbtn active" data-tab="dep1">1 · Character-set</button>
+      <button class="tabbtn" data-tab="dep2">2 · Language</button>
+      <button class="tabbtn" data-tab="dep3">3 · Corpus</button>
+      <button class="tabbtn" data-tab="dep4">4 · Application</button>
+    </div>
+
+    <!-- DEP 1 -->
+    <div class="tabpanel active" id="dep1">
+      <div class="grid grid-3">
+        <div class="flip-outer"><div class="flip-inner">
+          <div class="flip-face flip-front"><span class="tag tag-lav">1960s</span><h4>ASCII (7‑bit)</h4><p>128 characters — Roman alphabet + English essentials only.</p><span class="flip-hint">tap ↻</span></div>
+          <div class="flip-face flip-back"><h4>Example</h4><p>Non-English text gets "romanized": German <em>über</em> → <em>ueber</em>, French <em>déjà</em> → <em>deja</em>.</p></div>
+        </div></div>
+        <div class="flip-outer"><div class="flip-inner">
+          <div class="flip-face flip-front"><span class="tag tag-pink">1980s</span><h4>8‑bit sets (ISO‑8859)</h4><p>256 characters, one script per set (Cyrillic, Greek…).</p><span class="flip-hint">tap ↻</span></div>
+          <div class="flip-face flip-back"><h4>Example</h4><p>Same byte value means a <em>different character</em> depending on which 8‑bit set is active — a recipe for mix-ups.</p></div>
+        </div></div>
+        <div class="flip-outer"><div class="flip-inner">
+          <div class="flip-face flip-front"><span class="tag tag-mint">Today</span><h4>Unicode / UTF‑8</h4><p>100,000+ characters across 75+ scripts — one universal set.</p><span class="flip-hint">tap ↻</span></div>
+          <div class="flip-face flip-back"><h4>Example</h4><p>1–4 bytes per character. ASCII stays 1 byte, CJK text takes up to 3. No more overlap.</p></div>
+        </div></div>
+      </div>
+
+      <div class="callout sky" style="margin-top:24px;">
+        <strong>Verified mojibake example:</strong> the byte pair <code class="mono">C3 A9</code> decodes to <strong>"é"</strong> under UTF‑8 — but garbles into <strong>"Ã©"</strong> under ISO‑8859‑1. Try it in the encoding lab below.
+      </div>
+
+      <div class="card" style="margin-top:20px;">
+        <h4>🔬 Mini-lab: pick an encoding, watch the same bytes render differently</h4>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin:12px 0;">
+          <button class="tabbtn active" data-enc="utf8">UTF‑8 (correct)</button>
+          <button class="tabbtn" data-enc="latin1">ISO‑8859‑1 (mismatched)</button>
+        </div>
+        <div class="stream" id="encOutput">café — décor — piñata</div>
+        <p style="margin-top:10px;font-size:.85rem;color:var(--ink-soft);">This is exactly why a browser or app has to <em>declare</em>, <em>guess</em>, or <em>disambiguate</em> an encoding before showing you text.</p>
+      </div>
+
+      <table style="margin-top:24px;">
+        <tr><th>Character set</th><th>Size</th><th>Supports</th><th>Main problem</th></tr>
+        <tr><td>ASCII</td><td>128</td><td>English only</td><td>Cannot store most non-English characters</td></tr>
+        <tr><td>8-bit (ISO-8859)</td><td>256</td><td>One language/script at a time</td><td>Same byte → different characters across encodings</td></tr>
+        <tr><td>Unicode (UTF-8)</td><td>100,000+</td><td>Almost every world language &amp; symbol</td><td>None — one universal standard</td></tr>
+      </table>
+    </div>
+
+    <!-- DEP 2 -->
+    <div class="tabpanel" id="dep2">
+      <div class="grid grid-2">
+        <div class="card"><span class="tag tag-mint">Marks both</span><h4>🇪🇹 Amharic</h4><p>Word <em>and</em> sentence boundaries are explicitly written. Official language of Ethiopia (Semitic family, like Arabic/Hebrew). Very easy for a computer to segment.</p></div>
+        <div class="card"><span class="tag tag-butter">Marks some</span><h4>🇬🇧 English</h4><p>Spaces between most words, punctuation at sentence ends — but "Dr. Smith arrived." shows neither cue is fully reliable.</p></div>
+        <div class="card"><span class="tag tag-sky">Sentences only</span><h4>🇨🇳 Chinese / 🇯🇵 Japanese</h4><p><code>我喜欢学习</code> — punctuation (。？) marks sentence ends, but no spaces. Is it 我|喜欢|学习, or something else? Word boundaries must be inferred.</p></div>
+        <div class="card"><span class="tag tag-pink">Marks neither</span><h4>🇹🇭 Thai</h4><p><code>ฉันรักภาษาไทย</code> — no spaces, no sentence punctuation. Segmentation relies on dictionary lookup, grammar, and ML. The hardest of the four.</p></div>
+      </div>
+
+      <div class="callout mint" style="margin-top:24px;">
+        <strong>Related problem — language ID piggybacks on script:</strong>
+        <ul class="tight" style="margin-top:8px;">
+          <li><strong>Greek / Hebrew:</strong> unique alphabets — script alone identifies the language.</li>
+          <li><strong>Arabic vs. Persian:</strong> nearly identical script; Persian adds letters like پ چ گ ژ.</li>
+          <li><strong>Russian vs. Ukrainian:</strong> shared Cyrillic base, distinguished by a few non-overlapping letters.</li>
+        </ul>
+      </div>
+
+      <table style="margin-top:24px;">
+        <tr><th>Language</th><th>Word spaces?</th><th>Sentence punctuation?</th><th>Difficulty</th></tr>
+        <tr><td>Amharic</td><td>Yes</td><td>Yes</td><td>Easy</td></tr>
+        <tr><td>English</td><td>Yes (mostly)</td><td>Yes (mostly)</td><td>Moderate — abbreviations, contractions, names</td></tr>
+        <tr><td>Chinese / Japanese</td><td>No</td><td>Yes</td><td>Hard — must find the words</td></tr>
+        <tr><td>Thai</td><td>No</td><td>Usually no</td><td>Very hard — must infer both words and sentences</td></tr>
+      </table>
+    </div>
+
+    <!-- DEP 3 -->
+    <div class="tabpanel" id="dep3">
+      <div class="grid grid-2">
+        <div class="card"><span class="tag tag-mint">Well-formed</span><h4>📚 Literature &amp; edited news</h4><p>Correct spelling, proper capitalization, clear sentences. <em>The Call of the Wild</em> has 1,640 sentence-ending periods — a simple rule (period + space + capital) gets <strong>98%</strong> right.</p></div>
+        <div class="card"><span class="tag tag-pink">Wild-caught</span><h4>💬 Forums, chat, the open web</h4><p>Missing capitals, erratic punctuation, spelling slips. A real Usenet post: <em>"ive just loaded pcl onto my akcl… ill get the prompt but im not able to…"</em> — the same simple rule scores only <strong>88.4%</strong> on the Wall Street Journal.</p></div>
+      </div>
+      <table style="margin-top:24px;">
+        <tr><th>Feature</th><th>Well-formed text</th><th>Wild text</th></tr>
+        <tr><td>Capital letters</td><td>Correct</td><td>Often missing or random</td></tr>
+        <tr><td>Punctuation</td><td>Regular</td><td>Unpredictable, repeated ("???")</td></tr>
+        <tr><td>Spelling</td><td>Mostly correct</td><td>Many mistakes</td></tr>
+        <tr><td>Sentence splitting</td><td>Easy</td><td>Difficult — rules alone fall apart</td></tr>
+      </table>
+      <div class="callout" style="margin-top:20px;"><strong>Takeaway:</strong> the messier the text, the more intelligence a system needs before it can even find sentence boundaries.</div>
+    </div>
+
+    <!-- DEP 4 -->
+    <div class="tabpanel" id="dep4">
+      <div class="quote">"I'm going to pay $300 for the governor's report."<div class="who">The same text splits differently depending on what the system needs.</div></div>
+      <div class="grid grid-3" style="margin-top:20px;">
+        <div class="card"><h4>I'm</h4><p>A <strong>parser</strong> needs grammar features, so it's expanded: <code>I</code> + <code>am</code> — two tokens.</p></div>
+        <div class="card"><h4>$300</h4><p>A <strong>text-to-speech</strong> system needs it spoken: <code>three</code> / <code>hundred</code> / <code>dollars</code> — three tokens.</p></div>
+        <div class="card"><h4>governor's</h4><p>One token + possessive tag in the Brown corpus; <code>governor</code> + <code>'s</code> (two tokens) in the Susanne corpus. Same word, different standard.</p></div>
+      </div>
+      <table style="margin-top:24px;">
+        <tr><th>Application</th><th>What it needs</th><th>Tokenization</th></tr>
+        <tr><td>Parser</td><td>Grammar</td><td>I + am</td></tr>
+        <tr><td>Speech synthesis</td><td>Pronunciation</td><td>three + hundred + dollars</td></tr>
+        <tr><td>Search engine</td><td>Fast matching</td><td>I'm, $300 (kept whole)</td></tr>
+        <tr><td>Machine translation</td><td>Meaning</td><td>I + am, governor + 's</td></tr>
+        <tr><td>POS tagging</td><td>Grammatical roles</td><td>governor + possessive marker</td></tr>
+      </table>
+      <div class="callout pink" style="margin-top:20px;"><strong>Takeaway:</strong> there is no universal tokenization rule — "correct" is defined entirely by the downstream task.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= REGEX / ELIZA ================= -->
+<section id="regex" class="band-ink">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow" style="color:var(--butter);"><span class="dot"></span>Pattern matching</div>
+      <h2>Regular expressions — the tool NLP has leaned on since its first chatbot</h2>
+      <p class="section-sub">A <strong>regular expression (regex)</strong> is a formal pattern language for describing sets of strings — it lets code say "match anything that looks like <em>this shape</em>" instead of listing every possible word. It is the oldest and still one of the most useful tools in text preprocessing: finding abbreviations, splitting sentences, pulling out dates, validating input.</p>
+    </div>
+
+    <div class="callout sky reveal" style="margin-bottom:26px;color:var(--ink);">
+      <strong>What is ELIZA, and why does every NLP course mention it?</strong>
+      <p style="margin:8px 0 0;">ELIZA was written in 1964–66 by <strong>Joseph Weizenbaum</strong> at MIT, and is widely considered the <strong>first chatbot</strong>. It is named after Eliza Doolittle, the character in George Bernard Shaw's play <em>Pygmalion</em> who is taught to speak differently — a nod to how the program "speaks" back to whoever types to it. ELIZA's most famous personality, <strong>DOCTOR</strong>, imitated a Rogerian psychotherapist. It never understood a single sentence; it simply used a library of <strong>regular-expression rules</strong> to spot a pattern in your sentence, then reflected fragments of your own words back at you as a question. "I need some help" matches a rule for <code class="mono">I need (.*)</code> and becomes "What would it mean to you if you got some help?" The trick — and the reason it fooled people — is that pattern matching plus reflection can feel like understanding, even with zero comprehension underneath.</p>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card" style="background:#332A55;border-color:#4A3C7A;">
+        <h4 style="color:#fff;">🧠 The regex toolkit — try it live</h4>
+        <p style="font-size:.85rem;color:#DCD6F7;margin-bottom:12px;">Pick a pattern (or type your own) and a test string — matches highlight instantly.</p>
+        <table style="margin-top:0;">
+          <tr><td class="mono">.</td><td>any single character</td></tr>
+          <tr><td class="mono">\d</td><td>any digit</td></tr>
+          <tr><td class="mono">\w</td><td>any word character</td></tr>
+          <tr><td class="mono">\s</td><td>any whitespace</td></tr>
+          <tr><td class="mono">* +</td><td>0-or-more / 1-or-more</td></tr>
+          <tr><td class="mono">^ $</td><td>start / end of string</td></tr>
+        </table>
+        <div style="margin-top:16px;background:#fff;border-radius:var(--radius-md);padding:16px;color:var(--ink);">
+          <label style="font-size:.8rem;font-weight:700;">Pattern</label>
+          <div class="demo-samples" style="margin:6px 0 8px;">
+            <button class="sample-chip" data-regex="\d+">\d+ digits</button>
+            <button class="sample-chip" data-regex="[A-Z][a-z]*\.">Abbrev.</button>
+            <button class="sample-chip" data-regex="\w+'\w+">Contractions</button>
+            <button class="sample-chip" data-regex="^[Ii] (do not|don't) know">ELIZA rule</button>
+          </div>
+          <input type="text" id="regexPattern" value="\d+" style="width:100%;border:2px solid var(--lavender);border-radius:99px;padding:9px 14px;font-family:'JetBrains Mono';font-size:.85rem;margin-bottom:8px;">
+          <label style="font-size:.8rem;font-weight:700;">Test string</label>
+          <textarea id="regexTest" style="width:100%;min-height:60px;border:2px solid var(--lavender);border-radius:var(--radius-sm);padding:10px;font-family:'JetBrains Mono';font-size:.85rem;margin-top:6px;">Dr. Sharma said the report cost $3.9 million. I don't know what's next.</textarea>
+          <div id="regexResult" style="margin-top:10px;font-family:'JetBrains Mono';font-size:.85rem;line-height:1.7;background:var(--bg);border-radius:var(--radius-sm);padding:12px;"></div>
+        </div>
+        <p style="margin-top:14px;font-size:.85rem;">ELIZA's actual "I don't know" rule, in full: <code class="mono">^[Ii] (do not|don't) know</code></p>
+        <table style="margin-top:8px;">
+          <tr><td class="mono">^</td><td>anchor — must be at the very start of the sentence</td></tr>
+          <tr><td class="mono">[Ii]</td><td>the letter "I" or "i" — either capitalization</td></tr>
+          <tr><td class="mono">(do not|don't)</td><td>a group capturing either full or contracted negation</td></tr>
+          <tr><td class="mono">know</td><td>the literal word that completes the phrase</td></tr>
+        </table>
+      </div>
+
+      <div class="chat-box" style="align-self:start;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px;">
+          <div class="prof-avatar" style="width:36px;height:36px;border-radius:10px;font-size:1.1rem;">🤖</div>
+          <h4 style="margin-bottom:0;">ELIZA</h4>
+        </div>
+        <p style="font-size:.8rem;color:var(--ink-soft);margin:4px 0 10px;">Try: "I need some help" · "I feel tired" · "my mother annoys me" · "because I said so" · "I don't know what to do"</p>
+        <div class="chat-log" id="chatLog">
+          <div class="msg bot">Hello. I am a very small chatbot, built purely from regular expressions — a tiny cousin of the 1966 ELIZA program. What's on your mind?</div>
+        </div>
+        <form class="chat-form" id="chatForm">
+          <input type="text" id="chatInput" placeholder="Type something…" autocomplete="off">
+          <button type="submit">➤</button>
+        </form>
+
+        <div id="elizaTraceCard" style="margin-top:18px;background:var(--ink);border-radius:var(--radius-md);padding:16px;">
+          <h4 style="color:#fff;font-size:.95rem;margin-bottom:4px;">🔬 Live trace — currently matched rule</h4>
+          <p style="font-size:.78rem;color:#DCD6F7;margin-bottom:12px;">No comprehension happens here — just pattern matching. This shows exactly which regex rule just fired (or didn't) and how the reply was built from it.</p>
+          <div id="elizaTraceBody" style="background:#fff;color:var(--ink);border-radius:var(--radius-sm);padding:14px;font-size:.85rem;line-height:1.65;">
+            <em style="color:var(--ink-soft);">Send a message above to see the live trace.</em>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TOKENIZATION ================= -->
+<section id="tokenization">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Tokenization</div>
+      <h2>What is a word? A deceptively hard question</h2>
+      <p class="section-sub">Splitting text into individual words or tokens is essential for every NLP task — but four recurring challenges make it genuinely tricky.</p>
+    </div>
+
+    <div class="grid grid-4 reveal">
+      <div class="card"><span class="tag tag-lav">1</span><h4>"Hey!! How are you? :)"</h4><p>Punctuation and emoticons — are they tokens too?</p></div>
+      <div class="card"><span class="tag tag-pink">2</span><h4>"I do uh main- mainly business…"</h4><p>Disfluencies and false starts — what counts as a word?</p></div>
+      <div class="card"><span class="tag tag-mint">3</span><h4>"They're studying…"</h4><p>Contractions hide two words inside one.</p></div>
+      <div class="card"><span class="tag tag-butter">4</span><h4>"cats" vs. "cat"</h4><p>Same root, different forms — this is exactly what stemming/lemmatization later normalize.</p></div>
+    </div>
+
+    <div class="reveal" style="margin-top:40px;">
+      <h3 style="font-size:1.3rem;">One character, three jobs: the period</h3>
+      <div class="quote" style="font-size:1.05rem;">"Clairson International <strong>Corp.</strong> said it expects to report a net loss of <strong>$3.9</strong> to $4 million for its year ending Sept. 24<strong>.</strong>"<div class="who">Wall Street Journal, 1988</div></div>
+      <div class="grid grid-3" style="margin-top:16px;">
+        <div class="card"><h4>Decimal point</h4><p><code>$3.9</code> — the period is part of the number itself.</p></div>
+        <div class="card"><h4>Abbreviation marker</h4><p><code>Corp.</code> and <code>Sept.</code> — the period marks a shortened word.</p></div>
+        <div class="card"><h4>Sentence boundary</h4><p>The final period after "24" — and this time it isn't a decimal point.</p></div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:40px;">
+      <h3 style="font-size:1.3rem;">Apostrophes do double duty too</h3>
+      <table>
+        <tr><th>Form</th><th>Job</th><th>Example</th><th>Tokens</th></tr>
+        <tr><td>student's</td><td>Possession (genitive)</td><td>The student's notebook</td><td>student + 's, or student's</td></tr>
+        <tr><td>doesn't</td><td>Contraction</td><td>doesn't = does not</td><td>does + n't, or does + not</td></tr>
+        <tr><td>I'm / He's / We'll</td><td>Contraction</td><td>I am / He is / We will</td><td>Expand or keep whole — depends on the app</td></tr>
+      </table>
+    </div>
+
+    <div class="grid grid-3 reveal" style="margin-top:40px;">
+      <div class="card"><span class="tag tag-lav">German compounding</span><h4>Lebensversicherung</h4><p>= <em>Leben</em> (life) + <em>Versicherung</em> (insurance), written as one word but holding two concepts. Also: <em>Haustür</em> = <em>Haus</em> + <em>Tür</em> (house door).</p></div>
+      <div class="card"><span class="tag tag-pink">Turkish agglutination</span><h4>çöplüklerizdekilerdenmiydi</h4><p>One word → "was it from those that were in our garbage cans?" Root + plural + possession + location + tense, all suffixed on.</p></div>
+      <div class="card"><span class="tag tag-mint">End-of-line hyphens</span><h4>govern-\nment</h4><p>A line-break hyphen, not a real word boundary. About 5% of hyphens in a real English corpus were purely line-break artifacts.</p></div>
+    </div>
+
+    <div class="grid grid-3 reveal" style="margin-top:20px;">
+      <div class="card"><span class="tag tag-sky">Idiom</span><h4>"in spite of"</h4><p>Means exactly "despite" — three tokens that should behave like one.</p></div>
+      <div class="card"><span class="tag tag-sky">Dates &amp; money</span><h4>Nov. 18, 1989</h4><p>= 18 November 1989 = 11/18/89 — all need normalizing to the same value.</p></div>
+      <div class="card"><span class="tag tag-sky">Ambiguous scope</span><h4>"no one"</h4><p>= nobody, one idea — but in "No one man can do it alone," it's genuinely two words.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= NO-SPACE LANGUAGES ================= -->
+<section id="nospace" class="band-mint">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Tokenizing without spaces</div>
+      <h2>Chinese, Japanese, and Thai give the tokenizer no shortcuts</h2>
+    </div>
+
+    <div class="card reveal" style="margin-bottom:26px;">
+      <h4>Method 1 — Greedy (forward) matching, and why it can fail spectacularly</h4>
+      <p style="color:var(--ink-soft);margin-bottom:14px;">Start at the first character, always grab the longest dictionary word, repeat on what's left.</p>
+      <button class="btn secondary" id="greedyBtn" style="padding:10px 20px;font-size:.85rem;">▶ Run greedy matching on "thetabledownthere"</button>
+      <div class="stream" id="greedyOutput" style="margin-top:14px;">Click to run…</div>
+    </div>
+
+    <div class="grid grid-3 reveal">
+      <div class="card method-card"><span class="rank">2</span><span class="tag tag-lav">Backward matching</span><h4>Start from the end instead</h4><p><code>thetabledownthere</code>, read right to left, finds: there → down → table → the. Produces the correct segmentation here.</p></div>
+      <div class="card method-card"><span class="rank">3</span><span class="tag tag-pink">Bidirectional</span><h4>Run both, compare</h4><p>Forward AND backward matching, then choose whichever segmentation looks better — used by many modern systems.</p></div>
+      <div class="card method-card"><span class="rank">4</span><span class="tag tag-mint">Character-as-word</span><h4>Treat every character as a token</h4><p>我喜欢学习 → 我 | 喜 | 欢 | 学 | 习. Works surprisingly well (most Chinese words are 1–2 chars) but splits real multi-char words like 喜欢 ("like").</p></div>
+      <div class="card method-card"><span class="rank">5</span><span class="tag tag-sky">Statistical</span><h4>Learn co-occurrence</h4><p>北京大学 → 北京 | 大学 (Beijing | University). More accurate, handles new vocabulary — needs large training corpora.</p></div>
+      <div class="card method-card"><span class="rank">6</span><span class="tag tag-butter">Lexical + hybrid</span><h4>Dictionaries + rules + stats</h4><p>私は学生です → 私 | は | 学生 | です ("I am a student"). Solved by combining dictionary lookup, grammar rules, and statistics — as JUMAN and ChaSen do for Japanese.</p></div>
+      <div class="card"><span class="tag tag-pink">Real example</span><h4>The garden path</h4><p><code>我喜欢学习</code> could split as 我|喜欢|学习 ("I like studying") — a wrong dictionary choice early on derails everything after it, exactly like "theta·bled·own·there" in English.</p></div>
+    </div>
+
+    <table style="margin-top:26px;" class="reveal">
+      <tr><th>Method</th><th>How it works</th><th>Strength</th><th>Limitation</th></tr>
+      <tr><td>Greedy (forward)</td><td>Longest match from the start</td><td>Simple and fast</td><td>Can make wrong early choices</td></tr>
+      <tr><td>Backward matching</td><td>Longest match from the end</td><td>Often corrects forward errors</td><td>Still rule-based, not always right</td></tr>
+      <tr><td>Character-as-word</td><td>Every character = one token</td><td>Very simple, no dictionary</td><td>Splits real multi-char words</td></tr>
+      <tr><td>Statistical</td><td>Learns boundaries from data</td><td>High accuracy, adapts</td><td>Needs large training corpora</td></tr>
+      <tr><td>Lexical + hybrid</td><td>Dictionary + rules + statistics</td><td>Most accurate overall</td><td>Most complex to build</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= BPE ================= -->
+<section id="bpe">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Subword tokenization</div>
+      <h2>Byte-Pair Encoding: learning a vocabulary instead of hand-defining one</h2>
+      <p class="section-sub">The problem BPE solves: how do we handle words we've never seen before? Instead of words or characters, BPE induces "subword" tokens automatically from data — so <code>lower</code> can be represented as <code>low</code> + <code>er</code>, even if "lower" itself was never in the training set.</p>
+    </div>
+
+    <div class="stepper reveal">
+      <div class="step-chip"><span class="n">1</span>Initialize — start with characters</div>
+      <div class="step-chip"><span class="n">2</span>Find the most frequent adjacent pair</div>
+      <div class="step-chip"><span class="n">3</span>Merge it into one new symbol</div>
+      <div class="step-chip"><span class="n">4</span>Repeat until k merges are done</div>
+    </div>
+
+    <div class="card reveal">
+      <h4>🔬 Interactive BPE trainer</h4>
+      <p style="color:var(--ink-soft);">This is the exact toy corpus from your textbook: <code>5×low 2×lowest 6×newer 3×wider 2×new</code>. Drag the slider to control how many merges run — watch the vocabulary grow live and correctly, merge by merge.</p>
+      <label style="font-size:.85rem;font-weight:700;">Number of merges: <span id="mergeCount">4</span></label><br>
+      <input type="range" min="1" max="8" value="4" id="mergeSlider" style="width:100%;max-width:400px;">
+      <div id="bpeResult" style="margin-top:16px;"></div>
+    </div>
+
+    <div class="callout mint reveal" style="margin-top:20px;">
+      <strong>Verified against your first four merges:</strong> step 1 merges <code>e+r→er</code> (the most frequent adjacent pair, appearing 9 times across "newer" and "wider"). Step 2 merges <code>n+e→ne</code> (appears 8 times). From there the algorithm keeps going correctly based on real counts — try sliding past 4 and see what it finds next!
+    </div>
+  </div>
+</section>
+
+<!-- ================= SENTENCE SEGMENTATION ================= -->
+<section id="sentseg" class="band-sky">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Sentence segmentation</div>
+      <h2>What even counts as "one sentence"?</h2>
+    </div>
+
+    <div class="grid grid-2 reveal">
+      <div class="card"><span class="tag tag-lav">Obvious rule</span><h4>"Period + space + capital letter"</h4><p>Works fine: "The lecture ended. Students left." Fails here: "The meeting is on Sept. 15." — the period belongs to the abbreviation, not the sentence end.</p></div>
+      <div class="card"><span class="tag tag-pink">How often does it work?</span><h4>Accuracy depends entirely on the corpus</h4><p><strong>98%</strong> on <em>The Call of the Wild</em> (literary, well-behaved) vs. only <strong>88.4%</strong> on the Wall Street Journal — where <strong>47%</strong> of periods are abbreviation-markers, not sentence ends.</p></div>
+    </div>
+
+    <table style="margin-top:24px;">
+      <tr><th>Mark</th><th>Job</th><th>Behavior</th></tr>
+      <tr><td>.</td><td>Period</td><td>Usually ends a sentence — but not always</td></tr>
+      <tr><td>?</td><td>Question mark</td><td>Reliably ends a question</td></tr>
+      <tr><td>!</td><td>Exclamation</td><td>Reliably ends an exclamatory sentence</td></tr>
+      <tr><td>;</td><td>Semicolon</td><td>Connects related clauses — depends on task</td></tr>
+      <tr><td>,</td><td>Comma</td><td>Normally doesn't end a sentence, but some applications split long clauses here</td></tr>
+    </table>
+
+    <div class="grid grid-3 reveal" style="margin-top:26px;">
+      <div class="card"><h4>Clue 1</h4><p>Case of surrounding words — is the next word capitalized because it's a new sentence, or a proper noun?</p></div>
+      <div class="card"><h4>Clue 2</h4><p>Part of speech nearby — a proper noun after "Mr." suggests abbreviation, not boundary.</p></div>
+      <div class="card"><h4>Clue 3</h4><p>Word length before/after — very short words ending in a period (Dr., Mr., Jr.) are often abbreviations.</p></div>
+      <div class="card"><h4>Clue 4</h4><p>Known abbreviation list — a dictionary of common abbreviations: Dr., Prof., Corp., Inc., Sept.</p></div>
+      <div class="card"><h4>Clue 5</h4><p>Prefixes and suffixes — "International Corp." — the suffix strongly signals abbreviation.</p></div>
+      <div class="card"><h4>Garden path</h4><p>"…Penn St. University President…" reads as one sentence. Add "announced" after it and it suddenly becomes two.</p></div>
+    </div>
+
+    <div class="grid grid-2 reveal" style="margin-top:26px;">
+      <div class="card"><span class="tag tag-mint">Rule-based — ALEMBIC</span><p>75 abbreviations + 100+ hand rules, built over ~6 staff-months. <strong>99.1%</strong> accuracy on WSJ text.</p></div>
+      <div class="card"><span class="tag tag-butter">Trainable — SATZ / Riley</span><p>Trainable in minutes on under 1,000 sentences. <strong>98–99.8%</strong> accuracy — robust to OCR errors.</p></div>
+    </div>
+    <div class="callout reveal" style="margin-top:16px;"><strong>Plot twist:</strong> Alembic + Satz together score <strong>99.5%</strong> — higher than either alone. Hybrid systems consistently win.</div>
+  </div>
+</section>
+
+<!-- ================= BEYOND ENGLISH ================= -->
+<section id="beyond">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Beyond English</div>
+      <h2>Testing algorithms on the full diversity of human language</h2>
+    </div>
+    <div class="grid grid-4 reveal">
+      <div class="card"><h4>🗣️ Dialect</h4><p>Most languages have multiple dialects, shaped by region or social group.</p></div>
+      <div class="card"><h4>📰 Genre</h4><p>Newswires, books, scientific articles, Wikipedia, religious texts, spoken conversation.</p></div>
+      <div class="card"><h4>👥 Demographics</h4><p>Age, gender, race, and socioeconomic class all shape a text's linguistic properties.</p></div>
+      <div class="card"><h4>🕰️ Time</h4><p>Language evolves — Old French reads nothing like current French.</p></div>
+    </div>
+
+    <div class="reveal" style="margin-top:34px;">
+      <h3 style="font-size:1.3rem;">Documenting a dataset responsibly — the datasheet</h3>
+      <div class="accordion" id="datasheetAcc">
+        <div class="accordion-item"><div class="accordion-head">1 · Motivation <span class="chevron">▾</span></div><div class="accordion-body"><p>Why was the corpus collected, by whom, and who funded it?</p></div></div>
+        <div class="accordion-item"><div class="accordion-head">2 · Situation <span class="chevron">▾</span></div><div class="accordion-body"><p>When and how was the text written or spoken? Was there a task?</p></div></div>
+        <div class="accordion-item"><div class="accordion-head">3 · Language variety <span class="chevron">▾</span></div><div class="accordion-body"><p>What language, and which variety, was the corpus in?</p></div></div>
+        <div class="accordion-item"><div class="accordion-head">4 · Speaker demographics <span class="chevron">▾</span></div><div class="accordion-body"><p>Age, gender, and other traits of the text's authors.</p></div></div>
+        <div class="accordion-item"><div class="accordion-head">5 · Collection process <span class="chevron">▾</span></div><div class="accordion-body"><p>Size, sampling method, consent, preprocessing, available metadata.</p></div></div>
+        <div class="accordion-item"><div class="accordion-head">6 · Annotation process <span class="chevron">▾</span></div><div class="accordion-body"><p>What was annotated, by whom, how were annotators trained?</p></div></div>
+        <div class="accordion-item"><div class="accordion-head">7 · Distribution <span class="chevron">▾</span></div><div class="accordion-body"><p>Are there copyright or other intellectual-property restrictions?</p></div></div>
+      </div>
+    </div>
+
+    <div class="reveal" style="margin-top:34px;">
+      <h3 style="font-size:1.3rem;">Vocabulary check — six terms worth knowing cold</h3>
+      <div class="grid grid-3">
+        <div class="card"><h4>Text normalization</h4><p>Transforming text into a more uniform format for easier processing.</p></div>
+        <div class="card"><h4>Lemma</h4><p>The base form of a word — lemmatization reduces "running" to "run".</p></div>
+        <div class="card"><h4>Corpus</h4><p>A structured collection of texts, used as a dataset for NLP tasks.</p></div>
+        <div class="card"><h4>Token</h4><p>A single, meaningful element in text — tokenization splits text into tokens.</p></div>
+        <div class="card"><h4>Training / test corpus</h4><p>One dataset teaches the model patterns; a separate one evaluates performance.</p></div>
+        <div class="card"><h4>Vocabulary</h4><p>The set of unique tokens a model uses for processing.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= LIVE DEMO ================= -->
+<section id="livedemo">
+  <div class="wrap">
+    <div class="demo-section reveal">
+      <div class="blob" style="width:260px;height:260px;background:#fff;opacity:.08;top:-60px;left:-60px;"></div>
+      <div class="eyebrow" style="color:var(--butter);"><span class="dot"></span>The full workbench</div>
+      <h2>🚀 Type anything. Watch every preprocessing step happen live.</h2>
+      <p class="section-sub">This engine runs a real tokenizer, a faithful JavaScript port of the classic <strong>Porter Stemmer</strong> algorithm (verified line-by-line against the NLTK example in your e‑book — including tricky irregulars like "lying" → "lie"), a simplified lemmatizer, and two sentence-segmentation strategies — side by side, so every stem/lemma issue and every segmentation challenge becomes visible.</p>
+
+      <div class="demo-input-wrap">
+        <textarea id="demoInput" placeholder="Type or paste a sentence… e.g. Dr. Sharma teaches NLP. I'm not going to lie — the governor's report cost $3.9 million.">Dr. Sharma teaches NLP. I'm not going to lie — the governor's report cost $3.9 million.</textarea>
+        <div class="demo-samples">
+          <button class="sample-chip" data-sample="dennis">📖 The NLTK e-book example</button>
+          <button class="sample-chip" data-sample="ambig">🧩 Abbreviation ambiguity</button>
+          <button class="sample-chip" data-sample="apostrophes">✂️ Apostrophe stress-test</button>
+          <button class="sample-chip" data-sample="wild">🌐 Wild internet text</button>
+        </div>
+        <div class="demo-run">
+          <button class="btn coral" id="runDemoBtn">▶ Run full pipeline</button>
+          <span style="font-size:.82rem;color:var(--ink-soft);">Everything below is computed live in your browser — nothing is sent anywhere.</span>
+        </div>
+      </div>
+
+      <div class="demo-output" id="demoOutput">
+        <div class="demo-card" style="margin-bottom:18px;">
+          <h4>📚 The whole chapter, applied to your text</h4>
+          <p style="font-size:.82rem;color:var(--ink-soft);">The five recap points from the end of the deck — each one worked out live against what you typed, not just stated in the abstract.</p>
+          <div id="outRecap"></div>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-card">
+            <h4>🧩 Tokenization</h4>
+            <p style="font-size:.82rem;color:var(--ink-soft);">Regex-based tokenizer — every punctuation mark, number, and contraction becomes its own decision.</p>
+            <div id="outTokens"></div>
+          </div>
+          <div class="demo-card">
+            <h4>📄 Sentence segmentation</h4>
+            <p style="font-size:.82rem;color:var(--ink-soft);">Naive rule vs. abbreviation-aware rule, side by side.</p>
+            <div style="margin-bottom:10px;"><strong style="font-size:.8rem;">❌ Naive (period + space + capital):</strong><div id="outSentNaive"></div></div>
+            <div><strong style="font-size:.8rem;">✅ Abbreviation-aware:</strong><div id="outSentSmart"></div></div>
+          </div>
+          <div class="demo-card">
+            <h4>🌱 Stemming vs. Lemmatization</h4>
+            <p style="font-size:.82rem;color:var(--ink-soft);">Porter stemmer chops suffixes blindly; the simplified lemmatizer tries to land on a real dictionary word.</p>
+            <table class="compare-table" id="outCompareTable"></table>
+          </div>
+          <div class="demo-card">
+            <h4>⚠️ Challenges detected in your text</h4>
+            <p style="font-size:.82rem;color:var(--ink-soft);">Auto-flagged pillars, issues, and edge cases — tap the deck sections above to learn each one.</p>
+            <div class="badge-row" id="outIssues"></div>
+          </div>
+          <div class="demo-card">
+            <h4>🔎 Regex matches in your text</h4>
+            <p style="font-size:.82rem;color:var(--ink-soft);">The same abbreviation, currency, decimal, and contraction patterns from the toolkit above — run automatically against what you typed.</p>
+            <div id="outRegex"></div>
+          </div>
+          <div class="demo-card">
+            <h4>💬 Send your first sentence to Mini-ELIZA</h4>
+            <p style="font-size:.82rem;color:var(--ink-soft);">See how a 1966-style pattern-matching chatbot "reflects" your own sentence back at you.</p>
+            <button class="btn secondary" id="sendToElizaBtn" style="padding:9px 18px;font-size:.82rem;">🧠 Try it</button>
+            <div id="outEliza" style="margin-top:10px;font-size:.85rem;color:var(--ink-soft);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRACTICE ================= -->
+<section id="practice" class="band-butter">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow"><span class="dot"></span>Your turn</div>
+      <h2>Out-tokenize the tokenizer</h2>
+      <p class="section-sub">For each puzzle: how many tokens? Where's the sentence boundary? Think first, then reveal.</p>
+    </div>
+    <div class="grid grid-3 reveal">
+      <div class="puzzle" id="pz1">
+        <span class="tag tag-lav">Puzzle 1</span>
+        <p>"…headquarters at 55 Water St. A spokesman declined…"</p>
+        <button class="btn secondary" style="padding:9px 18px;font-size:.82rem;" onclick="this.parentElement.classList.toggle('revealed')">Reveal answer</button>
+        <div class="answer"><strong>One sentence — or two?</strong> "St." = Street here, so the period is an abbreviation marker <em>and</em>, in this case, also happens to sit right before a genuine sentence boundary. Context (a spokesman being a new clause) is the only way to tell.</div>
+      </div>
+      <div class="puzzle" id="pz2">
+        <span class="tag tag-pink">Puzzle 2</span>
+        <p>"Boston-based"</p>
+        <button class="btn secondary" style="padding:9px 18px;font-size:.82rem;" onclick="this.parentElement.classList.toggle('revealed')">Reveal answer</button>
+        <div class="answer"><strong>One token, or two words joined by a hyphen?</strong> Most modern tokenizers keep it as one token (a compound adjective) — but a parser might split it into "Boston" + "based" for grammar analysis.</div>
+      </div>
+      <div class="puzzle" id="pz3">
+        <span class="tag tag-mint">Puzzle 3</span>
+        <p>"I.D.'s" and "1980's"</p>
+        <button class="btn secondary" style="padding:9px 18px;font-size:.82rem;" onclick="this.parentElement.classList.toggle('revealed')">Reveal answer</button>
+        <div class="answer"><strong>Plural, or possessive?</strong> "I.D.'s" is usually a plural (multiple ID cards); "1980's" is usually a decade plural too, not a possessive — yet the apostrophe looks identical to "governor's" in Dependency 4. Only convention (and style guide) decides.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= RECAP ================= -->
+<section class="band-ink">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="eyebrow" style="color:var(--butter);"><span class="dot"></span>Recap</div>
+      <h2>The whole chapter in five sentences</h2>
+    </div>
+    <div class="grid grid-3 reveal" style="grid-template-columns:repeat(5,1fr);">
+      <div class="card" style="background:#332A55;border-color:#4A3C7A;"><h4 style="color:#fff;">1</h4><p style="color:#DCD6F7;">Preprocessing turns raw bits into characters, then tokens, then sentences — every later NLP stage depends on it.</p></div>
+      <div class="card" style="background:#332A55;border-color:#4A3C7A;"><h4 style="color:#fff;">2</h4><p style="color:#DCD6F7;">Four dependencies decide what's "correct": character-set, language, corpus, and application.</p></div>
+      <div class="card" style="background:#332A55;border-color:#4A3C7A;"><h4 style="color:#fff;">3</h4><p style="color:#DCD6F7;">Tokenization is easy in space-delimited languages, genuinely hard in unsegmented ones like Chinese and Thai.</p></div>
+      <div class="card" style="background:#332A55;border-color:#4A3C7A;"><h4 style="color:#fff;">4</h4><p style="color:#DCD6F7;">Sentence segmentation is mostly about disambiguating punctuation — the period alone does at least three jobs.</p></div>
+      <div class="card" style="background:#332A55;border-color:#4A3C7A;"><h4 style="color:#fff;">5</h4><p style="color:#DCD6F7;">Hybrid systems (rules + trainable models) consistently beat either approach alone.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <h2 style="font-size:1.6rem;">Questions? 🙋</h2>
+    <p class="section-sub" style="margin:0 auto;">Any question, mail on: <a href="mailto:bhumika.shah@scet.ac.in">bhumika.shah@scet.ac.in</a></p>
+    <div class="prof-card">
+      <div class="prof-avatar">👩‍🏫</div>
+      <div style="flex:1;text-align:left;">
+        <strong>Prof. Bhumika Shah</strong>
+        <small>Dept. of Information Technology · Text Preprocessing · Unit 2 · BTIT14706</small>
+      </div>
+      <a href="https://bhumikaa7981.github.io/meet-bhumika/" target="_blank" rel="noopener">Meet your professor →</a>
+    </div>
+    <p style="margin-top:34px;font-size:.78rem;color:var(--ink-soft);">Built for Sarvajanik University · Sarvajanik College of Engineering &amp; Technology · Content verified against the course deck and the NLTK e-book (Bird, Klein &amp; Loper).</p>
+  </div>
+</footer>
+
+<a href="#top" class="scrolltop" id="scrollTop">↑</a>
+
+<script>
+/* ============================================================
+   PORTER STEMMER — faithful JS port of NLTK's PorterStemmer
+   (NLTK_EXTENSIONS mode). Verified against the e-book's DENNIS
+   example: "lying"->"lie", "women"->"women", "DENNIS"->"denni", etc.
+   ============================================================ */
+const PorterStemmer = (function(){
+  const vowels = new Set(['a','e','i','o','u']);
+  const irregularForms = {
+    "sky": ["sky","skies"], "die": ["dying"], "lie": ["lying"], "tie": ["tying"],
+    "news": ["news"], "inning": ["innings","inning"], "outing": ["outings","outing"],
+    "canning": ["cannings","canning"], "howe": ["howe"], "proceed": ["proceed"],
+    "exceed": ["exceed"], "succeed": ["succeed"]
+  };
+  const pool = {};
+  for (const k in irregularForms) for (const v of irregularForms[k]) pool[v] = k;
+
+  function isConsonant(w,i){
+    const ch = w[i];
+    if (vowels.has(ch)) return false;
+    if (ch === 'y') return i===0 ? true : !isConsonant(w,i-1);
+    return true;
+  }
+  function measure(stem){
+    let cv=''; for (let i=0;i<stem.length;i++) cv += isConsonant(stem,i)?'c':'v';
+    const m = cv.match(/vc/g); return m?m.length:0;
+  }
+  const hasPosMeasure = (s)=>measure(s)>0;
+  function containsVowel(s){ for(let i=0;i<s.length;i++) if(!isConsonant(s,i)) return true; return false; }
+  function endsDoubleConsonant(w){ return w.length>=2 && w[w.length-1]===w[w.length-2] && isConsonant(w,w.length-1); }
+  function endsCVC(w){
+    const n=w.length;
+    const basic = n>=3 && isConsonant(w,n-3) && !isConsonant(w,n-2) && isConsonant(w,n-1) && !['w','x','y'].includes(w[n-1]);
+    const ext = n===2 && !isConsonant(w,0) && isConsonant(w,1);
+    return basic || ext;
+  }
+  function replaceSuffix(w,suf,rep){ return suf===''? w+rep : w.slice(0,w.length-suf.length)+rep; }
+  function applyRules(w,rules){
+    for (const [suf,rep,cond] of rules){
+      if (suf==='*d' && endsDoubleConsonant(w)){
+        const stem=w.slice(0,-2);
+        if(!cond || cond(stem)) return stem+rep;
+        return w;
+      }
+      if (w.endsWith(suf)){
+        const stem=replaceSuffix(w,suf,'');
+        if(!cond || cond(stem)) return stem+rep;
+        return w;
+      }
+    }
+    return w;
+  }
+  function step1a(w){
+    if (w.endsWith('ies') && w.length===4) return replaceSuffix(w,'ies','ie');
+    return applyRules(w,[['sses','ss',null],['ies','i',null],['ss','ss',null],['s','',null]]);
+  }
+  function step1b(w){
+    if (w.endsWith('ied')) return w.length===4?replaceSuffix(w,'ied','ie'):replaceSuffix(w,'ied','i');
+    if (w.endsWith('eed')){ const s=replaceSuffix(w,'eed',''); return measure(s)>0? s+'ee':w; }
+    let ok=false, mid=w;
+    for (const suf of ['ed','ing']){
+      if (w.endsWith(suf)){ const s=replaceSuffix(w,suf,''); if (containsVowel(s)){ok=true;mid=s;break;} }
+    }
+    if (!ok) return w;
+    return applyRules(mid,[
+      ['at','ate',null],['bl','ble',null],['iz','ize',null],
+      ['*d', mid[mid.length-1], ()=> !['l','s','z'].includes(mid[mid.length-1])],
+      ['', 'e', (s)=> measure(s)===1 && endsCVC(s)]
+    ]);
+  }
+  function step1c(w){
+    const cond=(s)=> s.length>1 && isConsonant(s,s.length-1);
+    return applyRules(w,[['y','i',cond]]);
+  }
+  function step2(w){
+    if (w.endsWith('alli') && hasPosMeasure(replaceSuffix(w,'alli',''))) return step2(replaceSuffix(w,'alli','al'));
+    const rules=[
+      ['ational','ate',hasPosMeasure],['tional','tion',hasPosMeasure],['enci','ence',hasPosMeasure],
+      ['anci','ance',hasPosMeasure],['izer','ize',hasPosMeasure],['bli','ble',hasPosMeasure],
+      ['alli','al',hasPosMeasure],['entli','ent',hasPosMeasure],['eli','e',hasPosMeasure],
+      ['ousli','ous',hasPosMeasure],['ization','ize',hasPosMeasure],['ation','ate',hasPosMeasure],
+      ['ator','ate',hasPosMeasure],['alism','al',hasPosMeasure],['iveness','ive',hasPosMeasure],
+      ['fulness','ful',hasPosMeasure],['ousness','ous',hasPosMeasure],['aliti','al',hasPosMeasure],
+      ['iviti','ive',hasPosMeasure],['biliti','ble',hasPosMeasure],['fulli','ful',hasPosMeasure],
+      ['logi','log',()=>hasPosMeasure(w.slice(0,-3))]
+    ];
+    return applyRules(w,rules);
+  }
+  function step3(w){
+    return applyRules(w,[
+      ['icate','ic',hasPosMeasure],['ative','',hasPosMeasure],['alize','al',hasPosMeasure],
+      ['iciti','ic',hasPosMeasure],['ical','ic',hasPosMeasure],['ful','',hasPosMeasure],['ness','',hasPosMeasure]
+    ]);
+  }
+  function step4(w){
+    const m1=(s)=>measure(s)>1;
+    return applyRules(w,[
+      ['al','',m1],['ance','',m1],['ence','',m1],['er','',m1],['ic','',m1],['able','',m1],['ible','',m1],
+      ['ant','',m1],['ement','',m1],['ment','',m1],['ent','',m1],
+      ['ion','',(s)=>measure(s)>1 && ['s','t'].includes(s[s.length-1])],
+      ['ou','',m1],['ism','',m1],['ate','',m1],['iti','',m1],['ous','',m1],['ive','',m1],['ize','',m1]
+    ]);
+  }
+  function step5a(w){
+    if (w.endsWith('e')){
+      const s=replaceSuffix(w,'e','');
+      if (measure(s)>1) return s;
+      if (measure(s)===1 && !endsCVC(s)) return s;
+    }
+    return w;
+  }
+  function step5b(w){ return applyRules(w,[['ll','l',(s)=>measure(w.slice(0,-1))>1]]); }
+
+  return function stem(word){
+    let w = word.toLowerCase();
+    if (Object.prototype.hasOwnProperty.call(pool,w)) return pool[w];
+    if (w.length<=2) return w;
+    w=step1a(w); w=step1b(w); w=step1c(w); w=step2(w); w=step3(w); w=step4(w); w=step5a(w); w=step5b(w);
+    return w;
+  };
+})();
+
+/* ============================================================
+   SIMPLIFIED LEMMATIZER — a small irregular-word dictionary plus
+   conservative suffix rules. Deliberately NOT full WordNet (that
+   needs a 150k+ entry dictionary) — labeled as an approximation.
+   The irregulars below match the e-book's own worked example.
+   ============================================================ */
+const LEMMA_IRREGULAR = {
+  women:'woman', men:'man', children:'child', mice:'mouse', geese:'goose',
+  feet:'foot', teeth:'tooth', people:'person', is:'be', are:'be', was:'be', were:'be',
+  am:'be', been:'be', being:'be', has:'have', had:'have', does:'do', did:'do',
+  went:'go', gone:'go', ate:'eat', better:'good', best:'good', worse:'bad', worst:'bad'
+};
+function lemmatize(word){
+  const w = word.toLowerCase();
+  if (!/[a-z]/.test(w)) return w;
+  if (LEMMA_IRREGULAR[w]) return LEMMA_IRREGULAR[w];
+  if (w === 'lying') return w; // WordNet lemmatizer genuinely fails on this — kept for accuracy
+  if (w.endsWith('ies') && w.length>4) return w.slice(0,-3)+'y';
+  if (w.endsWith('ves') && w.length>4) return w.slice(0,-3)+'f';
+  if (w.endsWith('ses') && w.length>4) return w.slice(0,-2);
+  if (w.endsWith('es') && w.length>4 && /(x|s|z|ch|sh)es$/.test(w)) return w.slice(0,-2);
+  if (w.endsWith('s') && !w.endsWith('ss') && !w.endsWith('us') && w.length>3) return w.slice(0,-1);
+  if (w.endsWith('ing') && w.length>5){
+    const stem = w.slice(0,-3);
+    return stem; // simplified: doesn't re-double consonants or add back 'e', by design
+  }
+  if (w.endsWith('ed') && w.length>4) return w.slice(0,-2);
+  return w;
+}
+
+/* ============================================================
+   TOKENIZER — regex based, splits on words (incl. contractions/
+   hyphens), currency + decimals, and standalone punctuation.
+   ============================================================ */
+function tokenize(text){
+  const re = /\w+(?:['’][\w]+)*(?:-\w+)*|\$\d[\d,]*(?:\.\d+)?%?|\d[\d,]*(?:\.\d+)?%?|[^\s\w]/g;
+  return text.match(re) || [];
+}
+
+/* ============================================================
+   SENTENCE SEGMENTATION — naive vs. abbreviation-aware
+   ============================================================ */
+const ABBR = ["dr","mr","mrs","ms","prof","sr","jr","st","sept","jan","feb","mar","apr","jun","jul","aug","oct","nov","dec","corp","inc","co","ltd","vs","etc","gov","dept","univ","no","approx","rev","gen","capt","lt","col","maj","fig"];
+function naiveSentenceSplit(text){
+  return text.split(/(?<=[.!?])\s+(?=[A-Z])/).map(s=>s.trim()).filter(Boolean);
+}
+function smartSentenceSplit(text){
+  const parts=[]; let last=0;
+  const re=/[.!?]+(?=\s+[A-Z])/g; let m;
+  while((m=re.exec(text))){
+    const idx = m.index+m[0].length;
+    const before = text.slice(0,m.index).trim();
+    const lw = (before.match(/([A-Za-z]+)$/)||[])[1];
+    if (lw && ABBR.includes(lw.toLowerCase())) continue;
+    // also skip if followed directly by a digit-like decimal pattern already consumed by tokenizer
+    parts.push(text.slice(last,idx).trim());
+    last = idx;
+  }
+  parts.push(text.slice(last).trim());
+  return parts.filter(Boolean);
+}
+
+/* ============================================================
+   BPE TRAINER
+   ============================================================ */
+function trainBPE(corpusFreq, numMerges){
+  let vocab={};
+  for (const w in corpusFreq) vocab[w.split('').join(' ')] = corpusFreq[w];
+  const merges=[];
+  for (let step=0; step<numMerges; step++){
+    const pairs={};
+    for (const word in vocab){
+      const syms = word.split(' ');
+      for (let i=0;i<syms.length-1;i++){
+        const p = syms[i]+' '+syms[i+1];
+        pairs[p] = (pairs[p]||0)+vocab[word];
+      }
+    }
+    let best=null, bestCount=0;
+    for (const p in pairs) if (pairs[p]>bestCount){bestCount=pairs[p]; best=p;}
+    if (!best) break;
+    const [a,b] = best.split(' ');
+    const escA=a.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), escB=b.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    const nv={};
+    for (const word in vocab){
+      const replaced = word.replace(new RegExp('(^|\\s)'+escA+' '+escB+'(?=\\s|$)','g'), (m,p1)=>p1+a+b);
+      nv[replaced]=vocab[word];
+    }
+    vocab=nv;
+    merges.push({pair:[a,b], merged:a+b, freq:bestCount});
+  }
+  return {merges, vocab};
+}
+
+/* ============================================================
+   MINI ELIZA — small original pattern set, reflection-based
+   ============================================================ */
+const ELIZA_RULES = [
+  [/\bi need (.*)/i, 'starts with "I need ___"', (m)=>`What would it mean to you if you got ${m[1]}?`],
+  [/\bi feel (.*)/i, 'starts with "I feel ___"', (m)=>`Why do you feel ${m[1]}?`],
+  [/\bi am (.*)/i, 'contains "I am ___"', (m)=>`How long have you been ${m[1]}?`],
+  [/\bi'?m (.*)/i, 'contains "I\'m ___" (contraction of "I am")', (m)=>`How long have you been ${m[1]}?`],
+  [/\bi (don'?t|do not) know (.*)/i, 'contains "I don\'t/do not know ___"', (m)=>`Why do you think you ${m[1]} know ${m[2]}?`],
+  [/\bmy (mother|father|mom|dad|sister|brother)\b(.*)/i, 'mentions a family member ("my mother/father/…")', (m)=>`Tell me more about your ${m[1]}${m[2]}.`],
+  [/\bbecause (.*)/i, 'contains "because ___" (a justification)', (m)=>`Is that the real reason, or just part of it?`],
+  [/\bi need to (.*)/i, 'contains "I need to ___"', (m)=>`Why do you need to ${m[1]}?`],
+  [/\bsorry\b/i, 'contains the word "sorry"', ()=>`No apology needed. Please continue.`],
+  [/\balways\b/i, 'contains the word "always" (an absolute claim)', ()=>`Can you think of a specific example?`],
+  [/\?\s*$/, 'ends with a question mark', ()=>`Why do you ask that?`],
+  [/\bi (.*) you\b/i, 'matches "I ___ you"', (m)=>`Why do you say I ${m[1]} you?`]
+];
+function elizaAnalyze(input){
+  for (const [pattern, label, fn] of ELIZA_RULES){
+    const m = input.match(pattern);
+    if (m) return {matched:true, pattern, label, groups:m.slice(1), reply:fn(m)};
+  }
+  const fallbacks = ["Tell me more about that.","How does that make you feel?","Why do you say that?","Let's explore that a little further."];
+  const reply = fallbacks[Math.floor(Math.random()*fallbacks.length)];
+  return {matched:false, pattern:null, label:null, groups:[], reply};
+}
+function elizaReply(input){ return elizaAnalyze(input).reply; }
+
+/* ============================================================ WIRING ============================================================ */
+document.addEventListener('DOMContentLoaded', ()=>{
+
+  // reveal on scroll
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if (e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+  // scroll-to-top button
+  const stop = document.getElementById('scrollTop');
+  window.addEventListener('scroll', ()=>{ stop.classList.toggle('show', window.scrollY>600); });
+
+  // hero pipeline animation
+  const stages = document.querySelectorAll('#heroPipeline .pipe-step');
+  const exampleTexts = [
+    "01001110 01001100 01010000 …",
+    "N L P   i s   a m a z i n g …",
+    '["NLP","is","amazing",".",…]',
+    '"NLP is amazing." + "It helps students."'
+  ];
+  let stageIdx=0;
+  function cyclePipeline(){
+    stages.forEach(s=>s.classList.remove('active'));
+    stages[stageIdx].classList.add('active');
+    document.getElementById('pipeExample').textContent = exampleTexts[stageIdx];
+    stageIdx = (stageIdx+1)%stages.length;
+  }
+  cyclePipeline();
+  setInterval(cyclePipeline, 2200);
+
+  // encoding mini-lab
+  const encBtns = document.querySelectorAll('[data-enc]');
+  encBtns.forEach(b=>b.addEventListener('click', ()=>{
+    encBtns.forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    const out = document.getElementById('encOutput');
+    if (b.dataset.enc==='utf8') out.textContent = 'café — décor — piñata';
+    else out.textContent = 'cafÃ© — dÃ©cor — piÃ±ata   (mojibake: same bytes, wrong encoding assumed)';
+  }));
+
+  // tabs (dependencies)
+  document.querySelectorAll('#depTabs .tabbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('#depTabs .tabbtn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // flip cards
+  document.querySelectorAll('.flip-outer').forEach(f=>{
+    f.addEventListener('click', ()=> f.classList.toggle('flipped'));
+  });
+
+  // accordion
+  document.querySelectorAll('.accordion-item').forEach(item=>{
+    item.querySelector('.accordion-head').addEventListener('click', ()=>{
+      item.classList.toggle('open');
+    });
+  });
+
+  // greedy matching demo
+  document.getElementById('greedyBtn').addEventListener('click', ()=>{
+    const dict = ['the','table','down','there','theta','bled','own','a','table','down'];
+    const s = 'thetabledownthere';
+    let i=0; const parts=[];
+    while(i<s.length){
+      let matched=null;
+      for (let len=Math.min(8,s.length-i); len>=1; len--){
+        const cand = s.substr(i,len);
+        if (dict.includes(cand)){ matched=cand; break; }
+      }
+      if (!matched){ matched = s[i]; }
+      parts.push(matched);
+      i += matched.length;
+    }
+    document.getElementById('greedyOutput').textContent = parts.join(' · ') + '\n\n→ Greedy grabs "theta" first (it IS a real word) and the whole sentence falls apart from there.\n→ Correct answer needs backward or bidirectional matching: the · table · down · there';
+  });
+
+  // BPE
+  const corpus = {low:5, lowest:2, newer:6, wider:3, new:2};
+  function renderBPE(n){
+    const {merges} = trainBPE(corpus, n);
+    let html = '<div class="bpe-widget"><strong>Corpus:</strong> 5×low, 2×lowest, 6×newer, 3×wider, 2×new<br><br>';
+    merges.forEach((m,i)=>{
+      html += `<div class="bpe-merge-row"><span style="color:var(--violet-deep);font-weight:700;">Step ${i+1}</span><span>${m.pair[0]} + ${m.pair[1]} → <strong>${m.merged}</strong></span><span style="margin-left:auto;color:var(--ink-soft);">seen ${m.freq}×</span></div>`;
+    });
+    html += '</div>';
+    document.getElementById('bpeResult').innerHTML = html;
+  }
+  document.getElementById('mergeSlider').addEventListener('input', (e)=>{
+    document.getElementById('mergeCount').textContent = e.target.value;
+    renderBPE(parseInt(e.target.value));
+  });
+  renderBPE(4);
+
+  // ELIZA chat
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+  const chatLog = document.getElementById('chatLog');
+  chatForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const val = chatInput.value.trim();
+    if (!val) return;
+    const u = document.createElement('div'); u.className='msg user'; u.textContent=val;
+    chatLog.appendChild(u);
+    const analysis = elizaAnalyze(val);
+    const b = document.createElement('div'); b.className='msg bot'; b.textContent = analysis.reply;
+    chatLog.appendChild(b);
+    chatLog.scrollTop = chatLog.scrollHeight;
+    chatInput.value='';
+
+    const traceEl = document.getElementById('elizaTraceBody');
+    if (traceEl){
+      let html = `<div><strong>You typed:</strong> <span class="mono">"${escapeHtml(val)}"</span></div>`;
+      if (analysis.matched){
+        html += `<div style="margin-top:8px;padding:8px 10px;background:var(--mint);border-radius:8px;"><strong>✅ Currently matched rule:</strong> <span class="mono">${escapeHtml(analysis.pattern.source)}</span><br><span style="color:var(--ink-soft);">${escapeHtml(analysis.label)}</span></div>`;
+        if (analysis.groups.length){
+          html += `<div style="margin-top:8px;"><strong>Captured text:</strong> ${analysis.groups.map((g,i)=>`group ${i+1} = <span class="mono">"${escapeHtml(g||'')}"</span>`).join(', ')}</div>`;
+          html += `<div style="margin-top:8px;"><strong>Reflection:</strong> the captured text is spliced straight into a reply template — no understanding of meaning, just substitution.</div>`;
+        } else {
+          html += `<div style="margin-top:8px;"><strong>No text captured</strong> — this rule only checks that the pattern exists, then returns a fixed reply.</div>`;
+        }
+        html += `<div style="margin-top:8px;"><strong>Reply generated:</strong> <span class="mono">"${escapeHtml(analysis.reply)}"</span></div>`;
+      } else {
+        html += `<div style="margin-top:8px;padding:8px 10px;background:var(--pink);border-radius:8px;"><strong>❌ No rule matched</strong> — none of the ${ELIZA_RULES.length} patterns in the toolkit fit this sentence.</div>`;
+        html += `<div style="margin-top:8px;"><strong>Fallback used:</strong> a generic stock reply is picked at random, since the pattern matcher has nothing to reflect back.</div>`;
+        html += `<div style="margin-top:8px;"><strong>Reply generated:</strong> <span class="mono">"${escapeHtml(analysis.reply)}"</span></div>`;
+      }
+      traceEl.innerHTML = html;
+    }
+  });
+
+  // ---------- LIVE DEMO ----------
+  const samples = {
+    dennis: "DENNIS: Listen, strange women lying in ponds distributing swords is no basis for a system of government. Supreme executive power derives from a mandate from the masses, not from some farcical aquatic ceremony.",
+    ambig: "Dr. Sharma teaches NLP. The meeting is on Sept. 15. Clairson International Corp. said it expects a loss of $3.9 million for its year ending Sept. 24.",
+    apostrophes: "The student's notebook doesn't have I'm's typos. We love the cats of Jean, but we don't like this cat. It's the 1980's I.D.'s that confused everyone.",
+    wild: "OMG this class is amaaazing!!! ive learned so much??? cant believe how cool NLP is, gonna study all nite lol"
+  };
+  document.querySelectorAll('.sample-chip[data-sample]').forEach(c=>{
+    c.addEventListener('click', ()=>{
+      document.getElementById('demoInput').value = samples[c.dataset.sample];
+    });
+  });
+
+  // ---------- LIVE REGEX TESTER ----------
+  function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function runRegexTest(){
+    const patInput = document.getElementById('regexPattern');
+    const testInput = document.getElementById('regexTest');
+    const out = document.getElementById('regexResult');
+    if (!patInput || !testInput || !out) return;
+    const patStr = patInput.value;
+    const str = testInput.value;
+    let re;
+    try {
+      re = new RegExp(patStr, 'g');
+    } catch(e){
+      out.innerHTML = `<span style="color:var(--coral-deep);">Invalid pattern: ${escapeHtml(e.message)}</span>`;
+      return;
+    }
+    let lastIndex = 0, html = '', count = 0, m;
+    re.lastIndex = 0;
+    while ((m = re.exec(str)) !== null) {
+      if (m[0] === '') { re.lastIndex++; continue; }
+      html += escapeHtml(str.slice(lastIndex, m.index));
+      html += `<mark style="background:var(--butter);border-radius:4px;padding:0 2px;">${escapeHtml(m[0])}</mark>`;
+      lastIndex = m.index + m[0].length;
+      count++;
+      if (count > 200) break;
+    }
+    html += escapeHtml(str.slice(lastIndex));
+    out.innerHTML = html + `<div style="margin-top:8px;color:var(--ink-soft);font-size:.78rem;">${count} match${count===1?'':'es'} found</div>`;
+  }
+  const regexPatternEl = document.getElementById('regexPattern');
+  const regexTestEl = document.getElementById('regexTest');
+  if (regexPatternEl){
+    regexPatternEl.addEventListener('input', runRegexTest);
+    regexTestEl.addEventListener('input', runRegexTest);
+    document.querySelectorAll('.sample-chip[data-regex]').forEach(c=>{
+      c.addEventListener('click', ()=>{
+        regexPatternEl.value = c.dataset.regex;
+        runRegexTest();
+      });
+    });
+    runRegexTest();
+  }
+
+  function renderTokenPills(tokens){
+    return tokens.map(t=>{
+      let cls='token-pill';
+      if (/^[^\w\s]+$/.test(t)) cls+=' punct';
+      else if (/^\$?\d/.test(t)) cls+=' num';
+      return `<span class="${cls}">${t.replace(/</g,'&lt;')}</span>`;
+    }).join('');
+  }
+
+  function detectIssues(text, tokens){
+    const issues = [];
+    if (/\b(Dr|Mr|Mrs|Ms|Prof|Corp|Inc|Sept|Jan|St)\./.test(text)) issues.push('🎓 Abbreviation ambiguity — period could be sentence-end OR abbreviation marker');
+    if (/[A-Za-z]'[a-zA-Z]/.test(text)) issues.push("✂️ Apostrophe ambiguity — possession vs. contraction");
+    if (/\$\d/.test(text)) issues.push('💲 Currency + decimal — number-internal period, not a sentence end');
+    if (/\d+\.\d+/.test(text)) issues.push('🔢 Decimal point — another non-sentence-ending period');
+    if (/-/.test(text)) issues.push('➖ Hyphen present — compound word or line-break artifact?');
+    if (/[!?]{2,}|[a-z]{2,}\?\?|:\)|:\(/.test(text)) issues.push('😀 Emoticon / repeated punctuation — wild-caught text signal');
+    if (/\b[a-z]+ing\b/i.test(text)) issues.push('🌱 "-ing" forms present — good stemming/lemmatization contrast case');
+    if (tokens.some(t=>/^[A-Z]{2,}$/.test(t))) issues.push('🔠 All-caps token — could be an acronym or shouting');
+    if (!/[.!?]$/.test(text.trim())) issues.push('❓ No clear terminal punctuation — sentence boundary is ambiguous');
+    if (issues.length===0) issues.push('✅ Nothing tricky detected — try one of the sample chips above for a harder case!');
+    return issues;
+  }
+
+  function runDemo(){
+    const text = document.getElementById('demoInput').value.trim();
+    if (!text) return;
+    const tokens = tokenize(text);
+    const wordTokens = tokens.filter(t=>/[a-zA-Z]/.test(t));
+
+    document.getElementById('outTokens').innerHTML = renderTokenPills(tokens) +
+      `<p style="margin-top:10px;font-size:.78rem;color:var(--ink-soft);">${tokens.length} tokens total (${wordTokens.length} word tokens, ${tokens.length-wordTokens.length} punctuation/number tokens)</p>`;
+
+    const naive = naiveSentenceSplit(text);
+    const smart = smartSentenceSplit(text);
+    document.getElementById('outSentNaive').innerHTML = naive.map(s=>`<span class="sent-chip">${s.replace(/</g,'&lt;')}</span>`).join('') + `<p style="font-size:.75rem;color:var(--ink-soft);margin-top:4px;">${naive.length} sentence(s) found</p>`;
+    document.getElementById('outSentSmart').innerHTML = smart.map(s=>`<span class="sent-chip">${s.replace(/</g,'&lt;')}</span>`).join('') + `<p style="font-size:.75rem;color:var(--ink-soft);margin-top:4px;">${smart.length} sentence(s) found</p>`;
+
+    let rows = '<tr><th>Token</th><th>Stemmed (Porter)</th><th>Lemmatized</th></tr>';
+    const seen = new Set();
+    wordTokens.forEach(t=>{
+      const key = t.toLowerCase();
+      if (seen.has(key)) return; seen.add(key);
+      const st = PorterStemmer(t);
+      const lm = lemmatize(t);
+      const diff = st!==lm;
+      rows += `<tr><td>${t}</td><td class="${diff?'stem-lemma-diff':''}">${st}</td><td>${lm}</td></tr>`;
+    });
+    document.getElementById('outCompareTable').innerHTML = rows;
+
+    const issues = detectIssues(text, tokens);
+    document.getElementById('outIssues').innerHTML = issues.map(i=>`<span class="issue-badge">${i}</span>`).join('');
+
+    const regexPatterns = [
+      {label:'Abbreviation', re:/\b[A-Z][a-z]{0,4}\./g},
+      {label:'Currency', re:/\$\d+(\.\d+)?/g},
+      {label:'Decimal', re:/\b\d+\.\d+\b/g},
+      {label:'Contraction', re:/\b\w+'\w+\b/g},
+      {label:'Hyphenated', re:/\b\w+-\w+\b/g}
+    ];
+    let regexHtml = '';
+    regexPatterns.forEach(p=>{
+      const matches = text.match(p.re);
+      if (matches && matches.length){
+        regexHtml += `<div style="margin-bottom:6px;"><span class="issue-badge">${p.label} · ${matches.length}</span> <span class="mono" style="font-size:.78rem;color:var(--ink-soft);">${matches.map(m=>escapeHtml(m)).join(', ')}</span></div>`;
+      }
+    });
+    document.getElementById('outRegex').innerHTML = regexHtml || '<p style="font-size:.82rem;color:var(--ink-soft);">No abbreviation/currency/decimal/contraction/hyphen patterns found in this text.</p>';
+
+    // ---- Recap panel: the 5 chapter takeaways, worked out against this text ----
+    const byteLen = new TextEncoder().encode(text).length;
+    const nonAscii = Array.from(new Set((text.match(/[^\x00-\x7F]/g) || [])));
+    const noSpaceVersion = text.replace(/\s+/g,'');
+    const abbrevCount = (text.match(/\b[A-Z][a-z]{0,4}\./g) || []).length;
+    const decimalCurrencyCount = (text.match(/\$?\d+\.\d+/g) || []).length;
+    const realSentenceEnds = smart.length;
+
+    let recap = '<div style="display:flex;flex-direction:column;gap:14px;">';
+
+    recap += `<div><strong>1. Bits → characters → tokens → sentences.</strong> Your input is <span class="mono">${byteLen} bytes</span> of UTF‑8, decoded into <span class="mono">${text.length} characters</span>, grouped by the tokenizer into <span class="mono">${tokens.length} tokens</span>, then grouped again by the sentence splitter into <span class="mono">${realSentenceEnds} sentence(s)</span>. Every stage below (stemming, regex matching, ELIZA) only runs because tokenization already happened — the pipeline is strictly one-directional.</div>`;
+
+    recap += `<div><strong>2. Four dependencies decided what "correct" means here.</strong> `
+      + `Character-set: ${nonAscii.length ? `your text uses non‑ASCII characters (${nonAscii.slice(0,8).map(c=>escapeHtml(c)).join(' ')}), so a plain ASCII tokenizer would mangle it` : 'your text is plain ASCII, so any basic tokenizer handles the character set fine'}. `
+      + `Language: tokenized here as space-delimited English — a different rule set entirely would be needed for Chinese or Thai (see below). `
+      + `Corpus/register: ${/[!?]{2,}|lol|omg|gonna|nite/i.test(text) ? 'the informal punctuation and slang here behave like noisy internet text, not edited prose' : 'the punctuation here reads like edited, formal prose'}. `
+      + `Application: a search engine would likely fold "${wordTokens[0]||'a word'}" and its stem together, while a grammar checker needs them kept apart — same tokens, different downstream choice.</div>`;
+
+    recap += `<div><strong>3. Tokenization is easy here because English uses spaces.</strong> With spaces, the tokenizer found <span class="mono">${tokens.length} tokens</span> unambiguously. Strip every space out — <span class="mono">"${escapeHtml(noSpaceVersion.slice(0,40))}${noSpaceVersion.length>40?'…':''}"</span> — and there is no longer any reliable signal for where one word ends and the next begins. That is exactly the everyday reality for Chinese, Japanese, and Thai text, where greedy dictionary matching (see the "No-space languages" section above) is needed just to get started, and even it gets fooled.</div>`;
+
+    recap += `<div><strong>4. Sentence segmentation = disambiguating punctuation.</strong> In your text the period does up to three jobs: it closed off <span class="mono">${abbrevCount}</span> abbreviation(s), sat inside <span class="mono">${decimalCurrencyCount}</span> decimal/currency number(s), and only genuinely ended a sentence <span class="mono">${realSentenceEnds}</span> time(s) (per the abbreviation-aware splitter). ${abbrevCount+decimalCurrencyCount>0 ? 'A naive "period = end of sentence" rule cannot tell these apart — that\'s the ambiguity the deck warns about.' : 'This particular text has no abbreviation or decimal traps, so the naive rule happens to get it right here — try one of the sample chips above to break it.'}</div>`;
+
+    recap += `<div><strong>5. Hybrid systems win.</strong> The naive splitter found <span class="mono">${naive.length}</span> sentence(s); the abbreviation-aware splitter found <span class="mono">${smart.length}</span>. ${naive.length !== smart.length ? `They disagree — exactly the gap that rule-based abbreviation lists (like ALEMBIC) or trainable models (like SATZ) are built to close, and combining both approaches consistently beats either one alone.` : `They agree on this input, but that won't hold for every sentence — that's why production systems still combine hand-written abbreviation rules with a trainable model rather than trusting either one alone.`}</div>`;
+
+    recap += '</div>';
+    document.getElementById('outRecap').innerHTML = recap;
+
+    document.getElementById('demoOutput').classList.add('show');
+    document.getElementById('demoOutput').scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  document.getElementById('runDemoBtn').addEventListener('click', runDemo);
+
+  document.getElementById('sendToElizaBtn').addEventListener('click', ()=>{
+    const text = document.getElementById('demoInput').value.trim();
+    if (!text) return;
+    const firstSentence = smartSentenceSplit(text)[0] || text;
+    chatInput.value = firstSentence;
+    chatForm.dispatchEvent(new Event('submit', {cancelable:true}));
+    document.getElementById('regex').scrollIntoView({behavior:'smooth', block:'center'});
+    document.getElementById('outEliza').textContent = 'Sent — scroll up to see the reply in the Mini-ELIZA chat window ↑';
+  });
+
+  // run once on load with default text so the page feels alive
+  setTimeout(runDemo, 600);
+});
+</script>
+</body>
+</html>
