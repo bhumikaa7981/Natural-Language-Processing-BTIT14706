@@ -44,8 +44,6 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 @media (prefers-reduced-motion: reduce){ *{animation-duration:.001ms !important; transition-duration:.001ms !important; scroll-behavior:auto !important;} }
 ::selection{ background:var(--pink); color:#fff; }
 
-/* ---------- scrollbar flair on shelves ---------- */
-/* ---------- scrollbar flair on shelves ---------- */
 .shelf::-webkit-scrollbar{ height:8px; }
 .shelf::-webkit-scrollbar-track{ background:transparent; }
 .shelf::-webkit-scrollbar-thumb{ background:var(--line); border-radius:99px; }
@@ -70,7 +68,6 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 .theme-chip.pulse{ animation:chipPulse .5s ease; }
 @keyframes chipPulse{ 0%{ transform:scale(1);} 35%{ transform:scale(1.14) rotate(-2deg);} 100%{ transform:translateY(-2px) scale(1.04);} }
 
-/* ---- shelf 3D flip transitions when switching theme ---- */
 .shelf{ perspective:1400px; }
 .poster.flip-out{ animation:flipOut .32s cubic-bezier(.5,0,.8,.3) forwards; }
 .poster.flip-in{ animation:flipIn .55s cubic-bezier(.2,.8,.2,1) both; }
@@ -109,7 +106,7 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 }
 .hero h1 .accent{ color:var(--pink-ink); }
 .hero h1 .accent2{ color:#E0A100; }
-.hero p.sub{ max-width:560px; color:var(--text-dim); font-size:17px; margin:0 0 8px; }
+.hero p.sub{ max-width:580px; color:var(--text-dim); font-size:17px; margin:0 0 8px; }
 .hero p.sub b{ color:var(--text); }
 
 /* ---------- shelf / poster cards ---------- */
@@ -138,7 +135,6 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 .poster .ptitle{ font-family:'Unbounded'; font-weight:700; font-size:16.5px; line-height:1.18; color:var(--text); }
 .poster .ptags{ margin-top:8px; font-family:'Space Mono'; font-size:9.5px; color:rgba(43,33,64,.62); }
 
-/* ---- the small fancy analyze button ---- */
 .analyze-btn{
   position:absolute; left:50%; bottom:-11px; transform:translateX(-50%);
   display:inline-flex; align-items:center; gap:3px; z-index:3;
@@ -222,6 +218,27 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 .meter{ height:8px; border-radius:99px; background:var(--bg-panel2); overflow:hidden; border:1px solid var(--line); }
 .meter-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--pink),var(--yellow),var(--cyan)); transition:width 1.6s cubic-bezier(.2,.8,.2,1); border-radius:99px; }
 
+/* ---------- algorithm explainer ---------- */
+.algo-explainer{
+  background:var(--bg-panel); border:1px solid var(--line); border-radius:18px; padding:20px 22px;
+  margin-bottom:22px; box-shadow:var(--shadow); display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap;
+}
+.algo-explainer .aicon{
+  font-size:26px; flex:0 0 auto; width:46px; height:46px; border-radius:13px; display:flex;
+  align-items:center; justify-content:center; background:var(--bg-panel2);
+  animation:aiconSpin 5s ease-in-out infinite;
+}
+@keyframes aiconSpin{ 0%,100%{ transform:rotate(0deg); } 50%{ transform:rotate(8deg) scale(1.06); } }
+.algo-explainer .atext{ flex:1 1 320px; min-width:260px; }
+.algo-explainer h3{ margin:0 0 6px; font-family:'Unbounded'; font-size:14.5px; }
+.algo-explainer p{ margin:0; font-size:13px; color:var(--text-dim); line-height:1.55; }
+.algo-explainer .aformula{
+  font-family:'Space Mono'; font-size:11.5px; background:var(--bg-panel2); border-radius:10px;
+  padding:10px 12px; margin-top:10px; color:var(--text); line-height:1.7;
+}
+.algo-explainer .aformula b{ color:var(--pink-ink); }
+.algo-explainer .aformula .lbl{ color:var(--violet-ink); }
+
 /* ---------- results grid ---------- */
 .results{ display:none; }
 .results.show{ display:block; }
@@ -232,8 +249,9 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 .rcard{
   background:var(--bg-panel); border:1px solid var(--line); border-radius:16px; padding:14px;
   opacity:0; transform:translateY(16px); animation:rise .5s cubic-bezier(.2,.8,.2,1) forwards;
-  position:relative; box-shadow:var(--shadow);
+  position:relative; box-shadow:var(--shadow); transition:box-shadow .25s ease, transform .25s ease;
 }
+.rcard:hover{ transform:translateY(-4px); box-shadow:0 18px 32px -14px rgba(120,70,150,.42); }
 @keyframes rise{ to{ opacity:1; transform:translateY(0); } }
 .rcard .rank{
   position:absolute; top:-10px; left:12px; font-family:'Unbounded'; font-weight:800; font-size:12px;
@@ -248,11 +266,36 @@ h1,h2,h3,.display{font-family:'Unbounded',sans-serif;}
 .rcard .rmatch .mp{ font-family:'Space Mono'; font-size:10px; color:var(--cyan-ink); font-weight:700; flex:0 0 auto; }
 .rcard .rwhy{ font-size:12px; color:var(--text-dim); line-height:1.4; }
 
+/* ---- math-the-work toggle ---- */
+.math-toggle{
+  margin-top:10px; width:100%; display:flex; align-items:center; justify-content:center; gap:5px;
+  font-family:'Space Mono'; font-size:9.5px; font-weight:700; letter-spacing:.3px; text-transform:uppercase;
+  color:var(--violet-ink); background:var(--bg-panel2); border:1px solid var(--line); border-radius:99px;
+  padding:6px 10px; cursor:pointer; transition:background .2s ease, transform .15s ease;
+}
+.math-toggle:hover{ background:#ECE0FF; transform:translateY(-1px); }
+.math-toggle .arrow{ display:inline-block; transition:transform .25s ease; }
+.rcard.open .math-toggle .arrow{ transform:rotate(180deg); }
+.math-panel{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .35s ease; }
+.math-panel > div{ overflow:hidden; }
+.rcard.open .math-panel{ grid-template-rows:1fr; margin-top:10px; }
+.math-inner{ padding-top:10px; border-top:1px dashed var(--line); }
+.math-row{ display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.math-row .mtag{ font-family:'Space Mono'; font-size:9.5px; color:var(--text); flex:0 0 auto; width:84px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.math-row .mbar{ flex:1; height:6px; background:var(--bg-panel2); border-radius:99px; overflow:hidden; border:1px solid var(--line); }
+.math-row .mbar i{ display:block; height:100%; background:linear-gradient(90deg,var(--violet),var(--pink)); border-radius:99px; }
+@keyframes barGrow{ from{ width:0%; } }
+.rcard.open .math-row .mbar i{ animation:barGrow .6s cubic-bezier(.2,.8,.2,1); }
+.math-row .mval{ font-family:'Space Mono'; font-size:9.5px; color:var(--violet-ink); font-weight:700; flex:0 0 auto; width:32px; text-align:right; }
+.math-formula{ font-family:'Space Mono'; font-size:10px; color:var(--text-dim); margin-top:8px; line-height:1.6; background:var(--bg-panel2); border-radius:8px; padding:8px 10px; }
+.math-formula b{ color:var(--pink-ink); }
+.math-note{ font-family:'Space Mono'; font-size:9.5px; color:var(--text-dim); font-style:italic; margin-top:6px; }
+
 /* ---------- results header ---------- */
 .results-head{ text-align:left; margin-bottom:20px; }
 .results-head .eyebrow{ margin-bottom:10px; }
 .results-head h2{ font-size:26px; margin:0 0 6px; }
-.results-head p{ color:var(--text-dim); margin:0; font-size:14.5px; }
+.results-head p.lead{ color:var(--text-dim); margin:0 0 20px; font-size:14.5px; }
 
 /* ---------- footer ---------- */
 footer{ max-width:1180px; margin:60px auto 0; padding:26px 24px 40px; border-top:1px solid var(--line); }
@@ -264,13 +307,13 @@ footer p b{ color:var(--text); }
 
 <div class="topnav">
   <div class="brand"><span class="dot"></span> the binge engine</div>
-  <div class="nav-pill"><span class="blip"></span> algorithm status: unreasonably confident</div>
+  <div class="nav-pill"><span class="blip"></span> <span id="titleCountPill">algorithm status: unreasonably confident</span></div>
 </div>
 
 <header class="hero">
   <div class="eyebrow">a completely unserious recommendation lab</div>
   <h1>Pick one show.<br>We'll pretend we <span class="accent">know</span> you<span class="accent2">.</span></h1>
-  <p class="sub">Tap anything below. Watch it get <b>scanned, tagged and judged</b> in real time, then get 10 more things to add to the pile you'll never finish.</p>
+  <p class="sub">Tap anything below. Watch it get <b>scanned, tagged and judged</b> in real time, then get 10 more things to add to the pile you'll never finish — with the actual math shown, tag by tag.</p>
 </header>
 
 <section class="section">
@@ -311,7 +354,18 @@ footer p b{ color:var(--text); }
   <div class="results-head">
     <div class="eyebrow">match engine output · ranked, not random</div>
     <h2>Because you clearly have a type 👀</h2>
-    <p>Ranked by shared DNA — pace, tone, chaos level, all of it. Here's your next ten.</p>
+    <p class="lead">Ranked by shared DNA — pace, tone, chaos level, all of it. Here's your next ten.</p>
+    <div class="algo-explainer">
+      <div class="aicon">🧮</div>
+      <div class="atext">
+        <h3>How the % is actually calculated</h3>
+        <p>Every title carries 5 taste tags. Not all tags are equally useful for matching: a tag that only 2 titles in the whole library share tells you a lot more than a tag that 40 titles share, so rare tags get a bigger "weight". A candidate's match % is just the weight of the tags it shares with your pick, divided by the most it could possibly share. Tap <b>"show the math"</b> on any card below to see the exact numbers.</p>
+        <div class="aformula">
+          <span class="lbl">weight(tag)</span> = <b>1 + (1 − frequency ÷ library size) × 2</b><br>
+          <span class="lbl">match %</span> = <b>Σ weight(shared tags) ÷ Σ weight(your pick's tags) × 100</b>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="results-grid" id="resultsGrid"></div>
 </section>
@@ -322,9 +376,11 @@ footer p b{ color:var(--text); }
 
 <script>
 /* ============================= LIBRARY =============================
-   Every title carries a tiny "taste DNA" — a handful of tags. Recommendations
-   are just titles that share the most tags with whatever you picked. It's not
-   rocket science, it's just... very confident bookkeeping. */
+   Every title carries a tiny "taste DNA" — a handful of tags drawn from a
+   shared vocabulary. Recommendations score how much DNA two titles share,
+   weighting rarer tags more heavily than common ones (a light IDF-style
+   idea borrowed straight from text-retrieval / NLP). It's not rocket
+   science, it's just... very confident bookkeeping. */
 const LIBRARY = [
   // ---- the 10 original "starter" titles ----
   {id:'st',  title:'Stranger Things',            plat:'Netflix', glyph:'🚲', hue:[320,265], genre:'fantasy',   tags:['nostalgic','80s','supernatural','ensemble','adventure'], pick:true},
@@ -338,7 +394,7 @@ const LIBRARY = [
   {id:'pc',  title:'Panchayat',                   plat:'Prime',   glyph:'🌾', hue:[130,90],  genre:'comedy',    tags:['feel-good','comedy','slice-of-life','witty','coming-of-age'], pick:true},
   {id:'mb',  title:'MrBeast',                     plat:'YouTube', glyph:'💰', hue:[50,10],   genre:'reality',   tags:['adrenaline','non-stop','feel-good','chaotic','binge-fast'], pick:true},
 
-  // ---- extended pool ----
+  // ---- original extended pool ----
   {id:'dk',  title:'Dark',                        plat:'Netflix', glyph:'🌀', hue:[230,260], genre:'fantasy',  tags:['supernatural','mystery','slow-burn','tension','plot-twists']},
   {id:'oz',  title:'Ozark',                       plat:'Netflix', glyph:'🚤', hue:[190,150], genre:'thriller', tags:['crime','tension','character-study','dark','slow-burn']},
   {id:'pb',  title:'Peaky Blinders',               plat:'Netflix', glyph:'🎩', hue:[210,20],  genre:'drama',    tags:['period','crime','violent','ensemble','tension']},
@@ -357,8 +413,71 @@ const LIBRARY = [
   {id:'hd',  title:'House of the Dragon',           plat:'Prime',   glyph:'🐉', hue:[0,340],   genre:'fantasy',  tags:['period','violent','plot-twists','ensemble','tension']},
   {id:'gt',  title:'Gullak',                        plat:'Prime',   glyph:'🏺', hue:[95,60],   genre:'comedy',   tags:['feel-good','slice-of-life','witty','coming-of-age','comedy']},
   {id:'am',  title:'Arcane',                        plat:'Netflix', glyph:'⚡', hue:[280,200], genre:'fantasy',  tags:['supernatural','adventure','violent','character-study','ensemble']},
-  {id:'ph',  title:'Panchayat Panti (Reality Bites)',plat:'YouTube', glyph:'📹', hue:[55,20],   genre:'reality',  tags:['chaotic','non-stop','feel-good','binge-fast','adrenaline']},
-  {id:'ac',  title:'Asur',                          plat:'Prime',   glyph:'🔱', hue:[260,300], genre:'thriller', tags:['mystery','dark','tension','plot-twists','slow-burn']}
+  {id:'ph',  title:'Reality Bites',                 plat:'YouTube', glyph:'📹', hue:[55,20],   genre:'reality',  tags:['chaotic','non-stop','feel-good','binge-fast','adrenaline']},
+  {id:'ac',  title:'Asur',                          plat:'Prime',   glyph:'🔱', hue:[260,300], genre:'thriller', tags:['mystery','dark','tension','plot-twists','slow-burn']},
+
+  // ---- 55 new additions: global + Indian, spread across every mood ----
+  {id:'crn', title:'The Crown',                    plat:'Netflix', glyph:'👑', hue:[220,260], genre:'drama',    tags:['period','politics','ensemble','slow-burn','character-study']},
+  {id:'got', title:'Game of Thrones',               plat:'HBO Max', glyph:'🐺', hue:[0,30],    genre:'fantasy',  tags:['fantasy-world','violent','plot-twists','ensemble','war']},
+  {id:'lok', title:'Loki',                          plat:'Disney+', glyph:'🐍', hue:[140,60],  genre:'superhero',tags:['superhero','plot-twists','mystery','chaotic','adventure']},
+  {id:'wvn', title:'WandaVision',                   plat:'Disney+', glyph:'📺', hue:[300,340], genre:'superhero',tags:['superhero','supernatural','mystery','character-study','nostalgic']},
+  {id:'sev', title:'Severance',                     plat:'Apple TV+',glyph:'🧠', hue:[200,220], genre:'thriller', tags:['mystery','dark','workplace','slow-burn','tension']},
+  {id:'suc', title:'Succession',                    plat:'HBO Max', glyph:'💼', hue:[30,10],   genre:'drama',    tags:['workplace','dark-comedy','character-study','politics','witty']},
+  {id:'bear',title:'The Bear',                      plat:'Hulu',    glyph:'🔪', hue:[10,40],   genre:'drama',    tags:['workplace','cooking','tension','character-study','chaotic']},
+  {id:'abt', title:'Abbott Elementary',              plat:'Hulu',    glyph:'🍎', hue:[50,90],   genre:'comedy',   tags:['school','workplace','comedy','feel-good','witty']},
+  {id:'frn', title:'Friends',                        plat:'Netflix', glyph:'☕', hue:[40,10],   genre:'comedy',   tags:['comedy','feel-good','ensemble','witty','slice-of-life']},
+  {id:'hmy', title:'How I Met Your Mother',          plat:'Hulu',    glyph:'💛', hue:[45,60],   genre:'comedy',   tags:['comedy','romance','ensemble','witty','feel-good']},
+  {id:'ofc', title:'The Office',                     plat:'Netflix', glyph:'📎', hue:[40,200],  genre:'comedy',   tags:['workplace','comedy','deadpan','witty','ensemble']},
+  {id:'prk', title:'Parks and Recreation',           plat:'Netflix', glyph:'🌳', hue:[130,90],  genre:'comedy',   tags:['workplace','comedy','feel-good','witty','ensemble']},
+  {id:'shl', title:'Sherlock',                       plat:'Netflix', glyph:'🔍', hue:[210,240], genre:'thriller', tags:['mystery','character-study','witty','plot-twists','tension']},
+  {id:'wwd', title:'What We Do in the Shadows',      plat:'Hulu',    glyph:'🧛', hue:[270,220], genre:'comedy',   tags:['dark-comedy','supernatural','deadpan','chaotic','satire']},
+  {id:'eup', title:'Euphoria',                       plat:'HBO Max', glyph:'💊', hue:[320,300], genre:'drama',    tags:['coming-of-age','dark','character-study','chaotic','music']},
+  {id:'rvd', title:'Riverdale',                      plat:'Netflix', glyph:'🍒', hue:[350,20],  genre:'thriller', tags:['mystery','coming-of-age','plot-twists','dark','gothic']},
+  {id:'umb', title:'The Umbrella Academy',           plat:'Netflix', glyph:'☂️', hue:[260,300], genre:'superhero',tags:['superhero','supernatural','chaotic','ensemble','plot-twists']},
+  {id:'bjk', title:'BoJack Horseman',                plat:'Netflix', glyph:'🐴', hue:[190,150], genre:'comedy',   tags:['dark-comedy','character-study','satire','animated','slow-burn']},
+  {id:'arc', title:'Archer',                         plat:'Hulu',    glyph:'🕶️', hue:[10,340],  genre:'comedy',   tags:['spy','dark-comedy','animated','satire','chaotic']},
+  {id:'nar', title:'Narcos',                         plat:'Netflix', glyph:'🌵', hue:[40,10],   genre:'thriller', tags:['crime','tension','true-crime','dark','non-stop']},
+  {id:'mhn', title:'Mindhunter',                     plat:'Netflix', glyph:'🩸', hue:[220,250], genre:'thriller', tags:['true-crime','dark','slow-burn','mystery','character-study']},
+  {id:'qng', title:"The Queen's Gambit",             plat:'Netflix', glyph:'♟️', hue:[200,170], genre:'drama',    tags:['period','character-study','slow-burn','coming-of-age','competition']},
+  {id:'brg', title:'Bridgerton',                     plat:'Netflix', glyph:'💌', hue:[330,300], genre:'drama',    tags:['period','romance','ensemble','witty','feel-good']},
+  {id:'emp', title:'Emily in Paris',                 plat:'Netflix', glyph:'🥐', hue:[340,300], genre:'comedy',   tags:['romance','workplace','feel-good','travel','witty']},
+  {id:'sxe', title:'Sex Education',                  plat:'Netflix', glyph:'🏫', hue:[300,340], genre:'comedy',   tags:['school','coming-of-age','comedy','witty','feel-good']},
+  {id:'hst', title:'Heartstopper',                   plat:'Netflix', glyph:'🍂', hue:[45,150],  genre:'comedy',   tags:['coming-of-age','romance','feel-good','school','slice-of-life']},
+  {id:'hmt', title:"The Handmaid's Tale",            plat:'Hulu',    glyph:'🩸', hue:[0,340],   genre:'drama',    tags:['apocalyptic','dark','politics','tension','character-study']},
+  {id:'wwl', title:'Westworld',                      plat:'HBO Max', glyph:'🤖', hue:[40,200],  genre:'thriller', tags:['mystery','dark','plot-twists','slow-burn','fantasy-world']},
+  {id:'bkl', title:'The Blacklist',                  plat:'Netflix', glyph:'🕴️', hue:[30,10],   genre:'thriller', tags:['crime','spy','tension','plot-twists','non-stop']},
+  {id:'jkr', title:'Jack Ryan',                      plat:'Prime',   glyph:'🎯', hue:[200,240], genre:'thriller', tags:['spy','tension','non-stop','war','adrenaline']},
+  {id:'rch', title:'Reacher',                        plat:'Prime',   glyph:'👊', hue:[10,40],   genre:'thriller', tags:['crime','violent','adrenaline','non-stop','tension']},
+  {id:'cit', title:'Citadel',                        plat:'Prime',   glyph:'🕵️', hue:[220,260], genre:'thriller', tags:['spy','adrenaline','plot-twists','non-stop','tension']},
+  {id:'lup', title:'Lupin',                          plat:'Netflix', glyph:'🎩', hue:[40,10],   genre:'thriller', tags:['heist','crime','witty','plot-twists','non-stop']},
+  {id:'dhm', title:'Dahmer — Monster',                plat:'Netflix', glyph:'🔦', hue:[230,260], genre:'thriller', tags:['true-crime','dark','slow-burn','character-study','tension']},
+  {id:'tgk', title:'Tiger King',                     plat:'Netflix', glyph:'🐯', hue:[40,10],   genre:'reality',  tags:['true-crime','docuseries','chaotic','non-stop','dark-comedy']},
+  {id:'qre', title:'Queer Eye',                      plat:'Netflix', glyph:'✨', hue:[330,300], genre:'reality',  tags:['feel-good','docuseries','non-stop','chaotic','family']},
+  {id:'lib', title:'Love Is Blind',                  plat:'Netflix', glyph:'💍', hue:[340,300], genre:'reality',  tags:['romance','chaotic','docuseries','non-stop','feel-good']},
+  {id:'gbb', title:'The Great British Bake Off',     plat:'Netflix', glyph:'🍰', hue:[45,90],   genre:'reality',  tags:['competition','cooking','feel-good','docuseries','family']},
+  {id:'srv', title:'Survivor',                       plat:'YouTube', glyph:'🏝️', hue:[190,150], genre:'reality',  tags:['survival','competition','non-stop','chaotic','adrenaline']},
+  {id:'amr', title:'The Amazing Race',                plat:'YouTube', glyph:'🌍', hue:[200,170], genre:'reality',  tags:['travel','competition','adrenaline','non-stop','chaotic']},
+  {id:'f1d', title:'Formula 1: Drive to Survive',     plat:'Netflix', glyph:'🏎️', hue:[10,40],   genre:'reality',  tags:['sports','docuseries','competition','adrenaline','non-stop']},
+  {id:'lsd', title:'The Last Dance',                  plat:'YouTube', glyph:'🏀', hue:[30,10],   genre:'reality',  tags:['sports','docuseries','character-study','competition','nostalgic']},
+  {id:'cst', title:'Castlevania',                     plat:'Netflix', glyph:'🏰', hue:[270,220], genre:'fantasy',  tags:['supernatural','violent','gothic','fantasy-world','adventure']},
+  {id:'avt', title:'Avatar: The Last Airbender',      plat:'Netflix', glyph:'🌊', hue:[190,150], genre:'fantasy',  tags:['fantasy-world','adventure','coming-of-age','ensemble','family']},
+  {id:'wtc', title:'The Witcher',                     plat:'Netflix', glyph:'⚔️', hue:[200,240], genre:'fantasy',  tags:['fantasy-world','violent','adventure','slow-burn','mystery']},
+  {id:'sdb', title:'Shadow and Bone',                 plat:'Netflix', glyph:'🌑', hue:[260,300], genre:'fantasy',  tags:['fantasy-world','adventure','ensemble','plot-twists','romance']},
+  {id:'sdm', title:'The Sandman',                     plat:'Netflix', glyph:'💤', hue:[270,220], genre:'fantasy',  tags:['supernatural','gothic','mystery','slow-burn','fantasy-world']},
+  {id:'gdo', title:'Good Omens',                      plat:'Prime',   glyph:'😇', hue:[45,150],  genre:'fantasy',  tags:['supernatural','comedy','witty','apocalyptic','feel-good']},
+  {id:'fnd', title:'Foundation',                      plat:'Apple TV+',glyph:'🌌', hue:[220,260], genre:'fantasy',  tags:['fantasy-world','slow-burn','politics','ensemble','mystery']},
+  {id:'mdn', title:'The Mandalorian',                 plat:'Disney+', glyph:'🪐', hue:[40,200],  genre:'fantasy',  tags:['adventure','fantasy-world','family','non-stop','adrenaline']},
+  {id:'trp', title:'TVF Tripling',                    plat:'SonyLIV', glyph:'🚗', hue:[45,90],   genre:'comedy',   tags:['travel','family','feel-good','witty','slice-of-life']},
+  {id:'prr', title:'Permanent Roommates',             plat:'YouTube', glyph:'💑', hue:[340,300], genre:'comedy',   tags:['romance','comedy','witty','slice-of-life','feel-good']},
+  {id:'asp', title:'Aspirants',                       plat:'YouTube', glyph:'📚', hue:[190,150], genre:'drama',    tags:['coming-of-age','school','character-study','feel-good','slice-of-life']},
+  {id:'ied', title:'Inside Edge',                     plat:'Prime',   glyph:'🏏', hue:[10,40],   genre:'thriller', tags:['sports','crime','tension','plot-twists','non-stop']},
+  {id:'crj', title:'Criminal Justice',                 plat:'Disney+', glyph:'⚖️', hue:[220,250], genre:'thriller', tags:['crime','legal','mystery','tension','slow-burn']},
+  {id:'ptl', title:'Paatal Lok',                       plat:'Prime',   glyph:'🌆', hue:[230,260], genre:'thriller', tags:['crime','dark','mystery','tension','politics']},
+  {id:'jmt', title:'Jamtara',                          plat:'Netflix', glyph:'📱', hue:[40,10],   genre:'thriller', tags:['crime','satire','tension','non-stop','dark-comedy']},
+  {id:'rbs', title:'Rocket Boys',                      plat:'SonyLIV', glyph:'🚀', hue:[200,170], genre:'drama',    tags:['period','character-study','slow-burn','ensemble','family']},
+  {id:'tzk', title:'Taaza Khabar',                     plat:'Disney+', glyph:'📰', hue:[45,90],   genre:'comedy',   tags:['satire','dark-comedy','chaotic','witty','feel-good']},
+  {id:'frz', title:'Farzi',                            plat:'Prime',   glyph:'💵', hue:[40,10],   genre:'thriller', tags:['crime','tension','non-stop','plot-twists','dark-comedy']},
+  {id:'mhr', title:'Maharani',                         plat:'SonyLIV', glyph:'👑', hue:[330,300], genre:'drama',    tags:['politics','period','character-study','ensemble','slow-burn']}
 ];
 
 /* Genre buckets used by the theme selector — each maps to a slice of the
@@ -377,15 +496,32 @@ let activeTheme = 'all';
 const STEPS = [
   "Reading the vibe of your pick",
   "Cross-checking taste DNA against the library",
+  "Weighting rare tags over common ones",
   "Running the chaos-to-cozy calibration",
   "Filtering out anything your ex would recommend",
-  "Ranking by gut feeling, not just tags",
   "Locking in your next ten"
 ];
 
 function gradient(hue){
   return 'linear-gradient(155deg, hsl('+hue[0]+',92%,88%), hsl('+hue[1]+',85%,76%))';
 }
+
+document.getElementById('titleCountPill').textContent =
+  'algorithm status: unreasonably confident · '+LIBRARY.length+' titles indexed';
+
+/* ---- tag statistics: how rare is each tag, and how much should it count ---- */
+function buildTagStats(lib){
+  const freq = {};
+  lib.forEach(item=> item.tags.forEach(t=> freq[t]=(freq[t]||0)+1));
+  const N = lib.length;
+  const weights = {};
+  Object.keys(freq).forEach(t=>{
+    // rarer tag (lower freq) -> weight closer to 3. common tag -> weight closer to 1.
+    weights[t] = +(1 + (1 - freq[t]/N) * 2).toFixed(2);
+  });
+  return {freq, weights, N};
+}
+const TAG_STATS = buildTagStats(LIBRARY);
 
 /* ---- theme chip row ---- */
 const themeRow = document.getElementById('themeRow');
@@ -472,22 +608,33 @@ function renderShelf(themeKey, animate){
 
 renderShelf('all', false);
 
-/* ---- recommendation scoring ---- */
+/* ---- recommendation scoring (weighted-tag match, with a small same-genre nudge for ranking only) ---- */
+function scoreCandidate(source, candidate){
+  const shared = candidate.tags.filter(t=>source.tags.includes(t));
+  const tagScore = shared.reduce((s,t)=> s + TAG_STATS.weights[t], 0);
+  const maxScore = source.tags.reduce((s,t)=> s + TAG_STATS.weights[t], 0);
+  const sameGenre = candidate.genre === source.genre;
+  const genreBonus = sameGenre ? +(maxScore*0.15).toFixed(2) : 0;
+  const rankScore = tagScore + genreBonus;
+  const pct = Math.max(8, Math.min(99, Math.round((tagScore/maxScore)*100)));
+  return {item:candidate, shared, tagScore:+tagScore.toFixed(2), maxScore:+maxScore.toFixed(2), genreBonus, sameGenre, rankScore, pct};
+}
+
 function getRecommendations(title){
   const others = LIBRARY.filter(x=>x.id!==title.id);
-  const scored = others.map(o=>{
-    const shared = o.tags.filter(t=>title.tags.includes(t));
-    return {item:o, shared, score:shared.length};
-  });
-  scored.sort((a,b)=> b.score-a.score);
+  const scored = others.map(o=> scoreCandidate(title, o));
+  scored.sort((a,b)=> (b.rankScore - a.rankScore) || (b.pct - a.pct));
   return scored.slice(0,10);
 }
 
-function reasonText(shared){
-  const clean = t => t.replace('-',' ');
-  if (shared.length===0) return "Zero tag overlap, honestly. Algorithm's just vibing.";
-  if (shared.length===1) return "Same "+clean(shared[0])+" energy, different cast.";
-  return "Both bring the "+shared.slice(0,2).map(clean).join(' + ')+" energy.";
+function reasonText(r){
+  const clean = t => t.replace(/-/g,' ');
+  let base;
+  if (r.shared.length===0) base = "No shared tags — riding on genre vibes alone.";
+  else if (r.shared.length===1) base = "Same "+clean(r.shared[0])+" energy, different cast.";
+  else base = "Shares "+r.shared.slice(0,2).map(clean).join(' + ')+" energy"+(r.shared.length>2 ? ' (+'+(r.shared.length-2)+' more)' : '')+'.';
+  if (r.sameGenre) base += ' Same genre lane, too.';
+  return base;
 }
 
 /* ---- run the "analysis" show ---- */
@@ -495,6 +642,7 @@ let runToken = 0;
 function runAnalysis(id){
   const title = LIBRARY.find(t=>t.id===id);
   const myRun = ++runToken;
+  const recs = getRecommendations(title); // computed up front so the confidence meter reflects real match strength
 
   document.querySelectorAll('.poster').forEach(p=> p.classList.toggle('active', p.dataset.id===id));
 
@@ -524,7 +672,9 @@ function runAnalysis(id){
 
   analysisSection.scrollIntoView({behavior:'smooth', block:'start'});
 
-  const finalPct = Math.min(96, 62 + title.tags.length*6 + Math.floor(Math.random()*8));
+  // confidence reflects the real strength of the top matches, not a made-up number
+  const top3 = recs.slice(0,3);
+  const finalPct = Math.max(35, Math.min(97, Math.round(top3.reduce((s,r)=>s+r.pct,0)/top3.length) + 4));
 
   stepEls.forEach((el,i)=>{
     setTimeout(()=>{
@@ -546,27 +696,51 @@ function runAnalysis(id){
   setTimeout(()=>{
     if (myRun!==runToken) return;
     scanBox.classList.add('done');
-    showResults(title);
+    showResults(title, recs);
   }, totalDelay);
 }
 
-function showResults(title){
-  const recs = getRecommendations(title);
+function showResults(title, recs){
   const grid = document.getElementById('resultsGrid');
   grid.innerHTML = '';
   recs.forEach((r,i)=>{
-    const maxPossible = title.tags.length;
-    const pct = Math.max(8, Math.round(r.score/maxPossible*100));
     const card = document.createElement('div');
     card.className = 'rcard';
     card.style.animationDelay = (i*80) + 'ms';
+
+    const mathRows = r.shared.length
+      ? r.shared.map(t=>{
+          const w = TAG_STATS.weights[t];
+          const barPct = Math.round((w/3)*100);
+          return '<div class="math-row"><span class="mtag">#'+t.replace('-','')+'</span><span class="mbar"><i style="width:'+barPct+'%"></i></span><span class="mval">'+w.toFixed(1)+'</span></div>';
+        }).join('')
+      : '<div class="math-note">No shared tags to weigh — this one only scores from a genre nudge.</div>';
+
+    const formula = r.shared.length
+      ? '<b>'+r.shared.map(t=>TAG_STATS.weights[t].toFixed(1)).join(' + ')+'</b> = '+r.tagScore.toFixed(1)
+        +'&nbsp;&nbsp;→&nbsp;&nbsp;'+r.tagScore.toFixed(1)+' ÷ '+r.maxScore.toFixed(1)+' (max possible)'
+        +'&nbsp;&nbsp;=&nbsp;&nbsp;<b>'+r.pct+'%</b>'
+      : '0 ÷ '+r.maxScore.toFixed(1)+' = <b>'+r.pct+'%</b> (floor score)';
+
+    const genreNote = r.sameGenre
+      ? '<div class="math-note">+ same-genre nudge used to help rank this card, not counted in the % above</div>'
+      : '';
+
     card.innerHTML =
       '<div class="rank">#'+(i+1)+'</div>'
       + '<div class="rglyph">'+r.item.glyph+'</div>'
       + '<div class="rplat">'+r.item.plat+'</div>'
       + '<div class="rtitle">'+r.item.title+'</div>'
-      + '<div class="rmatch"><div class="mm"><i style="width:'+pct+'%"></i></div><div class="mp">'+pct+'%</div></div>'
-      + '<div class="rwhy">'+reasonText(r.shared)+'</div>';
+      + '<div class="rmatch"><div class="mm"><i style="width:'+r.pct+'%"></i></div><div class="mp">'+r.pct+'%</div></div>'
+      + '<div class="rwhy">'+reasonText(r)+'</div>'
+      + '<button type="button" class="math-toggle"><span class="arrow">▾</span> show the math</button>'
+      + '<div class="math-panel"><div class="math-inner">'
+        + mathRows
+        + '<div class="math-formula">'+formula+'</div>'
+        + genreNote
+      + '</div></div>';
+
+    card.querySelector('.math-toggle').addEventListener('click', ()=> card.classList.toggle('open'));
     grid.appendChild(card);
   });
   const resultsSection = document.getElementById('resultsSection');
