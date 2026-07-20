@@ -38,7 +38,6 @@
   }
   .wrap{max-width:980px;margin:0 auto;}
 
-  /* HEADER */
   header{text-align:center;margin-bottom:36px;}
   .eyebrow{
     display:inline-flex;align-items:center;gap:8px;
@@ -53,10 +52,10 @@
     background:linear-gradient(90deg,var(--pink-dark),var(--purple-dark) 50%,var(--teal-dark));
     -webkit-background-clip:text;background-clip:text;color:transparent;
   }
-  .sub{color:var(--muted);font-size:16px;max-width:560px;margin:0 auto;}
+  .sub{color:var(--muted);font-size:16px;max-width:600px;margin:0 auto;}
+  .db-note{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--purple-dark);}
 
-  /* LANG TABS */
-  .tabs{display:flex;justify-content:center;gap:10px;margin:32px 0 18px;}
+  .tabs{display:flex;justify-content:center;gap:10px;margin:32px 0 18px;flex-wrap:wrap;}
   .tab{
     font-family:'Baloo 2',cursive;font-weight:700;font-size:16px;
     padding:10px 22px;border-radius:999px;border:2px solid var(--line);
@@ -68,7 +67,14 @@
   }
   .tab:hover{color:var(--text);}
 
-  /* SONG GRID */
+  .search-row{display:flex;justify-content:center;margin-bottom:18px;}
+  .search-box{
+    width:100%;max-width:420px;font-family:'Poppins',sans-serif;font-size:14px;
+    padding:10px 16px;border-radius:999px;border:2px solid var(--line);background:var(--panel);
+    color:var(--text);outline:none;
+  }
+  .search-box:focus{border-color:var(--purple-dark);}
+
   .grid{
     display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
     gap:12px;margin-bottom:8px;
@@ -86,9 +92,8 @@
     box-shadow:0 6px 20px rgba(255,224,138,0.35);
   }
   .song-title{font-weight:600;font-size:14.5px;}
-  .song-artist{font-size:12.5px;color:var(--muted);}
+  .song-artist{font-size:12px;color:var(--muted);}
 
-  /* RUN BUTTON */
   .run-row{display:flex;justify-content:center;margin:30px 0 10px;}
   .run-btn{
     font-family:'Baloo 2',cursive;font-weight:700;font-size:18px;
@@ -101,7 +106,6 @@
   }
   .run-btn:not(:disabled):hover{transform:translateY(-2px) scale(1.02);}
 
-  /* PIPELINE */
   .pipeline{margin-top:38px;display:flex;flex-direction:column;gap:18px;}
   .step{
     background:var(--panel);border:2px solid var(--line);border-radius:20px;
@@ -125,11 +129,14 @@
     padding:6px 12px;border-radius:8px;background:var(--panel-2);
     border:1px solid var(--line);color:var(--text);
   }
-  .chip.fade{opacity:.35;}
+  .chip.fade{opacity:.4;text-decoration:line-through;}
+  .chip.signal{border-color:var(--pink-dark);color:var(--pink-dark);font-weight:700;background:rgba(255,169,217,0.18);}
+  .row-label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:12px 0 6px 40px;}
 
   .tagline-box{
     margin-left:40px;background:var(--panel-2);border-left:3px solid var(--purple-dark);
     border-radius:8px;padding:10px 14px;font-size:13.5px;color:var(--muted);font-style:italic;
+    margin-bottom:14px;
   }
 
   .pill{
@@ -143,7 +150,6 @@
 
   .pill-row{margin-left:40px;display:flex;flex-wrap:wrap;gap:2px;}
 
-  /* OUTPUT */
   .output{
     margin-top:8px;border-radius:22px;padding:28px;
     background:linear-gradient(135deg,rgba(255,169,217,0.30),rgba(156,243,224,0.30));
@@ -151,9 +157,15 @@
   }
   .output h2{font-family:'Baloo 2',cursive;margin:0 0 4px;font-size:24px;}
   .output .sub2{color:var(--muted);font-size:13.5px;margin-bottom:18px;}
+  .formula-box{
+    background:var(--panel);border:1px dashed var(--purple-dark);border-radius:12px;
+    padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text);
+    margin-bottom:20px;line-height:1.7;
+  }
+  .formula-box b{color:var(--purple-dark);}
   .playlist-card{
     display:flex;align-items:center;gap:16px;background:var(--panel);
-    border-radius:16px;padding:16px 18px;margin-bottom:18px;border:1px solid var(--line);
+    border-radius:16px;padding:16px 18px;margin-bottom:20px;border:1px solid var(--line);
   }
   .art{
     width:56px;height:56px;border-radius:12px;flex-shrink:0;
@@ -163,19 +175,26 @@
   .playlist-name{font-family:'Baloo 2',cursive;font-weight:700;font-size:18px;}
   .playlist-desc{color:var(--muted);font-size:13px;}
   .sim-title{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--teal-dark);margin-bottom:10px;}
-  .sim-list{display:flex;flex-direction:column;gap:8px;}
-  .sim-item{
-    display:flex;justify-content:space-between;background:var(--panel-2);
-    padding:10px 14px;border-radius:10px;font-size:13.5px;
-  }
-  .sim-item span:last-child{color:var(--muted);}
-  .match{color:var(--teal-dark);font-family:'JetBrains Mono',monospace;font-weight:600;}
+    text-transform:uppercase;color:var(--teal-dark);margin-bottom:12px;}
+
+  .match-card{background:var(--panel);border-radius:14px;padding:16px 18px;margin-bottom:12px;border:1px solid var(--line);}
+  .match-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:10px;}
+  .match-name{font-weight:600;font-size:14.5px;}
+  .match-artist{color:var(--muted);font-size:12px;display:block;}
+  .match-pct{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:17px;flex-shrink:0;}
+  .pct-strong{color:var(--teal-dark);}
+  .pct-good{color:var(--pink-dark);}
+  .pct-loose{color:var(--muted);}
+  .bar-track{height:8px;border-radius:99px;background:var(--panel-2);overflow:hidden;margin-bottom:10px;}
+  .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pink-dark),var(--teal-dark));width:0%;transition:width .8s ease;}
+  .reason-list{display:flex;flex-wrap:wrap;gap:6px;}
+  .reason-chip{font-size:11.5px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:4px 9px;color:var(--muted);}
+  .reason-chip b{color:var(--text);font-family:'JetBrains Mono',monospace;}
 
   .hint{text-align:center;color:var(--muted);font-size:13px;margin-top:10px;}
 
   @media (max-width:520px){
-    .step-quip,.chip-row,.pill-row,.tagline-box{margin-left:0;}
+    .step-quip,.chip-row,.pill-row,.tagline-box,.row-label{margin-left:0;}
     .step-head{gap:10px;}
   }
 </style>
@@ -186,12 +205,17 @@
   <header>
     <div class="eyebrow">🎧 how streaming apps read your feelings</div>
     <h1>Lyric Whisperer</h1>
-    <p class="sub">Feed it a trending song. Watch the NLP model sniff out the theme, catch the mood, and quietly build you a playlist — no therapist required.</p>
+    <p class="sub">Feed it a trending song. Watch the NLP model tokenize it, tag the theme and mood, then score every other track in the catalog to justify — with a percentage — exactly why it's queuing up next.</p>
+    <div class="db-note" id="dbNote"></div>
   </header>
 
   <div class="tabs">
-    <button class="tab active" data-lang="en">🇬🇧 English · Trending 10</button>
-    <button class="tab" data-lang="hi">🇮🇳 Hindi · Latest 10</button>
+    <button class="tab active" data-lang="en">🇬🇧 English · Trending Catalog</button>
+    <button class="tab" data-lang="hi">🇮🇳 Hindi · Trending Catalog</button>
+  </div>
+
+  <div class="search-row">
+    <input type="text" class="search-box" id="searchBox" placeholder="Search the catalog by title or artist…">
   </div>
 
   <div class="grid" id="songGrid"></div>
@@ -206,69 +230,221 @@
 </div>
 
 <script>
+/* =========================================================
+   CATALOG — 52 songs total (32 EN / 20 HI). Vibe fields are
+   original paraphrases describing each song's story, not
+   quoted lyrics.
+   ========================================================= */
 const SONGS = {
   en: [
-    {title:"Anti-Hero", artist:"Taylor Swift", theme:"self-doubt & self-reckoning", mood:"Introspective", emotions:["anxious 😬","self-aware 🪞","wry 😏"], keywords:["monster","midnights","mirror","shrink"], vibe:"Every party I throw, I turn into the thing I was scared of.", playlist:"Overthinking O'Clock 🌙", desc:"For 2am spirals with impeccable production."},
-    {title:"As It Was", artist:"Harry Styles", theme:"nostalgia & letting go", mood:"Bittersweet", emotions:["wistful 🥲","fond 💭","a little numb 😶"], keywords:["Harry's house","nothing's the same","seventies","fine"], vibe:"You know it's not the same as it was, in this world it's just us.", playlist:"Golden Hour Goodbyes 🌇", desc:"Nostalgia you can dance badly to."},
-    {title:"Flowers", artist:"Miley Cyrus", theme:"self-love & independence", mood:"Empowered", emotions:["confident 💪","liberated 🕊️","unbothered 😎"], keywords:["can buy myself","flowers","talk to myself","better"], vibe:"I can love me better than you can, baby.", playlist:"Main Character Energy 💅", desc:"Solo dance-party, no plus-one required."},
-    {title:"Cruel Summer", artist:"Taylor Swift", theme:"secret longing", mood:"Yearning", emotions:["giddy 🙈","nervous 💗","hopeful ✨"], keywords:["cruel","secret","devil","fever dream"], vibe:"I'm drunk in the back of the car, and I cried like a baby coming home.", playlist:"Golden Hour Goodbyes 🌇", desc:"Summer feelings that hit a little too hard."},
-    {title:"Espresso", artist:"Sabrina Carpenter", theme:"playful magnetism", mood:"Flirty", emotions:["cheeky 😏","breezy 🍹","confident 💃"], keywords:["espresso","that's that me","sleep","mountain dew"], vibe:"I'm working late 'cause I'm a singer, one touch and I'm a sinner.", playlist:"Confidence In A Can 🥤", desc:"For strutting to the mailbox like it's a runway."},
-    {title:"Die With A Smile", artist:"Lady Gaga & Bruno Mars", theme:"love against the clock", mood:"Tender", emotions:["devoted 🥹","urgent ❤️‍🔥","warm 🫶"], keywords:["world ends","smile","hold you","last night"], vibe:"If the world was ending, I'd wanna be next to you.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Built for last dances and long hugs."},
-    {title:"Good Luck, Babe!", artist:"Chappell Roan", theme:"denial & desire", mood:"Defiant", emotions:["frustrated 😤","yearning 💔","sharp-tongued 🗣️"], keywords:["good luck","forget me","label","dizzy"], vibe:"You'd have to stop the world just to stop the feeling.", playlist:"Plot Twist Playlist 🔄", desc:"For processing feelings you didn't ask for."},
-    {title:"Birds of a Feather", artist:"Billie Eilish", theme:"devotion & fragility", mood:"Dreamy", emotions:["besotted 🥰","fragile 🫧","content 😌"], keywords:["birds","feather","stay","flock together"], vibe:"I don't think I could love you more, it might not be enough.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Soft, floaty, dangerously romantic."},
-    {title:"Beautiful Things", artist:"Benson Boone", theme:"fear of losing joy", mood:"Anxious-hopeful", emotions:["grateful 🙏","scared 😰","tender 💛"], keywords:["beautiful things","losing you","please","careful"], vibe:"I just wanna keep you, close your eyes, let's stay here for a while.", playlist:"Overthinking O'Clock 🌙", desc:"Gratitude with a side of dread — relatable."},
-    {title:"Texas Hold 'Em", artist:"Beyoncé", theme:"freedom & togetherness", mood:"Rowdy-warm", emotions:["playful 🤠","free 🌾","joyful 😂"], keywords:["Texas","hold 'em","boots","hoedown"], vibe:"This ain't Texas, ain't no hold 'em, so lay your cards down.", playlist:"Barn-Door Karaoke 🤠", desc:"For pretending you know how to two-step."}
+    {title:"Anti-Hero", artist:"Taylor Swift", theme:"self-doubt & self-reckoning", mood:"Introspective", emotions:["anxious 😬","self-aware 🪞","wry 😏"], keywords:["monster","mirror","shrink","midnights"], vibe:"She wonders, half-joking, if she's the exhausting one at her own party.", playlist:"Overthinking O'Clock 🌙", desc:"For 2am spirals with impeccable production."},
+    {title:"As It Was", artist:"Harry Styles", theme:"nostalgia & letting go", mood:"Bittersweet", emotions:["wistful 🥲","fond 💭","numb 😶"], keywords:["seventies","nothing","fine","same"], vibe:"Life looks different now, and everyone's quietly adjusting to it.", playlist:"Golden Hour Goodbyes 🌇", desc:"Nostalgia you can dance badly to."},
+    {title:"Flowers", artist:"Miley Cyrus", theme:"self-love & independence", mood:"Empowered", emotions:["confident 💪","liberated 🕊️","unbothered 😎"], keywords:["flowers","buy","myself","better"], vibe:"She realizes she can give herself everything she used to wait on someone else for.", playlist:"Main Character Energy 💅", desc:"Solo dance-party, no plus-one required."},
+    {title:"Cruel Summer", artist:"Taylor Swift", theme:"secret longing", mood:"Yearning", emotions:["giddy 🙈","nervous 💗","hopeful ✨"], keywords:["cruel","secret","devil","fever"], vibe:"A summer romance she's too scared to admit out loud.", playlist:"Plot Twist Playlist 🔄", desc:"Summer feelings that hit a little too hard."},
+    {title:"Espresso", artist:"Sabrina Carpenter", theme:"playful magnetism", mood:"Flirty", emotions:["cheeky 😏","breezy 🍹","confident 💃"], keywords:["espresso","singer","sinner","mountain"], vibe:"She knows exactly the effect she has on a room, and finds it funny.", playlist:"Confidence In A Can 🥤", desc:"For strutting to the mailbox like it's a runway."},
+    {title:"Die With A Smile", artist:"Lady Gaga & Bruno Mars", theme:"love against the clock", mood:"Tender", emotions:["devoted 🥹","urgent ❤️‍🔥","warm 🫶"], keywords:["world","ends","smile","hold"], vibe:"If everything ended tomorrow, being together would still be enough.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Built for last dances and long hugs."},
+    {title:"Good Luck, Babe!", artist:"Chappell Roan", theme:"denial & desire", mood:"Defiant", emotions:["frustrated 😤","yearning 💔","sharp 🗣️"], keywords:["luck","forget","label","dizzy"], vibe:"Calling out someone who won't admit what they clearly feel.", playlist:"Villain Era Anthems 🩸", desc:"For feelings you didn't ask for, said loudly."},
+    {title:"Birds of a Feather", artist:"Billie Eilish", theme:"devotion & fragility", mood:"Dreamy", emotions:["besotted 🥰","fragile 🫧","content 😌"], keywords:["birds","feather","stay","flock"], vibe:"A love so complete it quietly terrifies her.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Soft, floaty, dangerously romantic."},
+    {title:"Beautiful Things", artist:"Benson Boone", theme:"fear of losing joy", mood:"Anxious-hopeful", emotions:["grateful 🙏","scared 😰","tender 💛"], keywords:["beautiful","losing","please","careful"], vibe:"So happy now that losing it has become the only fear left.", playlist:"Overthinking O'Clock 🌙", desc:"Gratitude with a side of dread."},
+    {title:"Texas Hold 'Em", artist:"Beyoncé", theme:"freedom & togetherness", mood:"Rowdy-warm", emotions:["playful 🤠","free 🌾","joyful 😂"], keywords:["texas","holdem","boots","hoedown"], vibe:"An invitation to let loose wherever you happen to be.", playlist:"Barn-Door Karaoke 🤠", desc:"For pretending you know how to two-step."},
+    {title:"Levitating", artist:"Dua Lipa", theme:"euphoric new romance", mood:"Giddy", emotions:["dazzled ✨","playful 😄","weightless 🎈"], keywords:["levitating","moonlight","dancefloor","glow"], vibe:"A crush so good it genuinely feels like floating.", playlist:"Party On The Rooftop 🎉", desc:"Instant hip-sway, zero effort required."},
+    {title:"Blinding Lights", artist:"The Weeknd", theme:"desperate craving for connection", mood:"Euphoric-urgent", emotions:["restless 😵‍💫","hopeful ✨","nostalgic 🌆"], keywords:["blinding","lights","city","alone"], vibe:"Driving through an empty city just to feel close to someone.", playlist:"Party On The Rooftop 🎉", desc:"Neon-soaked, built for a night drive."},
+    {title:"Bad Guy", artist:"Billie Eilish", theme:"mischievous power play", mood:"Dark-playful", emotions:["smug 😏","sly 🖤","amused 😄"], keywords:["badguy","duh","quiet","seesaw"], vibe:"She's not who you expected, and she's enjoying every second of that.", playlist:"Villain Era Anthems 🩸", desc:"For strutting off like you planned the plot twist."},
+    {title:"Happier Than Ever", artist:"Billie Eilish", theme:"cathartic anger after mistreatment", mood:"Explosive", emotions:["furious 😡","relieved 😮‍💨","done ✋"], keywords:["happier","control","walked","respect"], vibe:"Quiet hurt that finally boils over into relief.", playlist:"Villain Era Anthems 🩸", desc:"Whisper-to-scream, extremely cathartic."},
+    {title:"Someone You Loved", artist:"Lewis Capaldi", theme:"grief of a breakup", mood:"Devastated", emotions:["heartbroken 💔","empty 🕳️","longing 🥺"], keywords:["someone","loved","pieces","empty"], vibe:"Missing the person who used to hold everything together.", playlist:"Ugly-Cry Anthology 😭", desc:"Tissues mandatory, no exceptions."},
+    {title:"Stay", artist:"The Kid LAROI & Justin Bieber", theme:"desperate plea to not lose someone", mood:"Pleading", emotions:["desperate 🥺","anxious 😬","hopeful 🙏"], keywords:["stay","alone","sorry","please"], vibe:"Repeating the same mistake while begging for one more chance.", playlist:"Plot Twist Playlist 🔄", desc:"For 1am texts you probably shouldn't send."},
+    {title:"Peaches", artist:"Justin Bieber", theme:"chill devoted romance", mood:"Sunny-content", emotions:["relaxed 😌","adoring 🥰","satisfied 🙂"], keywords:["peaches","california","georgia","sunshine"], vibe:"Easy, sunlit devotion with absolutely nowhere else to be.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Sunday-morning, feet-up energy."},
+    {title:"Industry Baby", artist:"Lil Nas X", theme:"triumphant comeback", mood:"Triumphant", emotions:["proud 💪","unbothered 😎","joyful 😂"], keywords:["industry","baby","funny","biggest"], vibe:"Proving the doubters wrong felt even better than expected.", playlist:"Main Character Energy 💅", desc:"For strutting out of any bad situation."},
+    {title:"Unholy", artist:"Sam Smith & Kim Petras", theme:"forbidden temptation", mood:"Dark-seductive", emotions:["sinful 😈","thrilled 😳","smug 😏"], keywords:["unholy","church","secret","body"], vibe:"A scandal the whole neighborhood is quietly whispering about.", playlist:"Villain Era Anthems 🩸", desc:"Deliciously dramatic, don't play at church."},
+    {title:"About Damn Time", artist:"Lizzo", theme:"bouncing back with joy", mood:"Empowering", emotions:["joyful 😂","resilient 💪","playful 😄"], keywords:["damn","time","turn","feeling"], vibe:"Deciding, out loud, that the bad stretch is officially over.", playlist:"Main Character Energy 💅", desc:"Instant confidence, batteries included."},
+    {title:"Vampire", artist:"Olivia Rodrigo", theme:"anger at being used", mood:"Furious", emotions:["betrayed 😡","bitter 😒","sharp 🗣️"], keywords:["vampire","bloodsucker","fame","sunlight"], vibe:"Realizing someone only ever took, and never once gave back.", playlist:"Villain Era Anthems 🩸", desc:"Piano-ballad-to-scream, extremely satisfying."},
+    {title:"Snooze", artist:"SZA", theme:"sultry, all-consuming devotion", mood:"Sultry", emotions:["obsessed 😵‍💫","devoted 🥰","hungry 🔥"], keywords:["snooze","alarm","favorite","sleep"], vibe:"Not wanting to leave the bed, or the feeling that comes with it.", playlist:"3AM Feelings 🌌", desc:"Low lights, high feelings."},
+    {title:"Paint The Town Red", artist:"Doja Cat", theme:"unapologetic self-mythology", mood:"Villain-confident", emotions:["smug 😏","free 🕊️","unbothered 😎"], keywords:["paint","town","red","hell"], vibe:"Owning the reputation instead of running from it.", playlist:"Villain Era Anthems 🩸", desc:"For entrances, not exits."},
+    {title:"Lose Control", artist:"Teddy Swims", theme:"helpless longing", mood:"Soulful-desperate", emotions:["aching 💔","hungry 🔥","honest 😮‍💨"], keywords:["lose","control","phone","calling"], vibe:"Trying to resist calling someone, and losing every single time.", playlist:"3AM Feelings 🌌", desc:"For calling someone you shouldn't, at 2am."},
+    {title:"Houdini", artist:"Dua Lipa", theme:"playful elusiveness", mood:"Teasing", emotions:["playful 😏","confident 💃","elusive 🎩"], keywords:["houdini","catch","magic","disappear"], vibe:"Daring someone to actually catch her this time.", playlist:"Party On The Rooftop 🎉", desc:"For playing hard to get, on purpose."},
+    {title:"Golden", artist:"HUNTR/X", theme:"self-belief & destiny", mood:"Triumphant", emotions:["fierce 🔥","proud 💪","electric ⚡"], keywords:["golden","shine","legend","rise"], vibe:"Stepping into a power she was always meant to have.", playlist:"Main Character Energy 💅", desc:"For walking in like the credits are about to roll."},
+    {title:"Ordinary", artist:"Alex Warren", theme:"devotion beyond words", mood:"Tender", emotions:["overwhelmed 🥹","grateful 🙏","devoted 🫶"], keywords:["ordinary","heaven","pray","worship"], vibe:"Someone so important that plain, ordinary love doesn't feel like enough.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Big swelling chorus, bigger feelings."},
+    {title:"APT.", artist:"ROSÉ & Bruno Mars", theme:"flirty party game", mood:"Playful-flirty", emotions:["giddy 🙈","silly 😄","confident 💃"], keywords:["apartment","game","drink","knock"], vibe:"Turning a silly party game into an excuse to flirt all night.", playlist:"Party On The Rooftop 🎉", desc:"For pre-game playlists with a wink."},
+    {title:"Sailor Song", artist:"Gigi Perez", theme:"queer devotion & yearning", mood:"Yearning", emotions:["infatuated 🙈","vulnerable 🫧","hopeful ✨"], keywords:["sailor","ocean","girl","gay"], vibe:"Falling for someone and, for once, saying it plainly out loud.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Slow-burn, then all at once."},
+    {title:"Not Like Us", artist:"Kendrick Lamar", theme:"triumphant public callout", mood:"Fierce", emotions:["defiant 😤","smug 😏","unbothered 😎"], keywords:["not","like","us","west"], vibe:"Settling a rivalry loudly, publicly, and without apology.", playlist:"Villain Era Anthems 🩸", desc:"For walking away from an argument you clearly won."},
+    {title:"Please Please Please", artist:"Sabrina Carpenter", theme:"anxious devotion", mood:"Anxious-playful", emotions:["embarrassed 😳","hopeful 🙏","protective 🛡️"], keywords:["please","embarrass","heartbreak","promise"], vibe:"Begging a partner not to make her regret loving them.", playlist:"Overthinking O'Clock 🌙", desc:"Half joke, half genuine plea."},
+    {title:"Feather", artist:"Sabrina Carpenter", theme:"light, joyful love", mood:"Buoyant", emotions:["light 🪶","joyful 😄","free 🕊️"], keywords:["feather","dance","glad","easy"], vibe:"Loving someone who makes everything feel weightless.", playlist:"Party On The Rooftop 🎉", desc:"For the good kind of easy."}
   ],
   hi: [
-    {title:"Saiyaara", artist:"Faheem Abdullah, Tanishk Bagchi, Arslan Nizami · Saiyaara (2025)", theme:"falling in love against the odds", mood:"Swoony", emotions:["mesmerised 😍","tender 🥹","hopeful ✨"], keywords:["saiyaara","wanderer","star","home"], vibe:"You wandered into my life like a star that decided to stay.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Soft strings, softer heart."},
-    {title:"Barbaad", artist:"Saiyaara OST (2025)", theme:"heartbreak after losing everything", mood:"Aching", emotions:["broken 💔","raw 😢","haunted 🌧️"], keywords:["barbaad","ruins","silence","ashes"], vibe:"Everything I built with you is standing in ruins, and I'm still standing here.", playlist:"Ugly-Cry Anthology 😭", desc:"Rainy window, one earbud, full spiral."},
-    {title:"Humsafar", artist:"Saiyaara OST (2025)", theme:"companionship for the long haul", mood:"Warm", emotions:["devoted 🥰","safe 🫶","grateful 🙏"], keywords:["humsafar","safar","haath","hamesha"], vibe:"Walk with me — not ahead, not behind, just beside.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Wedding-hashtag material."},
-    {title:"Aari Aari", artist:"Shashwat Sachdev · Dhurandhar: The Revenge (2026)", theme:"defiance & rebellion", mood:"Fierce", emotions:["angry 😤","unstoppable 🔥","electric ⚡"], keywords:["aari","badla","aag","jung"], vibe:"Come with your worst — I've already survived it once.", playlist:"Villain Era Anthems 🩸", desc:"For striding into a room like you own the plot."},
-    {title:"Main Aur Tu", artist:"Shashwat Sachdev · Dhurandhar: The Revenge (2026)", theme:"loyalty amid chaos", mood:"Intense-tender", emotions:["protective 🛡️","loyal 🤝","quietly scared 😳"], keywords:["main aur tu","saath","vaada","toofan"], vibe:"In a world on fire, it's still just you and me keeping the promise.", playlist:"Plot Twist Playlist 🔄", desc:"For processing feelings you didn't ask for."},
-    {title:"Qayde Se", artist:"Arijit Singh · Metro... In Dino (2025)", theme:"falling slowly, breaking all the rules", mood:"Playful-romantic", emotions:["nervous 😳","amused 😄","smitten 😍"], keywords:["qayde se","dil","kaayda","gustaakhi"], vibe:"Love clearly never read the rulebook, and now neither have I.", playlist:"Confidence In A Can 🥤", desc:"Sunshine energy, minor crush included."},
-    {title:"Zamaana Lage", artist:"Arijit Singh, Shreya Ghoshal · Metro... In Dino (2025)", theme:"slow-burn love in a busy world", mood:"Wistful", emotions:["patient ⏳","fond 💭","a little tired 😌"], keywords:["zamaana","waqt","ruko","mila"], vibe:"It took the world a while to notice, but I saw you first.", playlist:"Golden Hour Goodbyes 🌇", desc:"For long drives and longer feelings."},
+    {title:"Saiyaara", artist:"Faheem Abdullah, Tanishk Bagchi · Saiyaara (2025)", theme:"falling in love against the odds", mood:"Swoony", emotions:["mesmerised 😍","tender 🥹","hopeful ✨"], keywords:["saiyaara","wanderer","star","home"], vibe:"Someone wanders into her life like a star that decides to stay.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Soft strings, softer heart."},
+    {title:"Ghar Kab Aaoge", artist:"Sonu Nigam, Arijit Singh & more · Border 2 (2026)", theme:"a soldier's sacrifice & a family's wait", mood:"Stirring", emotions:["patriotic 🫡","heartbroken 💔","hopeful 🕊️"], keywords:["ghar","wapas","sarhad","intezaar"], vibe:"A family keeps the porch light on, still waiting for someone to come home.", playlist:"Goosebumps Anthem Club 🫡", desc:"For chills-down-the-spine sing-alongs."},
+    {title:"Aari Aari", artist:"Shashwat Sachdev · Dhurandhar: The Revenge (2026)", theme:"defiance & rebellion", mood:"Fierce", emotions:["angry 😤","unstoppable 🔥","electric ⚡"], keywords:["aari","badla","aag","jung"], vibe:"Come with your worst — this isn't the first storm survived.", playlist:"Villain Era Anthems 🩸", desc:"For striding into a room like you own the plot."},
+    {title:"Main Aur Tu", artist:"Shashwat Sachdev · Dhurandhar: The Revenge (2026)", theme:"loyalty amid chaos", mood:"Intense-tender", emotions:["protective 🛡️","loyal 🤝","quietly scared 😳"], keywords:["main aur tu","saath","vaada","toofan"], vibe:"In a world on fire, it's still just the two of them keeping a promise.", playlist:"Plot Twist Playlist 🔄", desc:"For processing feelings you didn't ask for."},
+    {title:"Tabaahi", artist:"Toxic (2026)", theme:"obsessive, toxic attraction", mood:"Dark-intense", emotions:["consumed 😵‍💫","addicted 🔥","unsettled 😬"], keywords:["tabaahi","nasha","zeher","jalna"], vibe:"Knowing exactly how this ends and walking toward it anyway.", playlist:"Villain Era Anthems 🩸", desc:"For striding into a room like you own the plot."},
+    {title:"Ishq Ka Fever", artist:"Arijit Singh · O'Romeo (2026)", theme:"feverish, uncontrollable infatuation", mood:"Feverish-romantic", emotions:["dizzy 😵‍💫","restless 🔥","smitten 😍"], keywords:["ishq","fever","garmi","behka"], vibe:"A fever no medicine can fix, because it already has a name.", playlist:"Plot Twist Playlist 🔄", desc:"For processing feelings you didn't ask for."},
+    {title:"Qayde Se", artist:"Arijit Singh · Metro... In Dino (2025)", theme:"falling slowly, breaking all the rules", mood:"Playful-romantic", emotions:["nervous 😳","amused 😄","smitten 😍"], keywords:["qayde se","dil","kaayda","gustaakhi"], vibe:"Love clearly never read the rulebook, and now neither has she.", playlist:"Confidence In A Can 🥤", desc:"Sunshine energy, minor crush included."},
+    {title:"Param Sundari", artist:"Sachin-Jigar, Amitabh Bhattacharya · Param Sundari (2025)", theme:"playful obsession", mood:"Cheeky", emotions:["infatuated 🙈","giddy 😄","teasing 😏"], keywords:["param sundari","husn","deewana","nazar"], vibe:"Call it whatever you like — he's officially lost his mind over her.", playlist:"Barn-Door Karaoke 🤠", desc:"Chaotic-good relationship energy, danceable."},
     {title:"Sitaare Zameen Par", artist:"Shankar-Ehsaan-Loy · Sitaare Zameen Par (2025)", theme:"joy & self-acceptance", mood:"Uplifting", emotions:["joyful 😂","proud 💪","free 🕊️"], keywords:["sitaare","zameen","apna","roshni"], vibe:"Some stars don't need the sky — they shine right here on the ground.", playlist:"Main Character Energy 💅", desc:"For pretending the sidewalk is a runway."},
-    {title:"Param Sundari", artist:"Sachin-Jigar, Amitabh Bhattacharya · Param Sundari (2025)", theme:"playful obsession", mood:"Cheeky", emotions:["infatuated 🙈","giddy 😄","teasing 😏"], keywords:["param sundari","husn","deewana","nazar"], vibe:"Call it whatever you like — I've officially lost my mind over you.", playlist:"Barn-Door Karaoke 🤠", desc:"Chaotic-good relationship energy, danceable."},
-    {title:"Tabaahi", artist:"Toxic (2026)", theme:"obsessive, toxic attraction", mood:"Dark-intense", emotions:["consumed 😵‍💫","addicted 🔥","unsettled 😬"], keywords:["tabaahi","nasha","zeher","jalna"], vibe:"I know this is ruin, and I'm walking straight into it anyway.", playlist:"Villain Era Anthems 🩸", desc:"For striding into a room like you own the plot."}
+    {title:"Humsafar", artist:"Saiyaara OST (2025)", theme:"companionship for the long haul", mood:"Warm", emotions:["devoted 🥰","safe 🫶","grateful 🙏"], keywords:["humsafar","safar","haath","hamesha"], vibe:"Walking together, not ahead, not behind, just side by side.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Wedding-hashtag material."},
+    {title:"Tum Kya Mile", artist:"Pritam, Arijit Singh & Shreya Ghoshal · Rocky Aur Rani Kii Prem Kahaani (2023)", theme:"falling deeply for someone unexpected", mood:"Swoony", emotions:["dazzled ✨","warm 🫶","hopeful ✨"], keywords:["tum","mile","rang","khushi"], vibe:"Meeting someone who quietly changes the color of everything.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Big-band romance, bigger feelings."},
+    {title:"Heeriye", artist:"Jasleen Royal, Arijit Singh (2023)", theme:"devoted admiration", mood:"Warm", emotions:["adoring 🥰","calm 😌","grateful 🙏"], keywords:["heeriye","soniye","dil","chain"], vibe:"Calling someone precious because they finally brought some peace.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Gentle, glowing, unhurried."},
+    {title:"Kesariya", artist:"Pritam, Arijit Singh · Brahmastra (2022)", theme:"overwhelming new love", mood:"Dreamy", emotions:["smitten 😍","nervous 😳","warm 🫶"], keywords:["kesariya","rang","dil","dhadkan"], vibe:"A shade of love too big to put into ordinary words.", playlist:"Plot Twist Playlist 🔄", desc:"For processing feelings you didn't ask for."},
+    {title:"Apna Bana Le", artist:"Sachin-Jigar, Arijit Singh · Bhediya (2022)", theme:"pleading devotion", mood:"Tender", emotions:["longing 🥺","devoted 🥰","soft 🫶"], keywords:["apna","bana","rooh","saathiya"], vibe:"Asking someone to fully, finally claim this love as theirs.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Slow, aching, sincere."},
+    {title:"Chaleya", artist:"Anirudh Ravichander, Arijit Singh · Jawan (2023)", theme:"playful infatuation", mood:"Giddy", emotions:["dizzy 😵‍💫","playful 😄","smitten 😍"], keywords:["chaleya","dil","udd","gaya"], vibe:"Her heart runs off before her mind can catch up to it.", playlist:"Confidence In A Can 🥤", desc:"Bouncy, breezy, mildly reckless."},
+    {title:"Jhoome Jo Pathaan", artist:"Vishal-Shekhar, Arijit Singh · Pathaan (2023)", theme:"euphoric celebration", mood:"Euphoric", emotions:["electric ⚡","joyful 😂","wild 🔥"], keywords:["jhoome","pathaan","rang","dhadak"], vibe:"Letting the whole room dance without a second thought.", playlist:"Barn-Door Karaoke 🤠", desc:"Full-volume, full-crowd energy."},
+    {title:"Tere Vaaste", artist:"Sachin-Jigar, Varun Jain · Zara Hatke Zara Bachke (2023)", theme:"devoted sacrifice", mood:"Tender", emotions:["devoted 🥰","warm 🫶","hopeful ✨"], keywords:["vaaste","dil","duniya","rab"], vibe:"Choosing someone even when it quietly costs something.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Wedding-band favorite for a reason."},
+    {title:"Deva Deva", artist:"Pritam, Arijit Singh · Brahmastra (2022)", theme:"seeking guidance & belonging", mood:"Reflective", emotions:["searching 🤔","humble 🙏","hopeful ✨"], keywords:["deva","raah","manzil","roshni"], vibe:"Asking for direction when the path ahead is unclear.", playlist:"Overthinking O'Clock 🌙", desc:"Contemplative, a little cinematic."},
+    {title:"O Bedardeya", artist:"Pritam, Arijit Singh · Tu Jhoothi Main Makkaar (2023)", theme:"heartbreak & longing", mood:"Devastated", emotions:["heartbroken 💔","aching 😢","lonely 🥺"], keywords:["bedardeya","dil","toota","yaad"], vibe:"Missing someone who clearly stopped caring first.", playlist:"Ugly-Cry Anthology 😭", desc:"Tissues mandatory, no exceptions."},
+    {title:"Ranjha", artist:"B Praak, Jasleen Royal · Shershaah (2021)", theme:"fated devotion", mood:"Swoony", emotions:["devoted 🥰","peaceful 😌","certain 🤝"], keywords:["ranjha","rabb","likhya","saathiya"], vibe:"Believing, calmly, that this love was always meant to happen.", playlist:"Slow Dance In The Kitchen 🕯️", desc:"Steady, certain, quietly devastating."}
   ]
 };
 
+/* =========================================================
+   TOKENIZER — a small, honest NLP pipeline demo:
+   1) split on whitespace after stripping punctuation
+   2) lowercase every token
+   3) flag stopwords vs. "signal" (emotionally loaded) tokens
+   ========================================================= */
+const STOPWORDS = new Set(['a','an','the','is','are','was','were','be','been','to','of','in','on','and','it',
+  'i','my','me','you','your','that','this','with','for','just','so','but','at','as','we','us','our',
+  'than','then','there','here','if','not','no','do','did','does','she','he','they','them','once',
+  'when','what','who','how','still','has','have','had','into','out','more','even','only','it\'s']);
+
+function tokenize(text){
+  const rawWords = text.replace(/[.,!?;:"'’]/g,'').split(/\s+/).filter(Boolean);
+  return rawWords.map(w => ({ word: w, norm: w.toLowerCase(), stop: STOPWORDS.has(w.toLowerCase()) }));
+}
+
+/* =========================================================
+   SIMILARITY ENGINE — every recommendation gets a transparent,
+   additive percentage score built from four weighted signals.
+   Max theoretical score is capped at 99% (never claim identity
+   unless it's literally the same track).
+   ========================================================= */
+function stripEmoji(str){
+  return str.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2000}-\u{206F}]/gu,'').trim();
+}
+
+const THEME_STOP = new Set(['a','and','the','of','&','with','for','to','in','on']);
+
+function similarity(a, b){
+  let score = 0;
+  const reasons = [];
+
+  // Signal 1: mood match — up to 35%
+  if (a.mood === b.mood) {
+    score += 35;
+    reasons.push({ label: `Same mood — "${b.mood}"`, pts: 35 });
+  }
+
+  // Signal 2: shared emotion tags — up to 30% (15% per shared emotion)
+  const aE = a.emotions.map(e => stripEmoji(e).toLowerCase());
+  const bE = b.emotions.map(e => stripEmoji(e).toLowerCase());
+  const sharedE = aE.filter(e => bE.includes(e));
+  if (sharedE.length) {
+    const pts = Math.min(30, sharedE.length * 15);
+    score += pts;
+    reasons.push({ label: `${sharedE.length} shared emotion${sharedE.length>1?'s':''} (${sharedE.join(', ')})`, pts });
+  }
+
+  // Signal 3: shared lyrical keywords — up to 25% (12% per shared keyword)
+  const sharedK = a.keywords.filter(k => b.keywords.includes(k));
+  if (sharedK.length) {
+    const pts = Math.min(25, sharedK.length * 12);
+    score += pts;
+    reasons.push({ label: `${sharedK.length} shared keyword${sharedK.length>1?'s':''} (#${sharedK.join(', #')})`, pts });
+  }
+
+  // Signal 4: theme word overlap — up to 10% (5% per shared theme word)
+  const aT = a.theme.toLowerCase().split(/[\s,]+/).filter(w => w && !THEME_STOP.has(w));
+  const bT = b.theme.toLowerCase().split(/[\s,]+/).filter(w => w && !THEME_STOP.has(w));
+  const sharedT = aT.filter(w => bT.includes(w));
+  if (sharedT.length) {
+    const pts = Math.min(10, sharedT.length * 5);
+    score += pts;
+    reasons.push({ label: `Theme overlap ("${sharedT.join('", "')}")`, pts });
+  }
+
+  // Signal 5: same destination playlist — flat 10% bonus
+  if (a.playlist === b.playlist) {
+    score += 10;
+    reasons.push({ label: `Both already live in "${b.playlist}"`, pts: 10 });
+  }
+
+  return { score: Math.min(99, score), reasons };
+}
+
+function recommend(selected, catalog, topN = 3){
+  const scored = catalog
+    .filter(s => s.title !== selected.title)
+    .map(s => ({ song: s, ...similarity(selected, s) }))
+    .sort((a, b) => b.score - a.score);
+  return scored.slice(0, topN);
+}
+
+function scoreClass(score){
+  if (score >= 65) return 'pct-strong';
+  if (score >= 35) return 'pct-good';
+  return 'pct-loose';
+}
+function scoreLabel(score){
+  if (score >= 65) return 'Strong match';
+  if (score >= 35) return 'Good match';
+  return 'Loose match';
+}
+
+/* ========================================================= */
+
 let currentLang = 'en';
 let selectedSong = null;
+let searchTerm = '';
 
 const grid = document.getElementById('songGrid');
 const runBtn = document.getElementById('runBtn');
 const hint = document.getElementById('hint');
 const pipeline = document.getElementById('pipeline');
 const tabs = document.querySelectorAll('.tab');
+const searchBox = document.getElementById('searchBox');
+const dbNote = document.getElementById('dbNote');
+
+function totalSongCount(){
+  return SONGS.en.length + SONGS.hi.length;
+}
+dbNote.textContent = `Catalog: ${totalSongCount()} songs indexed (${SONGS.en.length} English · ${SONGS.hi.length} Hindi)`;
 
 function renderGrid(){
   grid.innerHTML = '';
-  SONGS[currentLang].forEach((s, i)=>{
+  const list = SONGS[currentLang].filter(s => {
+    const q = searchTerm.toLowerCase();
+    return !q || s.title.toLowerCase().includes(q) || s.artist.toLowerCase().includes(q);
+  });
+  if (!list.length) {
+    grid.innerHTML = `<p style="color:var(--muted);grid-column:1/-1;text-align:center;">No songs match "${searchTerm}" in this catalog.</p>`;
+    return;
+  }
+  list.forEach((s) => {
     const card = document.createElement('button');
     card.className = 'song-card';
+    if (selectedSong && selectedSong.title === s.title) card.classList.add('selected');
     card.innerHTML = `<span class="song-title">${s.title}</span><span class="song-artist">${s.artist}</span>`;
-    card.addEventListener('click', ()=>selectSong(i, card));
+    card.addEventListener('click', () => selectSong(s, card));
     grid.appendChild(card);
   });
 }
 
-function selectSong(i, el){
-  document.querySelectorAll('.song-card').forEach(c=>c.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedSong = SONGS[currentLang][i];
+function selectSong(song, el){
+  document.querySelectorAll('.song-card').forEach(c => c.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  selectedSong = song;
   runBtn.disabled = false;
-  runBtn.textContent = `Run the NLP magic on "${selectedSong.title}" ✨`;
+  runBtn.textContent = `Run the NLP pipeline on "${selectedSong.title}" ✨`;
   hint.textContent = 'Model loaded. Hit the button and watch it work.';
   pipeline.innerHTML = '';
 }
 
-tabs.forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    tabs.forEach(t=>t.classList.remove('active'));
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    tabs.forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
     currentLang = tab.dataset.lang;
     selectedSong = null;
+    searchTerm = '';
+    searchBox.value = '';
     runBtn.disabled = true;
     runBtn.textContent = 'Pick a song first 🎵';
     hint.textContent = 'Tap a song above to load it into the model.';
@@ -277,49 +453,65 @@ tabs.forEach(tab=>{
   });
 });
 
-renderGrid();
+searchBox.addEventListener('input', (e) => {
+  searchTerm = e.target.value;
+  renderGrid();
+});
 
+renderGrid();
 runBtn.addEventListener('click', runPipeline);
 
+function tokenChipsRow(tokens, mode){
+  return tokens.map(t => {
+    if (mode === 'raw') return `<span class="chip">${t.word}</span>`;
+    const cls = t.stop ? 'chip fade' : 'chip signal';
+    return `<span class="${cls}">${t.norm}</span>`;
+  }).join('');
+}
+
 function runPipeline(){
-  if(!selectedSong) return;
+  if (!selectedSong) return;
   runBtn.disabled = true;
   pipeline.innerHTML = '';
   hint.textContent = 'Model is thinking... 🧠';
 
   const s = selectedSong;
-  const tokens = s.vibe.replace(/[.,]/g,'').split(' ');
+  const tokens = tokenize(s.vibe);
+  const signalCount = tokens.filter(t => !t.stop).length;
 
   const steps = [
     {
       title: 'Step 1 · Tokenize the lyrics',
-      quip: 'First, it chops the words apart like confetti.',
-      body: `<div class="tagline-box">Sample lyric vibe (illustrative): "${s.vibe}"</div>
-             <div class="chip-row">${tokens.map(t=>`<span class="chip">${t}</span>`).join('')}</div>`
+      quip: 'Split on whitespace, strip punctuation — this is what the model actually reads.',
+      body: `<div class="tagline-box">Model input (vibe summary): "${s.vibe}"</div>
+             <div class="row-label">Raw tokens (${tokens.length})</div>
+             <div class="chip-row">${tokenChipsRow(tokens, 'raw')}</div>
+             <div class="row-label">Lowercased + stopword filter → ${signalCount} signal token${signalCount!==1?'s':''} kept, rest discarded</div>
+             <div class="chip-row">${tokenChipsRow(tokens, 'norm')}</div>`
     },
     {
       title: 'Step 2 · Detect the theme',
-      quip: 'It zooms out from words to "what is this song actually about."',
+      quip: 'Zooms out from individual words to "what is this song actually about."',
       body: `<div class="pill-row"><span class="pill pill-theme">🎯 ${s.theme}</span></div>`
     },
     {
       title: 'Step 3 · Read the mood & emotions',
-      quip: 'Same as reading a room — but the room is 3 minutes of audio.',
+      quip: 'Same as reading a room — but the room is three minutes of audio.',
       body: `<div class="pill-row">
                <span class="pill pill-mood">🌈 Mood: ${s.mood}</span>
              </div>
              <div class="pill-row" style="margin-top:8px;">
-               ${s.emotions.map(e=>`<span class="pill pill-emotion">${e}</span>`).join('')}
+               ${s.emotions.map(e => `<span class="pill pill-emotion">${e}</span>`).join('')}
              </div>`
     },
     {
       title: 'Step 4 · Pull out the keywords',
-      quip: 'The words doing the heavy emotional lifting get flagged.',
-      body: `<div class="pill-row">${s.keywords.map(k=>`<span class="pill pill-keyword">#${k}</span>`).join('')}</div>`
+      quip: 'The words doing the heaviest emotional lifting get flagged for matching.',
+      body: `<div class="pill-row">${s.keywords.map(k => `<span class="pill pill-keyword">#${k}</span>`).join('')}</div>`
     }
   ];
 
-  steps.forEach((st, idx)=>{
+  steps.forEach((st, idx) => {
     const div = document.createElement('div');
     div.className = 'step';
     div.innerHTML = `
@@ -331,38 +523,76 @@ function runPipeline(){
       ${st.body}
     `;
     pipeline.appendChild(div);
-    setTimeout(()=>div.classList.add('show'), 250 + idx*550);
+    setTimeout(() => div.classList.add('show'), 250 + idx*550);
   });
 
-  setTimeout(()=>{
+  setTimeout(() => {
+    const catalog = SONGS[currentLang];
+    const matches = recommend(s, catalog, 3);
+
     const out = document.createElement('div');
-    out.className = 'output';
-    const others = SONGS[currentLang].filter(x=>x.title!==s.title && x.playlist===s.playlist);
-    const fallback = SONGS[currentLang].filter(x=>x.title!==s.title).slice(0,3);
-    const sims = (others.length ? others : fallback).slice(0,3);
+    out.className = 'step';
     out.innerHTML = `
-      <h2>Step 5 · Output 🎉</h2>
-      <div class="sub2">The model turns all that reading-between-the-lines into an actual playlist decision.</div>
-      <div class="playlist-card">
-        <div class="art">🎧</div>
-        <div>
-          <div class="playlist-name">Added to: ${s.playlist}</div>
-          <div class="playlist-desc">${s.desc}</div>
-        </div>
+      <div class="step-head">
+        <span class="step-num">5</span>
+        <span class="step-title">Step 5 · Score the catalog & recommend</span>
       </div>
-      <div class="sim-title">Because you liked the vibe, here's what's queued next</div>
-      <div class="sim-list">
-        ${sims.map(sim=>`<div class="sim-item"><span>${sim.title} — ${sim.artist}</span><span class="match">${sim.mood} match</span></div>`).join('')}
+      <div class="step-quip">Every other track in this ${catalog.length}-song catalog gets compared against "${s.title}" and scored.</div>
+      <div class="output">
+        <h2>Playlist decision 🎉</h2>
+        <div class="sub2">Theme, mood, emotions, and keywords turn into an actual placement — here's the math behind it.</div>
+
+        <div class="formula-box">
+          <b>match% =</b> mood match (35%) + shared emotions (≤30%, 15% each)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;+ shared keywords (≤25%, 12% each) + theme word overlap (≤10%, 5% each)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;+ same-playlist bonus (10%) — capped at 99%
+        </div>
+
+        <div class="playlist-card">
+          <div class="art">🎧</div>
+          <div>
+            <div class="playlist-name">Added to: ${s.playlist}</div>
+            <div class="playlist-desc">${s.desc}</div>
+          </div>
+        </div>
+
+        <div class="sim-title">Because you liked "${s.title}", here's what's queued next</div>
+        <div id="matchList"></div>
       </div>
     `;
     pipeline.appendChild(out);
-    setTimeout(()=>out.style.opacity='1', 50);
-    out.style.opacity='0';
-    out.style.transition='opacity .6s ease';
-    setTimeout(()=>{out.style.opacity='1';}, 60);
+    setTimeout(() => out.classList.add('show'), 60);
+
+    const matchList = out.querySelector('#matchList');
+    matches.forEach((m, i) => {
+      const card = document.createElement('div');
+      card.className = 'match-card';
+      const cls = scoreClass(m.score);
+      card.innerHTML = `
+        <div class="match-head">
+          <span>
+            <span class="match-name">${i+1}. ${m.song.title}</span>
+            <span class="match-artist">${m.song.artist}</span>
+          </span>
+          <span class="match-pct ${cls}">${m.score}% <span style="font-size:10px;font-weight:600;">· ${scoreLabel(m.score)}</span></span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="bar-${i}"></div></div>
+        <div class="reason-list">
+          ${m.reasons.length
+            ? m.reasons.map(r => `<span class="reason-chip"><b>+${r.pts}%</b> ${r.label}</span>`).join('')
+            : `<span class="reason-chip">Only a loose stylistic overlap — lowest-confidence pick of the batch</span>`}
+        </div>
+      `;
+      matchList.appendChild(card);
+      setTimeout(() => {
+        const bar = card.querySelector(`#bar-${i}`);
+        if (bar) bar.style.width = m.score + '%';
+      }, 200 + i*150);
+    });
+
     runBtn.disabled = false;
     runBtn.textContent = `Run it again on "${s.title}" 🔁`;
-    hint.textContent = 'Done! Scroll up to try a different song.';
+    hint.textContent = 'Done! Scroll up to try a different song, or search the catalog.';
   }, 250 + steps.length*550 + 300);
 }
 </script>
