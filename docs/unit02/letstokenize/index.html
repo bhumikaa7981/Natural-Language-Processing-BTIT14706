@@ -1,1 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tokenize It! — 5 Ways to Chop a Sentence</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF9F0; --ink:#241934; --muted:#7A6B94; --card:#FFFFFF; --line:#F1E6FF;
+    --pink:#FF3E9A; --pink-soft:#FFDCEF;
+    --lav:#8B5CF6; --lav-soft:#EBE0FF;
+    --sky:#0EA5E9; --sky-soft:#CDF1FF;
+    --mint:#00B48A; --mint-soft:#C9F7E9;
+    --butter:#C98E00; --butter-soft:#FFEFAE;
+    --gold:#FFB020;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;overflow-x:hidden;}
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:.001s !important; transition-duration:.001s !important;} }
 
+  /* floating background blobs */
+  .blob{position:fixed;border-radius:50%;filter:blur(2px);opacity:.5;z-index:0;animation:float 9s ease-in-out infinite;pointer-events:none;}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-26px) rotate(8deg);}}
+  .b1{width:120px;height:120px;background:var(--pink-soft);top:8%;left:4%;animation-delay:0s;}
+  .b2{width:90px;height:90px;background:var(--mint-soft);top:20%;right:6%;animation-delay:1.5s;}
+  .b3{width:70px;height:70px;background:var(--butter-soft);bottom:12%;left:8%;animation-delay:3s;}
+  .b4{width:100px;height:100px;background:var(--lav-soft);bottom:6%;right:10%;animation-delay:2s;}
+
+  .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 20px 90px;}
+
+  /* HERO */
+  .hero{text-align:center;padding:50px 0 20px;}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lav);background:var(--lav-soft);display:inline-block;padding:6px 16px;border-radius:99px;margin-bottom:18px;}
+  .hero h1{font-family:'Baloo 2',cursive;font-weight:800;font-size:clamp(32px,6vw,56px);margin:0 0 12px;line-height:1.04;}
+  .hero h1 .a{color:var(--pink);} .hero h1 .b{color:var(--sky);} .hero h1 .c{color:var(--mint);}
+  .hero p{color:var(--muted);font-size:16px;max-width:640px;margin:0 auto;line-height:1.6;}
+  .bounce-mascot{display:inline-block;animation:bounce 2s ease-in-out infinite;font-size:34px;margin-top:10px;}
+  @keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-10px) rotate(4deg);}}
+
+  /* method legend chips at top */
+  .legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 6px;}
+  .legend-chip{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;padding:7px 14px;border-radius:99px;border:2px solid;display:flex;align-items:center;gap:6px;}
+
+  /* INPUT PANEL */
+  .panel{background:var(--card);border-radius:28px;padding:26px 26px 22px;margin:34px 0;border:3px solid var(--line);box-shadow:0 10px 0 rgba(0,0,0,.03);}
+  .panel h2{font-family:'Baloo 2',cursive;font-size:22px;margin:0 0 6px;}
+  .panel .sub{color:var(--muted);font-size:13.5px;margin:0 0 16px;}
+  textarea{width:100%;min-height:74px;border-radius:16px;border:2px solid var(--line);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:14.5px;resize:vertical;outline:none;transition:.15s;}
+  textarea:focus{border-color:var(--pink);}
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;}
+  .preset-chip{font-family:'Baloo 2',cursive;font-weight:600;font-size:12.5px;background:var(--bg);border:2px solid var(--line);border-radius:99px;padding:8px 14px;cursor:pointer;transition:.15s;}
+  .preset-chip:hover{border-color:var(--pink);color:var(--pink);transform:translateY(-2px) rotate(-1deg);}
+  .run-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .run-btn{font-family:'Baloo 2',cursive;font-weight:800;font-size:15px;border:none;border-radius:99px;padding:13px 30px;cursor:pointer;background:linear-gradient(90deg,var(--pink),var(--lav));color:#fff;box-shadow:0 8px 22px rgba(255,62,154,.3);transition:.15s;}
+  .run-btn:hover{transform:translateY(-2px) scale(1.02);}
+  .runtime-badge{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);background:var(--bg);border:2px dashed var(--line);border-radius:99px;padding:7px 14px;display:none;}
+  .runtime-badge.show{display:inline-flex;}
+
+  /* RESULTS GRID (5 columns) */
+  .results-wrap{margin-top:24px;display:none;}
+  .results-wrap.show{display:block;}
+  .cols5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+  @media (max-width:980px){.cols5{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:560px){.cols5{grid-template-columns:1fr;}}
+  .mcol{border-radius:20px;padding:16px 14px;border:3px solid;background:#fff;display:flex;flex-direction:column;gap:10px;}
+  .mcol .mhead{display:flex;align-items:center;gap:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;}
+  .mcol .mtime{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);}
+  .token-flow{display:flex;flex-wrap:wrap;gap:5px;min-height:40px;}
+  .tk{opacity:0;transform:scale(.5) translateY(6px);animation:pop .35s cubic-bezier(.34,1.6,.64,1) forwards;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;padding:4px 8px;border-radius:8px;}
+  @keyframes pop{to{opacity:1;transform:none;}}
+  .mcol .meta{font-size:10.5px;color:var(--muted);font-family:'JetBrains Mono',monospace;border-top:1px dashed var(--line);padding-top:8px;}
+  .mcol .meta b{color:var(--ink);}
+  .mcol .foot{font-size:10.5px;line-height:1.5;}
+  .mcol .foot .s{color:#0E9C7C;} .mcol .foot .l{color:#D1453A;}
+
+  /* GALLERY */
+  .gallery-head{text-align:center;margin:60px 0 20px;}
+  .gallery-head h2{font-family:'Baloo 2',cursive;font-size:28px;margin:0 0 8px;}
+  .gallery-head p{color:var(--muted);font-size:14px;}
+  .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
+  .gcard{background:#fff;border:3px solid var(--line);border-radius:22px;padding:18px;cursor:pointer;transition:transform .18s ease, box-shadow .18s ease;box-shadow:0 6px 0 rgba(0,0,0,.03);}
+  .gcard:hover{transform:translateY(-4px) rotate(-.3deg);box-shadow:0 10px 20px rgba(139,92,246,.12);}
+  .gcard .gnum{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;color:var(--pink);background:var(--pink-soft);display:inline-block;padding:3px 10px;border-radius:99px;margin-bottom:10px;}
+  .gcard .gtext{font-size:13.5px;line-height:1.55;margin-bottom:8px;}
+  .gcard .ghint{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);}
+  .gcard .gresults{margin-top:14px;display:none;}
+  .gcard.open .gresults{display:block;}
+  .gcard.open{grid-column:1/-1;}
+
+  /* CODE + EXPLAIN SECTION */
+  .code-head{text-align:center;margin:64px 0 20px;}
+  .code-head h2{font-family:'Baloo 2',cursive;font-size:28px;margin:0 0 8px;}
+  .code-head p{color:var(--muted);font-size:14px;}
+  .acc{display:flex;flex-direction:column;gap:12px;}
+  .acc-item{border:3px solid var(--line);border-radius:20px;overflow:hidden;background:#fff;}
+  .acc-btn{width:100%;text-align:left;background:none;border:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;font-family:'Baloo 2',cursive;font-weight:700;font-size:15.5px;color:var(--ink);}
+  .acc-btn .arrow{transition:transform .25s ease;font-size:13px;}
+  .acc-item.open .acc-btn .arrow{transform:rotate(180deg);}
+  .acc-body{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .acc-item.open .acc-body{max-height:2400px;}
+  .acc-inner{padding:0 20px 20px;}
+  .code-block{background:#241B33;color:#F3EEFF;border-radius:14px;padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.75;overflow-x:auto;margin-bottom:14px;white-space:pre;}
+  .code-block .cm{color:#9C8FC2;} .code-block .kw{color:#7DE8C8;} .code-block .fn{color:#FFB0E0;} .code-block .st{color:#FFD98A;} .code-block .nb{color:#9AD1FF;}
+  .explain-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+  .explain-list li{background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.55;display:flex;gap:10px;}
+  .explain-list li .num{font-family:'JetBrains Mono',monospace;font-weight:700;flex-shrink:0;}
+
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:50px;font-family:'JetBrains Mono',monospace;}
+
+  /* =========================================================
+     FLOATING QUICK-NAV DOCK
+     ========================================================= */
+  .navdock{position:fixed;right:18px;bottom:22px;z-index:50;display:flex;flex-direction:column;gap:8px;
+    background:#fff;border:3px solid var(--line);border-radius:22px;padding:8px;box-shadow:0 10px 26px rgba(139,92,246,.18);
+    animation:dockfloat 5s ease-in-out infinite;}
+  @keyframes dockfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+  .navdock button{width:40px;height:40px;border-radius:14px;border:none;background:var(--bg);cursor:pointer;
+    font-size:17px;display:flex;align-items:center;justify-content:center;transition:.18s;position:relative;}
+  .navdock button:hover{background:var(--pink-soft);transform:scale(1.12) rotate(-4deg);}
+  .navdock button .tip{position:absolute;right:52px;top:50%;transform:translateY(-50%);background:var(--ink);color:#fff;
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:5px 10px;border-radius:8px;white-space:nowrap;
+    opacity:0;pointer-events:none;transition:.15s;}
+  .navdock button:hover .tip{opacity:1;}
+  @media (max-width:700px){.navdock{display:none;}}
+
+  /* =========================================================
+     CRITICAL CASES SECTION
+     ========================================================= */
+  .crit-head{text-align:center;margin:64px 0 8px;}
+  .crit-head h2{font-family:'Baloo 2',cursive;font-size:28px;margin:0 0 8px;}
+  .crit-head p{color:var(--muted);font-size:14px;max-width:680px;margin:0 auto;line-height:1.6;}
+  .crit-banner{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0 30px;}
+  .crit-stat{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;background:var(--lav-soft);
+    color:var(--lav);border:2px solid var(--lav);border-radius:99px;padding:6px 14px;}
+  .crit-grid{display:flex;flex-direction:column;gap:18px;}
+  .crit-card{position:relative;background:#fff;border:3px solid var(--line);border-radius:26px;padding:22px 24px;
+    box-shadow:0 8px 0 rgba(0,0,0,.03);transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease;
+    animation:cardbob 7s ease-in-out infinite;}
+  .crit-card:nth-child(2n){animation-delay:.6s;} .crit-card:nth-child(3n){animation-delay:1.3s;}
+  @keyframes cardbob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+  .crit-card:hover{border-color:var(--pink);box-shadow:0 14px 30px rgba(255,62,154,.14);}
+  .crit-card.open{border-color:var(--lav);}
+  .crit-top{display:flex;align-items:center;gap:14px;cursor:pointer;flex-wrap:wrap;}
+  .crit-badge{font-size:26px;flex-shrink:0;display:inline-block;animation:badgespin 4.5s ease-in-out infinite;}
+  @keyframes badgespin{0%,100%{transform:rotate(-8deg) scale(1);}50%{transform:rotate(8deg) scale(1.08);}}
+  .crit-titles{flex:1;min-width:200px;}
+  .crit-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:var(--ink);}
+  .crit-hook{color:var(--muted);font-size:13px;margin-top:2px;}
+  .crit-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:99px;
+    border:2px solid;white-space:nowrap;}
+  .crit-arrow{font-size:14px;color:var(--muted);transition:transform .25s ease;flex-shrink:0;}
+  .crit-card.open .crit-arrow{transform:rotate(180deg);}
+  .crit-body{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+  .crit-card.open .crit-body{max-height:4000px;}
+  .crit-inner{padding-top:18px;}
+  .crit-problem{background:var(--bg);border-radius:16px;padding:14px 18px;font-size:13.5px;line-height:1.65;margin-bottom:16px;border:2px dashed var(--line);}
+  .crit-problem b{color:var(--pink);}
+  .crit-why{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:18px;}
+  .crit-why-item{border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.5;border:2px solid;}
+  .crit-why-item .who{font-family:'Baloo 2',cursive;font-weight:700;font-size:12.5px;margin-bottom:4px;display:block;}
+
+  /* replay + trace visualizer */
+  .trace-block{margin-bottom:16px;}
+  .trace-title{font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;margin:0 0 8px;display:flex;align-items:center;gap:8px;justify-content:space-between;}
+  .replay-btn{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;border:2px solid var(--line);
+    background:var(--bg);border-radius:99px;padding:5px 12px;cursor:pointer;transition:.15s;}
+  .replay-btn:hover{border-color:var(--pink);color:var(--pink);}
+  .trace-lanes{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:760px){.trace-lanes{grid-template-columns:1fr;}}
+  .trace-lane{border-radius:16px;padding:12px 14px;border:2px solid;}
+  .trace-lane-h{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;margin-bottom:8px;}
+  .trace-word{display:flex;gap:2px;margin-bottom:10px;flex-wrap:wrap;}
+  .trace-charbox{width:22px;height:26px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;font-weight:600;border-radius:6px;background:var(--bg);transition:.2s;}
+  .trace-charbox.done{color:#fff;}
+  .trace-charbox.active{outline:2px solid var(--ink);transform:translateY(-2px);}
+  .trace-steps{display:flex;flex-direction:column;gap:6px;}
+  .trace-step{opacity:0;transform:translateX(-6px);animation:stepin .32s ease forwards;font-size:11.5px;line-height:1.5;
+    background:#fff;border-radius:10px;padding:7px 10px;font-family:'JetBrains Mono',monospace;}
+  @keyframes stepin{to{opacity:1;transform:none;}}
+  .trace-step .try{color:var(--muted);}
+  .trace-step .yes{color:#0E9C7C;font-weight:700;}
+  .trace-step .no{color:#D1453A;}
+
+  .cost-block{border-radius:16px;padding:14px 16px;border:2px dashed var(--line);background:var(--bg);margin-bottom:16px;}
+  .cost-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-family:'JetBrains Mono',monospace;font-size:11.5px;}
+  .cost-label{width:150px;flex-shrink:0;}
+  .cost-bar-track{flex:1;background:#fff;border-radius:99px;height:16px;overflow:hidden;border:1px solid var(--line);}
+  .cost-bar-fill{height:100%;border-radius:99px;width:0%;transition:width 1s cubic-bezier(.22,1,.36,1);}
+  .cost-val{width:56px;text-align:right;flex-shrink:0;font-weight:700;}
+  .cost-winner{color:#0E9C7C;font-weight:700;}
+
+  .crit-results-label{font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;margin:4px 0 10px;}
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+
+<div class="navdock">
+  <button onclick="document.getElementById('tryPanel').scrollIntoView({behavior:'smooth'})">🧪<span class="tip">Try it</span></button>
+  <button onclick="document.getElementById('criticalCases').scrollIntoView({behavior:'smooth'})">🔥<span class="tip">Critical cases</span></button>
+  <button onclick="document.getElementById('galleryHead').scrollIntoView({behavior:'smooth'})">🎪<span class="tip">Gallery</span></button>
+  <button onclick="document.getElementById('codeHead').scrollIntoView({behavior:'smooth'})">👩‍💻<span class="tip">Code</span></button>
+  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️<span class="tip">Top</span></button>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">Word segmentation, live in your browser</div>
+    <h1>5 ways to <span class="a">chop</span>, <span class="b">split</span> &amp; <span class="c">slice</span> a sentence.</h1>
+    <p>Type anything — bonus points for smashedtogetherwords, hashtags, and contractions. Watch five real tokenizers race to figure out where one word ends and the next begins.</p>
+    <div class="bounce-mascot">✂️</div>
+  </div>
+
+  <div class="legend" id="legend"></div>
+
+  <div class="panel">
+    <h2>🧪 Try it yourself</h2>
+    <p class="sub">Type your own sentence, or tap a preset to load a genuinely tricky one.</p>
+    <textarea id="userInput" placeholder="e.g. dontstopbelieving is my favorite icecream flavor #bestdayever"></textarea>
+    <div class="chip-row" id="presetChips"></div>
+    <div class="run-row">
+      <button class="run-btn" id="runBtn">✂️ Tokenize it!</button>
+      <span class="runtime-badge" id="runtimeBadge"></span>
+    </div>
+    <div class="results-wrap" id="resultsWrap"></div>
+  </div>
+
+  <div class="gallery-head">
+    <h2>🎪 10 Challenge Paragraphs</h2>
+    <p>Tap any card to watch all 5 methods duke it out on a genuinely tricky sentence.</p>
+  </div>
+  <div class="gallery-grid" id="galleryGrid"></div>
+
+  <div class="code-head">
+    <h2>👩‍💻 How the code actually works</h2>
+    <p>Real, runnable logic behind every column above — explained like you're hearing it for the first time.</p>
+  </div>
+  <div class="acc" id="codeAcc"></div>
+
+  <footer>Built for Unit-2-style tokenization demos · runs 100% in your browser, no server, no data leaves the page.</footer>
+</div>
+
+<script>
+/* =========================================================
+   DICTIONARY — small but real. Frequency = rough "how common"
+   score used by the statistical method (bigger = more common).
+   ========================================================= */
+const STOP = ["i","a","an","the","is","it","of","to","in","on","at","by","for","and","or","but","not",
+  "this","that","these","those","you","he","she","we","they","was","were","be","been","being","do","does",
+  "did","will","would","can","could","should","may","might","must","shall","my","your","his","her","its",
+  "our","their","here","there","how","when","what","who","whom","which","with","as","from","so","if","no",
+  "yes","up","down","out","over","under","into","than","then","now","today","last","all","one","every"];
+
+const DOMAIN = ["cant","cant","isnt","dont","ice","cream","new","york","times","year","years","eve",
+  "celebration","downtown","reported","big","stop","believing","believe","favorite","song","lyric","ever",
+  "fire","fighter","smart","phone","battery","life","great","covid","changed","how","we","work","communicate",
+  "worldwide","she","loves","love","peanut","butter","jelly","sandwich","sandwiches","lunch","gonna","be",
+  "there","five","minutes","wait","see","database","server","uptime","time","percent","month","annoying",
+  "auto","correct","autocorrect","ruins","ruin","sentence","he","plays","play","basketball","basket","ball",
+  "football","foot","table","tennis","weekend","week","end","truck","here","favorite"];
+
+const COMMON = ["people","world","water","house","home","school","student","teacher","computer","mobile",
+  "internet","data","science","learning","machine","language","natural","processing","model","network",
+  "neural","deep","artificial","intelligence","code","program","function","array","number","string","letter",
+  "word","sentence","paragraph","book","read","write","speak","talk","listen","hear","see","look","watch",
+  "eat","food","drink","sleep","walk","run","jump","game","sport","music","song","dance","movie","film",
+  "photo","picture","image","video","camera","phone","call","message","text","chat","friend","family",
+  "mother","father","sister","brother","child","baby","dog","cat","animal","bird","fish","tree","flower",
+  "garden","park","city","town","village","country","nation","government","president","election","vote",
+  "law","court","police","hospital","doctor","nurse","patient","medicine","disease","virus","health",
+  "fitness","exercise","gym","diet","weight","body","mind","brain","heart","blood","hand","team","player",
+  "match","score","win","lose","happy","sad","angry","funny","strange","amazing","boring","exciting",
+  "morning","evening","night","weekend","holiday","travel","journey","road","street","car","train","plane",
+  "ticket","money","price","shop","store","market","buy","sell","pay","bank","account","phone","charger",
+  "light","dark","color","shape","size","small","large","fast","slow","hot","cold","warm","cool"];
+
+const DICT = {};
+STOP.forEach(w=> DICT[w]=800);
+COMMON.forEach(w=>{ if(!(w in DICT)) DICT[w]=200; });
+DOMAIN.forEach(w=>{ if(!(w in DICT)) DICT[w]=150; });
+const MAXLEN = 16;
+
+/* =========================================================
+   THE FIVE ALGORITHMS — each takes one alphabetic "word chunk"
+   (already split off from punctuation/digits/whitespace) and
+   returns an array of token strings.
+   ========================================================= */
+function greedyForward(word){
+  const lower = word.toLowerCase(), n = word.length;
+  let i=0, tokens=[];
+  while(i<n){
+    let matchLen=0;
+    for(let len=Math.min(MAXLEN,n-i); len>=1; len--){
+      if(DICT[lower.substr(i,len)]){ matchLen=len; break; }
+    }
+    if(matchLen===0) matchLen=1;
+    tokens.push(word.substr(i,matchLen));
+    i+=matchLen;
+  }
+  return tokens;
+}
+function backwardMax(word){
+  const lower = word.toLowerCase(), n = word.length;
+  let i=n, tokens=[];
+  while(i>0){
+    let matchLen=0;
+    for(let len=Math.min(MAXLEN,i); len>=1; len--){
+      if(DICT[lower.substr(i-len,len)]){ matchLen=len; break; }
+    }
+    if(matchLen===0) matchLen=1;
+    tokens.unshift(word.substr(i-matchLen,matchLen));
+    i-=matchLen;
+  }
+  return tokens;
+}
+function charAsWord(word){ return word.split(''); }
+
+function statisticalSeg(word){
+  const lower = word.toLowerCase(), n = word.length;
+  const UNK = 2.1;          // cost-per-character penalty for "not a real dictionary word"
+  const TOKEN_TOLL = 6;     // flat cost every time we USE a token at all
+  // (without this toll, tiny high-frequency words like "i"/"in"/"be" get
+  //  "harvested" out of the middle of longer words because they're so cheap —
+  //  the toll makes the model prefer fewer, longer, more meaningful tokens)
+  const dp = new Array(n+1).fill(Infinity);
+  const back = new Array(n+1).fill(1);
+  dp[0]=0;
+  for(let i=1;i<=n;i++){
+    for(let len=1; len<=Math.min(MAXLEN,i); len++){
+      const sub = lower.substr(i-len,len);
+      const cost = (DICT[sub] ? -Math.log(DICT[sub]) : len*UNK) + TOKEN_TOLL;
+      if(dp[i-len]+cost < dp[i]){ dp[i]=dp[i-len]+cost; back[i]=len; }
+    }
+  }
+  const tokens=[]; let i=n;
+  while(i>0){ const len=back[i]; tokens.unshift(word.substr(i-len,len)); i-=len; }
+  return tokens;
+}
+
+function lexicalHybrid(word){
+  const fwd = greedyForward(word), bwd = backwardMax(word);
+  const same = fwd.length===bwd.length && fwd.every((t,i)=>t===bwd[i]);
+  if(same) return {tokens:fwd, note:'forward & backward agreed'};
+  if(fwd.length !== bwd.length){
+    return fwd.length<bwd.length ? {tokens:fwd,note:'picked forward (fewer tokens)'} : {tokens:bwd,note:'picked backward (fewer tokens)'};
+  }
+  const fs = fwd.filter(t=>t.length===1).length, bs = bwd.filter(t=>t.length===1).length;
+  if(fs!==bs) return fs<bs ? {tokens:fwd,note:'picked forward (fewer unknown chars)'} : {tokens:bwd,note:'picked backward (fewer unknown chars)'};
+  return {tokens:statisticalSeg(word), note:'tied — statistical model broke the tie'};
+}
+
+/* =========================================================
+   PARAGRAPH PIPELINE
+   ========================================================= */
+function surfaceChunks(text){
+  return text.match(/[A-Za-z']+|[0-9]+(?:\.[0-9]+)?%?|[^\sA-Za-z0-9']+/g) || [];
+}
+const isWordChunk = c => /^[A-Za-z']+$/.test(c) ;
+
+const METHODS = {
+  greedy:      { fn: c => isWordChunk(c) ? greedyForward(c) : [c] },
+  backward:    { fn: c => isWordChunk(c) ? backwardMax(c)  : [c] },
+  char:        { fn: c => isWordChunk(c) ? charAsWord(c)   : [c] },
+  statistical: { fn: c => isWordChunk(c) ? statisticalSeg(c) : [c] },
+  hybrid:      { fn: c => isWordChunk(c) ? lexicalHybrid(c).tokens : [c] }
+};
+
+function tokenizeParagraph(text){
+  const chunks = surfaceChunks(text);
+  const out = {};
+  Object.entries(METHODS).forEach(([name, m])=>{
+    const t0 = performance.now();
+    let tokens = [];
+    chunks.forEach(c=> tokens.push(...m.fn(c)));
+    const t1 = performance.now();
+    out[name] = { tokens, ms: t1-t0 };
+  });
+  return out;
+}
+
+/* =========================================================
+   META / DISPLAY CONFIG
+   ========================================================= */
+const META = {
+  greedy:      { name:'Greedy (Forward)', emoji:'➡️', ink:'--pink', soft:'--pink-soft', s:'Simple and fast', l:'Can make wrong early choices' },
+  backward:    { name:'Backward Matching', emoji:'⬅️', ink:'--sky', soft:'--sky-soft', s:'Often corrects forward errors', l:'Still rule-based, not always right' },
+  char:        { name:'Character-as-Word', emoji:'🔤', ink:'--butter', soft:'--butter-soft', s:'Very simple, no dictionary', l:'Splits real multi-char words' },
+  statistical: { name:'Statistical', emoji:'📊', ink:'--mint', soft:'--mint-soft', s:'High accuracy, adapts', l:'Needs large training corpora' },
+  hybrid:      { name:'Lexical + Hybrid', emoji:'🧬', ink:'--lav', soft:'--lav-soft', s:'Most accurate overall', l:'Most complex to build' }
+};
+const ORDER = ['greedy','backward','char','statistical','hybrid'];
+
+/* legend */
+const legend = document.getElementById('legend');
+ORDER.forEach(k=>{
+  const m = META[k];
+  const chip = document.createElement('div');
+  chip.className='legend-chip';
+  chip.style.borderColor = `var(${m.ink})`;
+  chip.style.color = `var(${m.ink})`;
+  chip.innerHTML = `${m.emoji} ${m.name}`;
+  legend.appendChild(chip);
+});
+
+/* =========================================================
+   RENDER a 5-column result set into a container
+   ========================================================= */
+function renderResults(container, resultObj, totalMs){
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'cols5';
+  ORDER.forEach(key=>{
+    const m = META[key];
+    const r = resultObj[key];
+    const col = document.createElement('div');
+    col.className = 'mcol';
+    col.style.borderColor = `var(${m.soft})`;
+    col.innerHTML = `
+      <div class="mhead" style="color:var(${m.ink})">${m.emoji} ${m.name}</div>
+      <div class="mtime">⏱ ${r.ms.toFixed(3)} ms</div>
+      <div class="token-flow"></div>
+      <div class="meta"><b>${r.tokens.length}</b> tokens</div>
+      <div class="foot"><span class="s">✓ ${m.s}</span><br><span class="l">⚠ ${m.l}</span></div>
+    `;
+    const flow = col.querySelector('.token-flow');
+    r.tokens.forEach((t,i)=>{
+      const chip = document.createElement('span');
+      chip.className = 'tk';
+      chip.style.background = `var(${m.soft})`;
+      chip.style.color = `var(${m.ink})`;
+      chip.style.animationDelay = (i*0.035)+'s';
+      chip.textContent = t;
+      flow.appendChild(chip);
+    });
+    grid.appendChild(col);
+  });
+  container.appendChild(grid);
+}
+
+/* =========================================================
+   MAIN INPUT PANEL
+   ========================================================= */
+const PRESETS = [
+  "dontstopbelieving is my favorite song lyric ever",
+  "I can't believe the icecream truck is here! #bestdayever",
+  "gonnabe there in five minutes, cantwait to see you!!",
+  "She loves peanutbutter and jellysandwiches for lunch",
+  "COVID19 changed how wework and communicate worldwide",
+  "thisisannoying when autocorrect ruins your sentence",
+  "The database server's uptime was 99.99% last month"
+];
+const presetChips = document.getElementById('presetChips');
+PRESETS.forEach(p=>{
+  const chip = document.createElement('button');
+  chip.className = 'preset-chip';
+  chip.textContent = p.length>42 ? p.slice(0,40)+'…' : p;
+  chip.title = p;
+  chip.addEventListener('click', ()=>{ userInput.value = p; runMain(); });
+  presetChips.appendChild(chip);
+});
+
+const userInput = document.getElementById('userInput');
+const runBtn = document.getElementById('runBtn');
+const runtimeBadge = document.getElementById('runtimeBadge');
+const resultsWrap = document.getElementById('resultsWrap');
+
+function runMain(){
+  const text = userInput.value.trim();
+  if(!text) return;
+  const t0 = performance.now();
+  const res = tokenizeParagraph(text);
+  const t1 = performance.now();
+  resultsWrap.classList.add('show');
+  renderResults(resultsWrap, res, t1-t0);
+  runtimeBadge.classList.add('show');
+  runtimeBadge.textContent = `⚡ full pass: ${(t1-t0).toFixed(3)} ms — basically instant`;
+  resultsWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+runBtn.addEventListener('click', runMain);
+userInput.value = PRESETS[0];
+
+/* =========================================================
+   GALLERY — 10 challenge paragraphs, lazy-rendered on click
+   ========================================================= */
+const GALLERY = [
+  "I can't believe the icecream truck is here! #bestdayever",
+  "The newyorktimes reported a big newyearseve celebration downtown",
+  "dontstopbelieving is my favorite song lyric ever",
+  "The firefighter's smartphone battery life isnt great today",
+  "COVID19 changed how wework and communicate worldwide",
+  "She loves peanutbutter and jellysandwiches for lunch",
+  "gonnabe there in five minutes, cantwait to see you!!",
+  "The database server's uptime was 99.99% last month",
+  "thisisannoying when autocorrect ruins your sentence",
+  "He plays basketball, football, and tabletennis every weekend"
+];
+const galleryGrid = document.getElementById('galleryGrid');
+GALLERY.forEach((text,i)=>{
+  const card = document.createElement('div');
+  card.className = 'gcard';
+  card.innerHTML = `
+    <span class="gnum">CHALLENGE ${i+1}</span>
+    <div class="gtext">“${text}”</div>
+    <div class="ghint">tap to run all 5 methods →</div>
+    <div class="gresults"></div>
+  `;
+  let built = false;
+  card.addEventListener('click', (e)=>{
+    const isOpen = card.classList.contains('open');
+    if(isOpen){ card.classList.remove('open'); return; }
+    card.classList.add('open');
+    if(!built){
+      const res = tokenizeParagraph(text);
+      renderResults(card.querySelector('.gresults'), res);
+      built = true;
+    }
+  });
+  galleryGrid.appendChild(card);
+});
+
+/* =========================================================
+   CODE + EXPLAIN ACCORDION
+   ========================================================= */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function hl(code){
+  let html = esc(code);
+  html = html.replace(/(\/\/.*)$/gm, '<span class="cm">$1</span>');
+  html = html.replace(/\b(function|const|let|for|while|if|else|return)\b/g, '<span class="kw">$1</span>');
+  html = html.replace(/\b(DICT|MAXLEN|greedyForward|backwardMax|charAsWord|statisticalSeg|lexicalHybrid)\b/g, m=>`<span class="fn">${m}</span>`);
+  html = html.replace(/(&quot;.*?&quot;|'[^']*')/g, '<span class="st">$1</span>');
+  html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="nb">$1</span>');
+  return html;
+}
+
+const CODE_SECTIONS = [
+  { key:'greedy', title:'➡️ Greedy (Forward) Max Matching',
+    code:
+`function greedyForward(word){
+  const lower = word.toLowerCase(), n = word.length;
+  let i = 0, tokens = [];
+  while(i < n){
+    let matchLen = 0;
+    for(let len = Math.min(MAXLEN, n-i); len >= 1; len--){
+      if(DICT[lower.substr(i, len)]){ matchLen = len; break; }
+    }
+    if(matchLen === 0) matchLen = 1;
+    tokens.push(word.substr(i, matchLen));
+    i += matchLen;
+  }
+  return tokens;
+}`,
+    explain:[
+      "Start a pointer <b>i</b> at the very first letter of the word.",
+      "From wherever <b>i</b> is standing, try the LONGEST possible chunk first (up to 16 letters), then keep shrinking it by one letter until that chunk is actually a word in the dictionary.",
+      "Found one? Great — grab it as a token and move <b>i</b> forward past it.",
+      "Found nothing, not even a single letter? Just take ONE letter as an 'unknown' token so we never get stuck.",
+      "Repeat until <b>i</b> reaches the end. Because it only ever looks forward and never looks back, one bad early guess can throw off everything after it — that's its one weakness."
+    ]
+  },
+  { key:'backward', title:'⬅️ Backward Max Matching',
+    code:
+`function backwardMax(word){
+  const lower = word.toLowerCase(), n = word.length;
+  let i = n, tokens = [];
+  while(i > 0){
+    let matchLen = 0;
+    for(let len = Math.min(MAXLEN, i); len >= 1; len--){
+      if(DICT[lower.substr(i-len, len)]){ matchLen = len; break; }
+    }
+    if(matchLen === 0) matchLen = 1;
+    tokens.unshift(word.substr(i-matchLen, matchLen));
+    i -= matchLen;
+  }
+  return tokens;
+}`,
+    explain:[
+      "Literally the mirror image of Greedy Forward — start the pointer <b>i</b> at the END of the word instead of the start.",
+      "Try the longest possible chunk ending exactly at <b>i</b>, shrinking until it's a real dictionary word.",
+      "Add it to the FRONT of the token list (since we're building the sentence backwards) and move <b>i</b> left.",
+      "Same unknown-letter fallback as before if nothing matches.",
+      "Why bother? Because English compounds are often 'head-final' (the important word is at the end, like fire+fighter) — starting from the end sometimes avoids the exact trap that tripped up the forward version."
+    ]
+  },
+  { key:'char', title:'🔤 Character-as-Word',
+    code:
+`function charAsWord(word){
+  return word.split('');
+}`,
+    explain:[
+      "This one has zero opinions. It doesn't even look at the dictionary.",
+      "It just chops the word into individual letters, full stop.",
+      "One line of code — that's the whole 'strength': you can't get simpler or faster than this.",
+      "The catch: real words like 'cream' become c-r-e-a-m, five meaningless tokens instead of one meaningful one. It's the baseline everyone else is trying to beat."
+    ]
+  },
+  { key:'statistical', title:'📊 Statistical (Probability) Segmentation',
+    code:
+`function statisticalSeg(word){
+  const lower = word.toLowerCase(), n = word.length;
+  const UNK = 2.1;         // cost per character for an "unknown" chunk
+  const TOKEN_TOLL = 6;    // flat cost for using a token AT ALL
+  const dp = new Array(n+1).fill(Infinity);
+  const back = new Array(n+1).fill(1);
+  dp[0] = 0;
+  for(let i = 1; i <= n; i++){
+    for(let len = 1; len <= Math.min(MAXLEN, i); len++){
+      const sub = lower.substr(i-len, len);
+      const cost = (DICT[sub] ? -Math.log(DICT[sub]) : len*UNK) + TOKEN_TOLL;
+      if(dp[i-len] + cost < dp[i]){ dp[i] = dp[i-len] + cost; back[i] = len; }
+    }
+  }
+  const tokens = []; let i = n;
+  while(i > 0){ const len = back[i]; tokens.unshift(word.substr(i-len,len)); i -= len; }
+  return tokens;
+}`,
+    explain:[
+      "Instead of greedily grabbing the first good-looking chunk, this method scores EVERY possible way to slice the word and picks the cheapest one overall — that's the 'statistical' part.",
+      "Each dictionary word gets a cost based on how common it is (common words are 'cheap' to use, rare/unknown chunks are 'expensive').",
+      "<b>TOKEN_TOLL</b> is the fun part: every single token used costs a flat 5 points, no matter what. Without it, the model would happily chop 'believing' into 'be' + 'l' + 'i' + 'e' + 'v' + 'in' + 'g' just because 'be', 'i' and 'in' are super common words on their own — the toll makes it stop being so trigger-happy and prefer fewer, longer, more meaningful tokens.",
+      "<b>dp[i]</b> stores the lowest total cost to explain the first <i>i</i> letters of the word — this is dynamic programming, building the answer up letter by letter.",
+      "For every position, it checks every possible chunk ending there and keeps whichever choice makes the running total cheapest.",
+      "At the end, it walks backward through its own notes (the <b>back[]</b> array) to reconstruct the winning path — the segmentation with the best overall 'story', not just the best first guess."
+    ]
+  },
+  { key:'hybrid', title:'🧬 Lexical + Hybrid (Dictionary + Rules + Statistics)',
+    code:
+`function lexicalHybrid(word){
+  const fwd = greedyForward(word), bwd = backwardMax(word);
+  const same = fwd.length === bwd.length && fwd.every((t,i)=>t===bwd[i]);
+  if(same) return { tokens: fwd, note: 'forward & backward agreed' };
+
+  if(fwd.length !== bwd.length){
+    return fwd.length < bwd.length
+      ? { tokens: fwd, note: 'picked forward (fewer tokens)' }
+      : { tokens: bwd, note: 'picked backward (fewer tokens)' };
+  }
+  const fs = fwd.filter(t=>t.length===1).length;
+  const bs = bwd.filter(t=>t.length===1).length;
+  if(fs !== bs){
+    return fs < bs
+      ? { tokens: fwd, note: 'picked forward (fewer unknown chars)' }
+      : { tokens: bwd, note: 'picked backward (fewer unknown chars)' };
+  }
+  return { tokens: statisticalSeg(word), note: 'tied — statistical model broke the tie' };
+}`,
+    explain:[
+      "Step 1 — run BOTH Greedy Forward and Backward Matching on the same word and compare their answers.",
+      "If they already agree, ship it — two independent rule-based methods agreeing is a strong signal they're both right.",
+      "If they disagree, prefer whichever produced FEWER tokens overall (fewer, longer chunks usually means fewer 'guessing games').",
+      "Still tied on token count? Prefer whichever has fewer leftover single-letter 'unknown' tokens — more real dictionary words is better.",
+      "Genuinely tied on everything? Bring in the Statistical method as the tie-breaker.",
+      "This is exactly why it's the most accurate on average — it never relies on just one opinion — but also why it's the most work to build: you need all four other methods working first."
+    ]
+  }
+];
+
+const acc = document.getElementById('codeAcc');
+CODE_SECTIONS.forEach(sec=>{
+  const item = document.createElement('div');
+  item.className = 'acc-item';
+  item.innerHTML = `
+    <button class="acc-btn"><span>${sec.title}</span><span class="arrow">▾</span></button>
+    <div class="acc-body">
+      <div class="acc-inner">
+        <div class="code-block">${hl(sec.code)}</div>
+        <ul class="explain-list">
+          ${sec.explain.map((e,i)=>`<li><span class="num">${i+1}.</span><span>${e}</span></li>`).join('')}
+        </ul>
+      </div>
+    </div>
+  `;
+  item.querySelector('.acc-btn').addEventListener('click', ()=> item.classList.toggle('open'));
+  acc.appendChild(item);
+});
+
+/* run once on load with the default preset for instant wow-factor */
+runMain();
+</script>
+</body>
+</html>
