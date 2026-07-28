@@ -31,6 +31,17 @@
 
   .wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 20px 90px;}
 
+  /* OFFICIAL DOC HEADER */
+  .doc-header{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:22px 26px 16px;font-family:'Poppins',sans-serif;}
+  .doc-header-top{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;}
+  .doc-uni{font-family:'Baloo 2',cursive;font-weight:800;font-size:15px;letter-spacing:.06em;color:var(--lav);}
+  .doc-page{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+  .doc-college{font-family:'Baloo 2',cursive;font-weight:700;font-size:17px;color:var(--ink);margin-top:2px;line-height:1.3;}
+  .doc-row{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--muted);margin-top:4px;}
+  .doc-row b{color:var(--ink);font-weight:600;}
+  .doc-row-details{font-size:12.5px;}
+  .doc-divider{height:2px;background:linear-gradient(90deg,var(--pink),var(--lav),var(--sky),var(--mint));border-radius:2px;margin:10px 0 8px;opacity:.6;}
+
   /* HERO */
   .hero{text-align:center;padding:50px 0 20px;}
   .kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lav);background:var(--lav-soft);display:inline-block;padding:6px 16px;border-radius:99px;margin-bottom:18px;}
@@ -39,6 +50,11 @@
   .hero p{color:var(--muted);font-size:16px;max-width:640px;margin:0 auto;line-height:1.6;}
   .bounce-mascot{display:inline-block;animation:bounce 2s ease-in-out infinite;font-size:34px;margin-top:10px;}
   @keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-10px) rotate(4deg);}}
+
+  /* quick nav */
+  .quicknav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:6px 0 0;}
+  .quicknav a{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;color:var(--muted);background:#fff;border:2px solid var(--line);border-radius:99px;padding:6px 13px;text-decoration:none;transition:.15s;}
+  .quicknav a:hover{color:var(--pink);border-color:var(--pink);transform:translateY(-1px);}
 
   /* method legend chips at top */
   .legend{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:26px 0 6px;}
@@ -65,9 +81,14 @@
   .cols5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
   @media (max-width:980px){.cols5{grid-template-columns:repeat(2,1fr);}}
   @media (max-width:560px){.cols5{grid-template-columns:1fr;}}
+  .divergence-banner{font-family:'Baloo 2',cursive;font-size:13.5px;font-weight:600;border-radius:16px;padding:10px 16px;margin-bottom:14px;line-height:1.5;}
+  .divergence-banner.diverge{background:var(--pink-soft);color:#B3005C;border:2px dashed var(--pink);}
+  .divergence-banner.agree{background:var(--mint-soft);color:#0E9C7C;border:2px dashed var(--mint);}
   .mcol{border-radius:20px;padding:16px 14px;border:3px solid;background:#fff;display:flex;flex-direction:column;gap:10px;}
   .mcol .mhead{display:flex;align-items:center;gap:7px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;}
+  .mcol .mrow2{display:flex;align-items:center;justify-content:space-between;gap:6px;}
   .mcol .mtime{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);}
+  .group-badge{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;border:1.5px solid;border-radius:99px;padding:1px 8px;}
   .token-flow{display:flex;flex-wrap:wrap;gap:5px;min-height:40px;}
   .tk{opacity:0;transform:scale(.5) translateY(6px);animation:pop .35s cubic-bezier(.34,1.6,.64,1) forwards;font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;padding:4px 8px;border-radius:8px;}
   @keyframes pop{to{opacity:1;transform:none;}}
@@ -86,6 +107,8 @@
   .gcard .gnum{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;color:var(--pink);background:var(--pink-soft);display:inline-block;padding:3px 10px;border-radius:99px;margin-bottom:10px;}
   .gcard .gtext{font-size:13.5px;line-height:1.55;margin-bottom:8px;}
   .gcard .ghint{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--muted);}
+  .gcard.divergence-card{border-color:var(--pink-soft);}
+  .gcard .gwhy{font-size:12px;line-height:1.55;color:var(--muted);background:var(--bg);border-radius:12px;padding:8px 12px;margin-bottom:8px;}
   .gcard .gresults{margin-top:14px;display:none;}
   .gcard.open .gresults{display:block;}
   .gcard.open{grid-column:1/-1;}
@@ -108,107 +131,81 @@
   .explain-list li{background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.55;display:flex;gap:10px;}
   .explain-list li .num{font-family:'JetBrains Mono',monospace;font-weight:700;flex-shrink:0;}
 
+  /* BPE PLAYGROUND */
+  .bpe-panel{margin-top:0;}
+  .bpe-why-list li code{background:var(--lav-soft);color:var(--lav);font-family:'JetBrains Mono',monospace;padding:1px 6px;border-radius:6px;font-size:12px;}
+  .bpe-mini-example{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:16px 0 4px;padding:14px 18px;background:var(--bg);border-radius:16px;border:2px dashed var(--line);font-family:'JetBrains Mono',monospace;font-size:14px;}
+  .bpe-mini-before{color:var(--muted);}
+  .bpe-mini-before .sep, .bpe-mini-after .sep{color:var(--line);margin:0 1px;}
+  .bpe-mini-arrow{color:var(--pink);font-family:'Baloo 2',cursive;font-weight:700;font-size:12.5px;}
+  .bpe-mini-after{color:var(--mint);font-weight:700;background:var(--mint-soft);padding:3px 10px;border-radius:8px;}
+
+  .bpe-controls-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:20px 0 6px;}
+  .bpe-ctrl-btn{font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;border:2px solid var(--line);background:#fff;border-radius:99px;padding:9px 18px;cursor:pointer;transition:.15s;color:var(--ink);}
+  .bpe-ctrl-btn:hover{border-color:var(--lav);color:var(--lav);transform:translateY(-1px);}
+  .bpe-ctrl-btn.primary{background:linear-gradient(90deg,var(--pink),var(--lav));color:#fff;border:none;box-shadow:0 6px 16px rgba(255,62,154,.25);}
+  .bpe-ctrl-btn.primary:hover{color:#fff;transform:translateY(-1px) scale(1.02);}
+  .bpe-ctrl-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .bpe-status{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+
+  .bpe-stage{display:grid;grid-template-columns:1.6fr 1fr;gap:22px;margin-top:20px;}
+  @media (max-width:860px){.bpe-stage{grid-template-columns:1fr;}}
+  .bpe-col-label{font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;}
+  #bpeCorpusWrap{background:var(--bg);border-radius:16px;border:2px solid var(--line);padding:6px 16px;max-height:420px;overflow-y:auto;}
+  .bpe-word-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .bpe-word-row:last-child{border-bottom:none;}
+  .bpe-freq{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--sky);background:var(--sky-soft);border-radius:8px;padding:3px 8px;flex-shrink:0;min-width:34px;text-align:center;}
+  .bpe-word-label{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);flex-shrink:0;width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bpe-symbols{display:flex;gap:5px;flex-wrap:wrap;}
+  .bpe-sym{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;background:var(--lav-soft);color:var(--lav);padding:4px 9px;border-radius:8px;transition:background .2s,color .2s,transform .2s;}
+  .bpe-sym.glow{animation:bpeGlow .65s ease-in-out infinite;}
+  @keyframes bpeGlow{0%,100%{background:var(--lav-soft);color:var(--lav);box-shadow:0 0 0 0 rgba(255,62,154,.5);}50%{background:var(--pink);color:#fff;box-shadow:0 0 0 5px rgba(255,62,154,.15);}}
+  .bpe-sym.merged-new{animation:bpePop .4s cubic-bezier(.34,1.6,.64,1);background:var(--mint-soft);color:#0E9C7C;}
+  @keyframes bpePop{0%{transform:scale(.4);opacity:0;}60%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+
+  .bpe-pairboard{background:var(--bg);border-radius:16px;border:2px solid var(--line);padding:14px;min-height:60px;}
+  .bpe-pair-item{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;margin-bottom:8px;}
+  .bpe-pair-item:last-child{margin-bottom:0;}
+  .bpe-pair-label{width:64px;flex-shrink:0;color:var(--ink);font-weight:600;}
+  .bpe-pair-label .plus{color:var(--muted);}
+  .bpe-pair-bar-track{flex:1;height:9px;background:#fff;border-radius:99px;overflow:hidden;border:1px solid var(--line);}
+  .bpe-pair-bar-fill{display:block;height:100%;background:linear-gradient(90deg,var(--pink),var(--lav));border-radius:99px;transition:width .3s ease;}
+  .bpe-pair-count{width:24px;text-align:right;color:var(--muted);flex-shrink:0;}
+  .bpe-pair-item.winner .bpe-pair-label{color:var(--pink);}
+  .bpe-pair-item.winner .bpe-pair-bar-track{border-color:var(--pink);}
+  .bpe-pair-empty,.bpe-log-empty{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted);font-style:italic;}
+
+  .bpe-log{background:var(--bg);border-radius:16px;border:2px solid var(--line);padding:12px 14px;max-height:220px;overflow-y:auto;}
+  .bpe-log-item{font-family:'JetBrains Mono',monospace;font-size:11px;background:#fff;border-radius:10px;padding:7px 10px;margin-bottom:7px;border:1px solid var(--line);}
+  .bpe-log-item:last-child{margin-bottom:0;}
+  .bpe-log-step{color:var(--pink);font-weight:700;margin-right:6px;}
+  .bpe-log-count{color:var(--muted);}
+
   footer{text-align:center;color:var(--muted);font-size:12px;margin-top:50px;font-family:'JetBrains Mono',monospace;}
-
-  /* =========================================================
-     FLOATING QUICK-NAV DOCK
-     ========================================================= */
-  .navdock{position:fixed;right:18px;bottom:22px;z-index:50;display:flex;flex-direction:column;gap:8px;
-    background:#fff;border:3px solid var(--line);border-radius:22px;padding:8px;box-shadow:0 10px 26px rgba(139,92,246,.18);
-    animation:dockfloat 5s ease-in-out infinite;}
-  @keyframes dockfloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
-  .navdock button{width:40px;height:40px;border-radius:14px;border:none;background:var(--bg);cursor:pointer;
-    font-size:17px;display:flex;align-items:center;justify-content:center;transition:.18s;position:relative;}
-  .navdock button:hover{background:var(--pink-soft);transform:scale(1.12) rotate(-4deg);}
-  .navdock button .tip{position:absolute;right:52px;top:50%;transform:translateY(-50%);background:var(--ink);color:#fff;
-    font-family:'JetBrains Mono',monospace;font-size:10.5px;padding:5px 10px;border-radius:8px;white-space:nowrap;
-    opacity:0;pointer-events:none;transition:.15s;}
-  .navdock button:hover .tip{opacity:1;}
-  @media (max-width:700px){.navdock{display:none;}}
-
-  /* =========================================================
-     CRITICAL CASES SECTION
-     ========================================================= */
-  .crit-head{text-align:center;margin:64px 0 8px;}
-  .crit-head h2{font-family:'Baloo 2',cursive;font-size:28px;margin:0 0 8px;}
-  .crit-head p{color:var(--muted);font-size:14px;max-width:680px;margin:0 auto;line-height:1.6;}
-  .crit-banner{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0 30px;}
-  .crit-stat{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;background:var(--lav-soft);
-    color:var(--lav);border:2px solid var(--lav);border-radius:99px;padding:6px 14px;}
-  .crit-grid{display:flex;flex-direction:column;gap:18px;}
-  .crit-card{position:relative;background:#fff;border:3px solid var(--line);border-radius:26px;padding:22px 24px;
-    box-shadow:0 8px 0 rgba(0,0,0,.03);transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease;
-    animation:cardbob 7s ease-in-out infinite;}
-  .crit-card:nth-child(2n){animation-delay:.6s;} .crit-card:nth-child(3n){animation-delay:1.3s;}
-  @keyframes cardbob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
-  .crit-card:hover{border-color:var(--pink);box-shadow:0 14px 30px rgba(255,62,154,.14);}
-  .crit-card.open{border-color:var(--lav);}
-  .crit-top{display:flex;align-items:center;gap:14px;cursor:pointer;flex-wrap:wrap;}
-  .crit-badge{font-size:26px;flex-shrink:0;display:inline-block;animation:badgespin 4.5s ease-in-out infinite;}
-  @keyframes badgespin{0%,100%{transform:rotate(-8deg) scale(1);}50%{transform:rotate(8deg) scale(1.08);}}
-  .crit-titles{flex:1;min-width:200px;}
-  .crit-word{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;color:var(--ink);}
-  .crit-hook{color:var(--muted);font-size:13px;margin-top:2px;}
-  .crit-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;padding:5px 12px;border-radius:99px;
-    border:2px solid;white-space:nowrap;}
-  .crit-arrow{font-size:14px;color:var(--muted);transition:transform .25s ease;flex-shrink:0;}
-  .crit-card.open .crit-arrow{transform:rotate(180deg);}
-  .crit-body{max-height:0;overflow:hidden;transition:max-height .4s ease;}
-  .crit-card.open .crit-body{max-height:4000px;}
-  .crit-inner{padding-top:18px;}
-  .crit-problem{background:var(--bg);border-radius:16px;padding:14px 18px;font-size:13.5px;line-height:1.65;margin-bottom:16px;border:2px dashed var(--line);}
-  .crit-problem b{color:var(--pink);}
-  .crit-why{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:18px;}
-  .crit-why-item{border-radius:14px;padding:12px 14px;font-size:12.5px;line-height:1.5;border:2px solid;}
-  .crit-why-item .who{font-family:'Baloo 2',cursive;font-weight:700;font-size:12.5px;margin-bottom:4px;display:block;}
-
-  /* replay + trace visualizer */
-  .trace-block{margin-bottom:16px;}
-  .trace-title{font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;margin:0 0 8px;display:flex;align-items:center;gap:8px;justify-content:space-between;}
-  .replay-btn{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;border:2px solid var(--line);
-    background:var(--bg);border-radius:99px;padding:5px 12px;cursor:pointer;transition:.15s;}
-  .replay-btn:hover{border-color:var(--pink);color:var(--pink);}
-  .trace-lanes{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  @media (max-width:760px){.trace-lanes{grid-template-columns:1fr;}}
-  .trace-lane{border-radius:16px;padding:12px 14px;border:2px solid;}
-  .trace-lane-h{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;margin-bottom:8px;}
-  .trace-word{display:flex;gap:2px;margin-bottom:10px;flex-wrap:wrap;}
-  .trace-charbox{width:22px;height:26px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;
-    font-size:12.5px;font-weight:600;border-radius:6px;background:var(--bg);transition:.2s;}
-  .trace-charbox.done{color:#fff;}
-  .trace-charbox.active{outline:2px solid var(--ink);transform:translateY(-2px);}
-  .trace-steps{display:flex;flex-direction:column;gap:6px;}
-  .trace-step{opacity:0;transform:translateX(-6px);animation:stepin .32s ease forwards;font-size:11.5px;line-height:1.5;
-    background:#fff;border-radius:10px;padding:7px 10px;font-family:'JetBrains Mono',monospace;}
-  @keyframes stepin{to{opacity:1;transform:none;}}
-  .trace-step .try{color:var(--muted);}
-  .trace-step .yes{color:#0E9C7C;font-weight:700;}
-  .trace-step .no{color:#D1453A;}
-
-  .cost-block{border-radius:16px;padding:14px 16px;border:2px dashed var(--line);background:var(--bg);margin-bottom:16px;}
-  .cost-row{display:flex;align-items:center;gap:10px;margin:8px 0;font-family:'JetBrains Mono',monospace;font-size:11.5px;}
-  .cost-label{width:150px;flex-shrink:0;}
-  .cost-bar-track{flex:1;background:#fff;border-radius:99px;height:16px;overflow:hidden;border:1px solid var(--line);}
-  .cost-bar-fill{height:100%;border-radius:99px;width:0%;transition:width 1s cubic-bezier(.22,1,.36,1);}
-  .cost-val{width:56px;text-align:right;flex-shrink:0;font-weight:700;}
-  .cost-winner{color:#0E9C7C;font-weight:700;}
-
-  .crit-results-label{font-family:'Baloo 2',cursive;font-weight:700;font-size:13.5px;margin:4px 0 10px;}
+  footer .credit{display:inline-block;margin-top:8px;font-family:'Baloo 2',cursive;font-weight:700;font-size:13px;color:var(--lav);}
 </style>
 </head>
 <body>
 
 <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
 
-<div class="navdock">
-  <button onclick="document.getElementById('tryPanel').scrollIntoView({behavior:'smooth'})">🧪<span class="tip">Try it</span></button>
-  <button onclick="document.getElementById('criticalCases').scrollIntoView({behavior:'smooth'})">🔥<span class="tip">Critical cases</span></button>
-  <button onclick="document.getElementById('galleryHead').scrollIntoView({behavior:'smooth'})">🎪<span class="tip">Gallery</span></button>
-  <button onclick="document.getElementById('codeHead').scrollIntoView({behavior:'smooth'})">👩‍💻<span class="tip">Code</span></button>
-  <button onclick="window.scrollTo({top:0,behavior:'smooth'})">⬆️<span class="tip">Top</span></button>
-</div>
-
 <div class="wrap">
+  <div class="doc-header">
+    <div class="doc-header-top">
+      <span class="doc-uni">SARVAJANIK UNIVERSITY</span>
+      <span class="doc-page">Page 1 of 3</span>
+    </div>
+    <div class="doc-college">Sarvajanik College of Engineering and Technology</div>
+    <div class="doc-row">
+      <span class="doc-degree">Bachelor of Technology</span>
+    </div>
+    <div class="doc-divider"></div>
+    <div class="doc-row doc-row-details">
+      <span><b>Year:</b> B. Tech IV (Semester VII)</span>
+      <span><b>Subject Name:</b> Natural Language Processing&nbsp;&nbsp;<b>Subject Code:</b> BTIT14706</span>
+    </div>
+  </div>
+
   <div class="hero">
     <div class="kicker">Word segmentation, live in your browser</div>
     <h1>5 ways to <span class="a">chop</span>, <span class="b">split</span> &amp; <span class="c">slice</span> a sentence.</h1>
@@ -217,8 +214,15 @@
   </div>
 
   <div class="legend" id="legend"></div>
+  <div class="quicknav">
+    <a href="#try">🧪 Try it</a>
+    <a href="#divergence">🔀 Disagreements</a>
+    <a href="#gallery">🎪 Challenges</a>
+    <a href="#bpe">🧬 BPE</a>
+    <a href="#code">👩‍💻 Code</a>
+  </div>
 
-  <div class="panel">
+  <div class="panel" id="try">
     <h2>🧪 Try it yourself</h2>
     <p class="sub">Type your own sentence, or tap a preset to load a genuinely tricky one.</p>
     <textarea id="userInput" placeholder="e.g. dontstopbelieving is my favorite icecream flavor #bestdayever"></textarea>
@@ -230,19 +234,72 @@
     <div class="results-wrap" id="resultsWrap"></div>
   </div>
 
-  <div class="gallery-head">
+  <div class="gallery-head" id="divergence">
+    <h2>🔀 When The Algorithms Disagree</h2>
+    <p>Same word, five different opinions. Tap a card to see exactly where — and why — each method splits off on its own path.</p>
+  </div>
+  <div class="gallery-grid divergence-grid" id="divergenceGrid"></div>
+
+  <div class="gallery-head" id="gallery">
     <h2>🎪 10 Challenge Paragraphs</h2>
     <p>Tap any card to watch all 5 methods duke it out on a genuinely tricky sentence.</p>
   </div>
   <div class="gallery-grid" id="galleryGrid"></div>
 
-  <div class="code-head">
+  <div class="code-head" id="bpe">
+    <h2>🧬 Byte Pair Encoding — Watch It Learn</h2>
+    <p>The subword algorithm behind GPT-style tokenizers. No dictionary required — it invents its own vocabulary by merging the most frequent pair, one step at a time.</p>
+  </div>
+  <div class="panel bpe-panel">
+    <h2>Why bother with subwords?</h2>
+    <p class="sub">Storing every whole word as its own token gets expensive fast, and any word the model hasn't seen before becomes a dead end. BPE solves both problems by learning small, reusable pieces instead.</p>
+    <ul class="explain-list bpe-why-list">
+      <li><span class="num">✂️</span><span>Instead of one giant token for a word like "newer", it learns tiny reusable chunks — things like <code>ne</code>, <code>new</code>, <code>low</code>, <code>er</code>, <code>est</code> — and builds words back up from them.</span></li>
+      <li><span class="num">🧩</span><span>A brand-new or rare word can still be assembled from pieces the model already knows, instead of collapsing into one big "unknown" token.</span></li>
+      <li><span class="num">📉</span><span>Fewer, more reusable pieces means a smaller vocabulary and shorter token sequences overall — which is exactly why real tokenizers (GPT, LLaMA, etc.) all use some flavor of this.</span></li>
+    </ul>
+    <div class="bpe-mini-example">
+      <span class="bpe-mini-before">n<span class="sep">·</span>e<span class="sep">·</span>w<span class="sep">·</span>e<span class="sep">·</span>r</span>
+      <span class="bpe-mini-arrow">learns common pairs →</span>
+      <span class="bpe-mini-after">new<span class="sep">·</span>er</span>
+    </div>
+
+    <h2 style="margin-top:28px;">🧪 Try it — build a corpus, then press Step</h2>
+    <p class="sub">Every word starts as loose characters. Each step counts every adjacent pair across the <i>whole</i> corpus (weighted by how often each word shows up), welds the single most frequent pair into one new symbol, and does it again — everywhere that pair appears, all at once.</p>
+    <div class="chip-row" id="bpePresetChips"></div>
+    <textarea id="bpeUserInput" placeholder="Or paste your own paragraph and hit 'Build corpus from my text' — repeated words with shared endings (running, jumping, playing, faster, smarter...) make the best demos."></textarea>
+    <div class="run-row" style="margin-top:10px;">
+      <button class="run-btn" id="bpeBuildBtn" style="background:linear-gradient(90deg,var(--mint),var(--sky));">📝 Build corpus from my text</button>
+    </div>
+
+    <div class="bpe-controls-row">
+      <button class="bpe-ctrl-btn primary" id="bpeStepBtn">⏭ Step (one merge)</button>
+      <button class="bpe-ctrl-btn" id="bpePlayBtn">▶ Play all</button>
+      <button class="bpe-ctrl-btn" id="bpeResetBtn">⟲ Reset</button>
+      <span class="bpe-status" id="bpeStatus"></span>
+    </div>
+
+    <div class="bpe-stage">
+      <div class="bpe-corpus-col">
+        <div class="bpe-col-label">📚 Corpus right now (frequency × current split)</div>
+        <div id="bpeCorpusWrap"></div>
+      </div>
+      <div class="bpe-side-col">
+        <div class="bpe-col-label">🏁 Candidate pairs this step</div>
+        <div class="bpe-pairboard" id="bpePairBoard"></div>
+        <div class="bpe-col-label" style="margin-top:18px;">📜 Merge history</div>
+        <div class="bpe-log" id="bpeLog"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-head" id="code">
     <h2>👩‍💻 How the code actually works</h2>
     <p>Real, runnable logic behind every column above — explained like you're hearing it for the first time.</p>
   </div>
   <div class="acc" id="codeAcc"></div>
 
-  <footer>Built for Unit-2-style tokenization demos · runs 100% in your browser, no server, no data leaves the page.</footer>
+  <footer>Created for Information Technology and AI &amp; Data Science departments<br><span class="credit">Created by Prof. Bhumika Shah</span></footer>
 </div>
 
 <script>
@@ -279,10 +336,16 @@ const COMMON = ["people","world","water","house","home","school","student","teac
   "ticket","money","price","shop","store","market","buy","sell","pay","bank","account","phone","charger",
   "light","dark","color","shape","size","small","large","fast","slow","hot","cold","warm","cool"];
 
+/* DECOY — genuine English words, but rare ones. They're what make
+   "thetabledownthere" a trap: greedy grabs "theta" (a real word!)
+   before it ever gets a chance to see "the" + "table". */
+const DECOY = ["theta","bled","own","ratio","ration"];
+
 const DICT = {};
 STOP.forEach(w=> DICT[w]=800);
 COMMON.forEach(w=>{ if(!(w in DICT)) DICT[w]=200; });
 DOMAIN.forEach(w=>{ if(!(w in DICT)) DICT[w]=150; });
+DECOY.forEach(w=>{ if(!(w in DICT)) DICT[w]=40; });
 const MAXLEN = 16;
 
 /* =========================================================
@@ -408,21 +471,55 @@ ORDER.forEach(k=>{
 });
 
 /* =========================================================
+   DIVERGENCE DETECTION — which methods produced the exact same
+   token sequence, and which went their own way?
+   ========================================================= */
+const GROUP_COLORS = [
+  {ink:'#0E9C7C', soft:'#D3F7EC', label:'A'},
+  {ink:'#D1453A', soft:'#FFE1DD', label:'B'},
+  {ink:'#8B5CF6', soft:'#EBE0FF', label:'C'},
+  {ink:'#C98E00', soft:'#FFEFAE', label:'D'},
+  {ink:'#0EA5E9', soft:'#CDF1FF', label:'E'}
+];
+function computeGroups(resultObj){
+  const sigToGroup = {}; const groups = {}; let n = 0;
+  ORDER.forEach(key=>{
+    const sig = resultObj[key].tokens.join('§');
+    if(!(sig in sigToGroup)) sigToGroup[sig] = GROUP_COLORS[n++];
+    groups[key] = sigToGroup[sig];
+  });
+  return { groups, distinctCount: n };
+}
+
+/* =========================================================
    RENDER a 5-column result set into a container
    ========================================================= */
 function renderResults(container, resultObj, totalMs){
   container.innerHTML = '';
+
+  const { groups, distinctCount } = computeGroups(resultObj);
+  const banner = document.createElement('div');
+  banner.className = 'divergence-banner ' + (distinctCount>1 ? 'diverge' : 'agree');
+  banner.innerHTML = distinctCount>1
+    ? `🔀 <b>${distinctCount} different outputs</b> among the 5 methods — matching badges below (●A ●B ●C…) mean those methods agreed with each other.`
+    : `✅ <b>All 5 methods agree</b> on this one — no ambiguity here.`;
+  container.appendChild(banner);
+
   const grid = document.createElement('div');
   grid.className = 'cols5';
   ORDER.forEach(key=>{
     const m = META[key];
     const r = resultObj[key];
+    const g = groups[key];
     const col = document.createElement('div');
     col.className = 'mcol';
     col.style.borderColor = `var(${m.soft})`;
     col.innerHTML = `
       <div class="mhead" style="color:var(${m.ink})">${m.emoji} ${m.name}</div>
-      <div class="mtime">⏱ ${r.ms.toFixed(3)} ms</div>
+      <div class="mrow2">
+        <div class="mtime">⏱ ${r.ms.toFixed(3)} ms</div>
+        ${distinctCount>1 ? `<span class="group-badge" style="background:${g.soft};color:${g.ink};border-color:${g.ink}">●${g.label}</span>` : ''}
+      </div>
       <div class="token-flow"></div>
       <div class="meta"><b>${r.tokens.length}</b> tokens</div>
       <div class="foot"><span class="s">✓ ${m.s}</span><br><span class="l">⚠ ${m.l}</span></div>
@@ -524,6 +621,58 @@ GALLERY.forEach((text,i)=>{
 });
 
 /* =========================================================
+   DIVERGENCE SPOTLIGHT — hand-picked words where the methods
+   genuinely split off from each other. Verified by actually
+   running the algorithms, not just eyeballed.
+   ========================================================= */
+const DIVERGENCE_EXAMPLES = [
+  {
+    word: "thetabledownthere",
+    why: "\"theta\" is a real word (the Greek letter!) — Greedy grabs it first because it's the longest match at position 0, then everything after it falls apart into \"bled\" + \"own\". Backward starts from the other end and never falls into that trap."
+  },
+  {
+    word: "whointoathere",
+    why: "Three-way split. Greedy reads \"at\"+\"here\" off the end; Backward reads \"a\"+\"there\" instead; Statistical takes a totally different route through \"in\"+\"to\", chasing the cheapest overall path rather than the first plausible one."
+  },
+  {
+    word: "downtownrationation",
+    why: "Backward spots the clever \"ratio\"+\"nation\" split hiding at the end. Greedy, working left to right, commits to \"ration\" early and gets stuck chopping the leftover \"ation\" into single letters. Statistical disagrees with both."
+  },
+  {
+    word: "uptimeatyears",
+    why: "Backward actually does WORSE here — it reads from the right, matches \"eat\" in the middle of \"uptime\", and shatters the rest into single letters. A reminder that backward isn't always the safer bet."
+  },
+  {
+    word: "greatuptimeithis",
+    why: "Greedy and Backward both keep \"uptime\" whole but disagree on the tail (\"it\"+\"his\" vs \"i\"+\"this\"). Statistical breaks \"uptime\" itself apart into \"up\"+\"time\" because that scores cheaper overall."
+  }
+];
+const divergenceGrid = document.getElementById('divergenceGrid');
+DIVERGENCE_EXAMPLES.forEach((ex,i)=>{
+  const card = document.createElement('div');
+  card.className = 'gcard divergence-card';
+  card.innerHTML = `
+    <span class="gnum">SPOTLIGHT ${i+1}</span>
+    <div class="gtext">“${ex.word}”</div>
+    <div class="gwhy">${ex.why}</div>
+    <div class="ghint">tap to run all 5 methods →</div>
+    <div class="gresults"></div>
+  `;
+  let built = false;
+  card.addEventListener('click', ()=>{
+    const isOpen = card.classList.contains('open');
+    if(isOpen){ card.classList.remove('open'); return; }
+    card.classList.add('open');
+    if(!built){
+      const res = tokenizeParagraph(ex.word);
+      renderResults(card.querySelector('.gresults'), res);
+      built = true;
+    }
+  });
+  divergenceGrid.appendChild(card);
+});
+
+/* =========================================================
    CODE + EXPLAIN ACCORDION
    ========================================================= */
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -531,7 +680,7 @@ function hl(code){
   let html = esc(code);
   html = html.replace(/(\/\/.*)$/gm, '<span class="cm">$1</span>');
   html = html.replace(/\b(function|const|let|for|while|if|else|return)\b/g, '<span class="kw">$1</span>');
-  html = html.replace(/\b(DICT|MAXLEN|greedyForward|backwardMax|charAsWord|statisticalSeg|lexicalHybrid)\b/g, m=>`<span class="fn">${m}</span>`);
+  html = html.replace(/\b(DICT|MAXLEN|greedyForward|backwardMax|charAsWord|statisticalSeg|lexicalHybrid|bpeTrain)\b/g, m=>`<span class="fn">${m}</span>`);
   html = html.replace(/(&quot;.*?&quot;|'[^']*')/g, '<span class="st">$1</span>');
   html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="nb">$1</span>');
   return html;
@@ -656,6 +805,45 @@ const CODE_SECTIONS = [
       "Genuinely tied on everything? Bring in the Statistical method as the tie-breaker.",
       "This is exactly why it's the most accurate on average — it never relies on just one opinion — but also why it's the most work to build: you need all four other methods working first."
     ]
+  },
+  { key:'bpe', title:'🧬 Byte Pair Encoding (BPE) — the merge loop',
+    code:
+`function bpeTrain(corpus, numMerges){
+  // corpus: [{ word, freq, symbols: [...chars] }]
+  const merges = [];
+  for(let step = 0; step < numMerges; step++){
+    const counts = {};
+    corpus.forEach(w=>{
+      for(let i = 0; i < w.symbols.length - 1; i++){
+        const key = w.symbols[i] + '_' + w.symbols[i+1];
+        counts[key] = (counts[key] || 0) + w.freq;
+      }
+    });
+    const bestKey = Object.keys(counts)
+      .sort((a,b)=> counts[b] - counts[a])[0];
+    if(!bestKey || counts[bestKey] < 2) break;   // nothing left worth merging
+    const [a, b] = bestKey.split('_');
+    corpus.forEach(w=>{
+      const out = []; let i = 0;
+      while(i < w.symbols.length){
+        if(i < w.symbols.length-1 && w.symbols[i]===a && w.symbols[i+1]===b){
+          out.push(a+b); i += 2;
+        } else { out.push(w.symbols[i]); i += 1; }
+      }
+      w.symbols = out;
+    });
+    merges.push({a, b, count: counts[bestKey]});
+  }
+  return merges;
+}`,
+    explain:[
+      "Start every word as plain characters, tagged with how often that whole word shows up in the training data (its <b>frequency</b>).",
+      "Count every adjacent SYMBOL PAIR across the entire corpus at once — not per word, across everything — weighting each occurrence by the word's frequency. A pair inside a word that appears 6 times counts 6, not 1.",
+      "Find the single most frequent pair and weld it into one new symbol, wherever it occurs, in every word at the same time. This is the ONE merge for this step.",
+      "Repeat: recount pairs (they've changed now that a merge happened), find the new winner, merge again.",
+      "Stop when nothing repeats often enough to be worth merging (or after a fixed number of merges — real tokenizers like GPT's stop after tens of thousands of merges).",
+      "The payoff: common chunks like <code>er</code>, <code>ing</code>, or <code>new</code> become their own single tokens, so future unseen words can be rebuilt out of pieces the model already knows instead of turning into one giant 'unknown'."
+    ]
   }
 ];
 
@@ -677,6 +865,225 @@ CODE_SECTIONS.forEach(sec=>{
   item.querySelector('.acc-btn').addEventListener('click', ()=> item.classList.toggle('open'));
   acc.appendChild(item);
 });
+
+/* =========================================================
+   BPE PLAYGROUND ENGINE
+   ========================================================= */
+let bpeCorpus = [];      // [{word, freq, symbols:[...]}]
+let bpeInitial = [];     // [{word, freq}] — used to rebuild on Reset
+let bpeHistory = [];     // [{step,a,b,merged,count}]
+let bpeAnimating = false;
+let bpePlaying = false;
+let bpePlayTimer = null;
+
+const bpeStepBtn   = document.getElementById('bpeStepBtn');
+const bpePlayBtn   = document.getElementById('bpePlayBtn');
+const bpeResetBtn  = document.getElementById('bpeResetBtn');
+const bpeStatusEl  = document.getElementById('bpeStatus');
+const bpeCorpusWrap= document.getElementById('bpeCorpusWrap');
+const bpePairBoard = document.getElementById('bpePairBoard');
+const bpeLogEl     = document.getElementById('bpeLog');
+const bpeUserInput = document.getElementById('bpeUserInput');
+const bpeBuildBtn  = document.getElementById('bpeBuildBtn');
+
+function bpePairCounts(){
+  const counts = {};
+  bpeCorpus.forEach(w=>{
+    for(let i=0;i<w.symbols.length-1;i++){
+      const key = w.symbols[i] + '\u0001' + w.symbols[i+1];
+      counts[key] = (counts[key]||0) + w.freq;
+    }
+  });
+  return counts;
+}
+function bpeTopPairs(counts, n){
+  return Object.entries(counts)
+    .map(([k,c])=>{ const [a,b]=k.split('\u0001'); return {a,b,count:c}; })
+    .sort((x,y)=> y.count - x.count)
+    .slice(0, n);
+}
+function bpeApplyMerge(a,b){
+  const merged = a+b;
+  bpeCorpus.forEach(w=>{
+    const syms = w.symbols, out = [];
+    let i=0;
+    while(i<syms.length){
+      if(i<syms.length-1 && syms[i]===a && syms[i+1]===b){ out.push(merged); i+=2; }
+      else { out.push(syms[i]); i+=1; }
+    }
+    w.symbols = out;
+  });
+}
+
+function bpeRenderCorpus(glowPair, newMergedStr){
+  bpeCorpusWrap.innerHTML = '';
+  bpeCorpus.forEach(w=>{
+    const row = document.createElement('div');
+    row.className = 'bpe-word-row';
+    row.innerHTML = `<span class="bpe-freq">${w.freq}×</span><span class="bpe-word-label">${esc(w.word)}</span><span class="bpe-symbols"></span>`;
+    const symsWrap = row.querySelector('.bpe-symbols');
+    w.symbols.forEach((s,i)=>{
+      const chip = document.createElement('span');
+      chip.className = 'bpe-sym';
+      if(glowPair){
+        const leftMatch  = i < w.symbols.length-1 && s===glowPair.a && w.symbols[i+1]===glowPair.b;
+        const rightMatch = i > 0 && s===glowPair.b && w.symbols[i-1]===glowPair.a;
+        if(leftMatch || rightMatch) chip.classList.add('glow');
+      }
+      if(newMergedStr && s===newMergedStr) chip.classList.add('merged-new');
+      chip.textContent = s;
+      symsWrap.appendChild(chip);
+    });
+    bpeCorpusWrap.appendChild(row);
+  });
+}
+function bpeRenderPairBoard(counts, winner){
+  const top = bpeTopPairs(counts, 6);
+  if(top.length===0){
+    bpePairBoard.innerHTML = '<div class="bpe-pair-empty">No adjacent pairs left — every word is now a single token.</div>';
+    return;
+  }
+  const maxCount = top[0].count;
+  bpePairBoard.innerHTML = top.map(p=>{
+    const isWinner = winner && p.a===winner.a && p.b===winner.b;
+    const pct = Math.max(8, Math.round(100*p.count/maxCount));
+    return `<div class="bpe-pair-item ${isWinner?'winner':''}">
+      <span class="bpe-pair-label">${esc(p.a)}<span class="plus"> + </span>${esc(p.b)}</span>
+      <span class="bpe-pair-bar-track"><span class="bpe-pair-bar-fill" style="width:${pct}%"></span></span>
+      <span class="bpe-pair-count">${p.count}</span>
+    </div>`;
+  }).join('');
+}
+function bpeRenderLog(){
+  if(bpeHistory.length===0){
+    bpeLogEl.innerHTML = '<div class="bpe-log-empty">Merges will appear here as they happen…</div>';
+    return;
+  }
+  bpeLogEl.innerHTML = bpeHistory.slice().reverse().map(h=>
+    `<div class="bpe-log-item"><span class="bpe-log-step">#${h.step}</span>${esc(h.a)} + ${esc(h.b)} → <b>${esc(h.merged)}</b> <span class="bpe-log-count">(seen ${h.count}×)</span></div>`
+  ).join('');
+}
+function bpeSyncButtons(){
+  bpePlayBtn.textContent = bpePlaying ? '⏸ Pause' : '▶ Play all';
+}
+function bpeUpdateStatus(done){
+  if(done){
+    bpeStatusEl.innerHTML = `🎉 <b>Merging complete</b> — no pair repeats often enough to merge further (${bpeHistory.length} merge${bpeHistory.length===1?'':'s'} learned).`;
+    bpeStepBtn.disabled = true;
+    bpePlayBtn.disabled = true;
+  } else {
+    bpeStatusEl.innerHTML = bpeHistory.length===0
+      ? `Ready — click <b>Step</b> to make the first merge.`
+      : `<b>${bpeHistory.length}</b> merge${bpeHistory.length===1?'':'s'} done so far.`;
+    bpeStepBtn.disabled = false;
+    bpePlayBtn.disabled = false;
+  }
+}
+
+function bpeStep(){
+  if(bpeAnimating) return;
+  const counts = bpePairCounts();
+  const top = bpeTopPairs(counts, 1)[0];
+  if(!top || top.count < 2){
+    bpeRenderPairBoard(counts, null);
+    bpeUpdateStatus(true);
+    bpePlaying = false;
+    bpeSyncButtons();
+    return;
+  }
+  bpeAnimating = true;
+  bpeRenderCorpus({a:top.a,b:top.b}, null);
+  bpeRenderPairBoard(counts, top);
+  setTimeout(()=>{
+    bpeApplyMerge(top.a, top.b);
+    bpeHistory.push({step:bpeHistory.length+1, a:top.a, b:top.b, merged:top.a+top.b, count:top.count});
+    bpeRenderCorpus(null, top.a+top.b);
+    bpeRenderLog();
+    bpeUpdateStatus(false);
+    bpeAnimating = false;
+    if(bpePlaying){
+      bpePlayTimer = setTimeout(bpeStep, 600);
+    }
+  }, 650);
+}
+function bpePause(){
+  bpePlaying = false;
+  clearTimeout(bpePlayTimer);
+  bpeSyncButtons();
+}
+function bpeTogglePlay(){
+  if(bpePlaying){ bpePause(); return; }
+  bpePlaying = true;
+  bpeSyncButtons();
+  bpeStep();
+}
+function bpeResetToInitial(){
+  bpePause();
+  bpeCorpus = bpeInitial.map(x=> ({word:x.word, freq:x.freq, symbols:x.word.split('')}));
+  bpeHistory = [];
+  bpeRenderCorpus(null, null);
+  bpeRenderPairBoard(bpePairCounts(), null);
+  bpeRenderLog();
+  bpeUpdateStatus(false);
+}
+function bpeSetCorpus(wordFreqPairs){
+  bpeInitial = wordFreqPairs.map(x=>({word:x.word.toLowerCase(), freq:x.freq}));
+  bpeResetToInitial();
+}
+
+function bpeParagraphToCorpus(text, maxWords){
+  maxWords = maxWords || 14;
+  const words = (text.toLowerCase().match(/[a-z]+/g) || []).filter(w=> w.length>=2);
+  if(words.length===0) return [];
+  const freq = {};
+  words.forEach(w=> freq[w] = (freq[w]||0) + 1);
+  let entries = Object.entries(freq).map(([w,f])=>({word:w, freq:f}));
+  entries.sort((a,b)=> b.freq-a.freq || b.word.length-a.word.length);
+  if(entries.length > maxWords) entries = entries.slice(0, maxWords);
+  return entries;
+}
+
+const BPE_PRESETS = [
+  { label:'Classic: low / newer / newest / widest', kind:'direct',
+    data:[{word:'low',freq:5},{word:'lower',freq:2},{word:'newer',freq:4},{word:'newest',freq:6},{word:'widest',freq:3}] },
+  { label:'Tech paragraph', kind:'para',
+    text:"Lower prices and newer phones make smarter shopping easier. The newest models are always the fastest, yet rarely the cheapest, and the smallest upgrade can feel like the biggest difference." },
+  { label:'Runners paragraph', kind:'para',
+    text:"The happiest, healthiest, fastest runners trained harder than the slower, weaker ones, yet even the strongest struggled on the coldest, windiest mornings of the coldest winter." }
+];
+const bpePresetChips = document.getElementById('bpePresetChips');
+BPE_PRESETS.forEach(p=>{
+  const chip = document.createElement('button');
+  chip.className = 'preset-chip';
+  chip.textContent = p.label;
+  chip.addEventListener('click', ()=>{
+    if(p.kind==='direct'){
+      bpeUserInput.value = '';
+      bpeSetCorpus(p.data);
+    } else {
+      bpeUserInput.value = p.text;
+      bpeSetCorpus(bpeParagraphToCorpus(p.text));
+    }
+  });
+  bpePresetChips.appendChild(chip);
+});
+
+bpeBuildBtn.addEventListener('click', ()=>{
+  const text = bpeUserInput.value.trim();
+  if(!text) return;
+  const corpus = bpeParagraphToCorpus(text);
+  if(corpus.length < 2){
+    bpeStatusEl.textContent = 'Type a bit more — need at least two different words to find a pair to merge.';
+    return;
+  }
+  bpeSetCorpus(corpus);
+});
+bpeStepBtn.addEventListener('click', ()=>{ bpePause(); bpeStep(); });
+bpePlayBtn.addEventListener('click', bpeTogglePlay);
+bpeResetBtn.addEventListener('click', bpeResetToInitial);
+
+/* start the BPE playground with the classic example loaded */
+bpeSetCorpus(BPE_PRESETS[0].data);
 
 /* run once on load with the default preset for instant wow-factor */
 runMain();
