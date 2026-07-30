@@ -297,48 +297,6 @@ main{max-width:1000px; margin:0 auto; padding:8px 20px 80px;}
 .chip:hover{border-color:var(--stem); color:var(--stem);}
 #pg-result{margin-top:18px;}
 
-/* ---------- PRACTICE ZONE ---------- */
-.practice-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin:20px 0;}
-.practice-card{
-  background:var(--surface); border:2px solid var(--line); border-radius:20px;
-  padding:20px 22px; box-shadow:var(--shadow); animation:pop .4s both;
-}
-.practice-num{
-  display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px;
-  border-radius:50%; background:var(--stem-soft); color:var(--stem); font-family:'JetBrains Mono',monospace;
-  font-weight:700; font-size:12.5px; margin-right:8px; flex-shrink:0;
-}
-.practice-diff{
-  display:inline-block; font-size:10.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
-  padding:3px 9px; border-radius:999px; float:right; margin-top:2px;
-}
-.practice-diff.easy{background:var(--insert-soft); color:#0C7C67;}
-.practice-diff.tricky{background:var(--supp-soft); color:#B0431E;}
-.practice-q{font-size:15.5px; line-height:1.55; margin:6px 0 14px; color:var(--ink);}
-.practice-q .mono{background:var(--bg2); padding:1px 6px; border-radius:5px;}
-.reveal-btn{
-  font-family:'Baloo 2',cursive; font-weight:600; font-size:13.5px; border-radius:10px;
-  padding:8px 14px; border:2px dashed var(--stem); background:var(--stem-soft); color:var(--stem);
-  cursor:pointer; width:100%; text-align:center; transition:.2s;
-}
-.reveal-btn:hover{background:var(--stem); color:#fff; border-style:solid;}
-.reveal-btn.is-open{background:var(--ink); color:#fff; border:2px solid var(--ink);}
-.practice-answer{
-  max-height:0; overflow:hidden; opacity:0; transition:max-height .4s ease, opacity .3s ease, margin .3s ease;
-}
-.practice-answer.shown{max-height:900px; opacity:1; margin-top:14px;}
-.practice-answer-inner{
-  background:var(--bg2); border-radius:14px; padding:14px 16px; font-size:14px; color:var(--ink-soft); line-height:1.65;
-}
-.practice-answer-inner b{color:var(--ink);}
-.practice-answer-inner .final-answer{
-  font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--stem); font-size:15px;
-  background:var(--stem-soft); display:inline-block; padding:4px 10px; border-radius:8px; margin-bottom:8px;
-}
-.practice-steps{margin:8px 0 0; padding-left:20px;}
-.practice-steps li{margin-bottom:6px;}
-.practice-steps li::marker{color:var(--stem); font-weight:700;}
-
 /* footer */
 footer{
   text-align:center; padding:44px 20px 60px; color:var(--ink-soft); font-size:13.5px; line-height:1.8;
@@ -374,7 +332,6 @@ footer a{font-weight:700; text-decoration:none; border-bottom:2px solid var(--st
   <button data-panel="theories" class="active">🧱 Word Theories</button>
   <button data-panel="challenges">⚠️ Morphology Challenges</button>
   <button data-panel="fst">⚙️ FST Engine</button>
-  <button data-panel="practice">✏️ Practice Zone</button>
 </nav>
 
 <main>
@@ -442,17 +399,6 @@ footer a{font-weight:700; text-decoration:none; border-bottom:2px solid var(--st
       <div class="chips" id="pg-chips"></div>
       <div id="pg-result"></div>
     </div>
-  </section>
-
-  <!-- PRACTICE PANEL -->
-  <section class="panel" id="panel-practice">
-    <div class="section-head">
-      <span class="eyebrow">Do it on your own</span>
-      <h2>Practice Zone ✏️</h2>
-      <p>10 questions per topic. Work each one out yourself first — then tap <b>Reveal Answer</b>. Trickier questions come with a full step-by-step explanation, not just the final answer.</p>
-    </div>
-    <div class="subtabs" id="practice-subtabs"></div>
-    <div id="practice-mount"></div>
   </section>
 </main>
 
@@ -613,91 +559,6 @@ const FST_PRESETS = {
 const IRREGULAR_PLURAL = {mouse:"mice", man:"men", woman:"women", child:"children", foot:"feet", tooth:"teeth", goose:"geese", person:"people", ox:"oxen", sheep:"sheep", deer:"deer", fish:"fish"};
 const IRREGULAR_PAST = {go:"went", sing:"sang", sit:"sat", eat:"ate", see:"saw", take:"took", catch:"caught", buy:"bought", think:"thought", bring:"brought", run:"ran", make:"made", have:"had", do:"did", say:"said", come:"came", write:"wrote", know:"knew", give:"gave", get:"got", find:"found", tell:"told", speak:"spoke", break:"broke", begin:"began", drink:"drank", swim:"swam", fly:"flew", drive:"drove", ride:"rode", fall:"fell", feel:"felt", keep:"kept", leave:"left", mean:"meant", read:"read", sleep:"slept", stand:"stood", teach:"taught"};
 
-/* ============================= PRACTICE ZONE DATA ============================= */
-const PRACTICE = {
-  theories: {
-    label:"🧱 Word Theories", intro:"Decompose the word, or say which theory (I&A / I&P / W&P) explains it best — and why the other two struggle.",
-    items:[
-      { diff:"easy", q:"Break <span class='mono'>unbelievable</span> into its I&amp;A pieces.",
-        answer:"un- (prefix, \"not\") + believe (stem) + -able (suffix, \"capable of\")",
-        steps:["Find the stem first — the piece carrying the core meaning: believe.","Peel off the front piece: un- means \"not\".","Peel off the back piece: -able means \"capable of being ___ed\".","Three clean, contiguous pieces, in a row — a textbook I&A case."] },
-      { diff:"easy", q:"Break <span class='mono'>disrespectful</span> into its I&amp;A pieces.",
-        answer:"dis- (prefix, \"not\") + respect (stem) + -ful (suffix, \"full of\")" },
-      { diff:"easy", q:"Break <span class='mono'>rewriting</span> into its I&amp;A pieces.",
-        answer:"re- (prefix, \"again\") + write (stem) + -ing (suffix, present participle)" },
-      { diff:"tricky", q:"Which theory best explains <span class='mono'>went</span> (the past tense of GO), and why do the other two struggle?",
-        answer:"Word &amp; Paradigm — went is simply the \"past\" cell of GO's paradigm table.",
-        steps:["I&A needs a stem + a separable affix. There is no piece of 'went' you can point to and call 'the past tense affix' — fails immediately.","I&P needs a phonological PROCESS linking go → went (like i→a in sing→sang). But go and went don't even share a root sound — there's no rule to write.","W&P sidesteps both problems: GO's paradigm simply has a cell labelled \"past\", and that cell's value happens to be went. No decomposition, no process — just a lookup." ] },
-      { diff:"easy", q:"Using Item &amp; Process, describe what happens in <span class='mono'>wolf → wolves</span>.",
-        answer:"Trigger: Plural. Process: voice the final consonant (f → v), then attach -es." },
-      { diff:"tricky", q:"Build the W&amp;P paradigm table for the lemma <span class='mono'>SEE</span> (5 cells: present, 3rd sg, past, -ing, past participle).",
-        answer:"present: see · 3rd sg: sees · past: saw · -ing: seeing · past participle: seen",
-        steps:["List every grammatical slot the paradigm needs to fill — here, 5 cells.","Fill each cell with whatever the real surface form is, however irregular.","Notice past (saw) and past participle (seen) are NOT built from each other by any general rule — W&P doesn't care, it just stores both."] },
-      { diff:"tricky", q:"Why does plain Item &amp; Arrangement struggle with <span class='mono'>children</span>?",
-        answer:"Because two irregularities are stacked in one word: an internal vowel/consonant change AND a rare suffix.",
-        steps:["Try to isolate the stem: child.","Try to isolate 'the plural piece': it looks like -ren, but ren alone doesn't mean 'plural' anywhere else in English.","Notice the stem itself is also altered in older forms (child → childr-) — so it's not even a clean stem+affix split.","Conclusion: I&A wants ONE affix carrying ONE meaning, cleanly separable from an unchanged stem. children gives neither a clean affix nor an unchanged stem."] },
-      { diff:"easy", q:"Break the compound-plus-suffix word <span class='mono'>kindhearted</span> into pieces.",
-        answer:"kind (stem) + heart (stem, compounded) + -ed (suffix, \"having\")" },
-      { diff:"tricky", q:"Explain, step by step, why <span class='mono'>foxes</span> is actually a mild challenge even for I&amp;A, and how I&amp;P frames it differently.",
-        answer:"I&A says fox+-s is a clean two-piece word — but the SPELLING needs an extra 'e' that isn't part of either piece.",
-        steps:["I&A view: fox (stem) + -s (suffix, plural). Two meaningful pieces, looks clean.","But the surface form is fox-e-s, not fox-s — where did that 'e' come from? It carries no meaning of its own.","I&P view: reframe it as a PROCESS — 'insert e before -s when the stem ends in a sibilant (s/x/z/sh/ch)'. The e isn't a meaningful piece, it's a side-effect of a phonological rule.","This is exactly why real systems often blend both ideas: I&A for what the pieces MEAN, I&P (morphonology) for how they're SPELLED."] },
-      { diff:"tricky", q:"Why can Word &amp; Paradigm handle the competing plurals of <span class='mono'>octopus</span> (octopuses / octopi / octopodes) more gracefully than I&amp;A?",
-        answer:"W&P just allows a single cell to hold multiple competing values with usage notes — I&A would need three separate, mutually exclusive suffix rules for one stem.",
-        steps:["I&A view: octopus + -es, or octopus(-us→-i), or octopus(-us→-odes) — three DIFFERENT arrangement rules apply to the same stem, with no principled way to pick one.","W&P view: the 'plural' cell of OCTOPUS's paradigm simply lists all three attested forms, optionally tagged by register (octopuses = common, octopi = folk-Latin, octopodes = pedantic/Greek).","This is a natural fit for W&P because paradigms are just data — they don't need one 'rule' to win." ] }
-    ]
-  },
-  challenges: {
-    label:"⚠️ Morphology Challenges", intro:"For each word, name the problem — isomorphism (meaning ↔ form mismatch) or contiguity (pieces not sitting cleanly together) — and say why.",
-    items:[
-      { diff:"easy", q:"German <span class='mono'>gesungen</span> (\"sung\", past participle) is built as ge-...-en wrapped around the stem sung. What problem is this?",
-        answer:"Contiguity problem — specifically a circumfix. One participle marker is split into two non-adjacent pieces (ge- and -en)." },
-      { diff:"tricky", q:"Latin <span class='mono'>amo</span> (\"I love\") packs 1st person + singular + present + indicative into the single suffix -o. What problem is this, and why?",
-        answer:"Isomorphism problem — specifically cumulative exponence: four features, one exponent.",
-        steps:["Isomorphism expects: one feature ↔ one dedicated affix.","Here FOUR features (person, number, tense, mood) are all bundled into just -o.","You cannot point to 'the singular part' or 'the present part' of -o separately — they're fused.","Conclusion: too many meanings crammed into one morph = a cumulative-exponence isomorphism problem."] },
-      { diff:"easy", q:"English <span class='mono'>cut</span> (past tense of \"cut\" = cut, no change at all). What problem is this?",
-        answer:"Isomorphism problem — a zero affix. The feature 'Past' is real, but has no visible exponent." },
-      { diff:"easy", q:"Tagalog <span class='mono'>kumain</span> (\"ate\", from kain \"eat\" + -um-). What problem is this?",
-        answer:"Contiguity problem — infixation. -um- is inserted INSIDE the stem, not attached at an edge." },
-      { diff:"tricky", q:"Hebrew <span class='mono'>gadol / gedola</span> (\"big\", masc/fem) are built by threading vowels through the consonant root g-d-l. What problem is this, and why is it different from ordinary suffixation?",
-        answer:"Contiguity problem — root-and-template (templatic) morphology. The root and the vowel pattern are two separate, interleaved tiers.",
-        steps:["Ordinary suffixation: stem stays together, affix attaches at an edge (cat + -s).","Here, the 'stem' isn't even pronounceable alone — g-d-l is just consonants.","A vowel template (a-o for masc, e-o-a for fem) is WOVEN between those consonants to build a real word.","Neither unit sits at an edge or in one block — they're interleaved on separate tiers, which is why this needs multi-tape FSTs, not a simple stem+affix chain." ] },
-      { diff:"tricky", q:"French <span class='mono'>irons</span> (\"we will go\") marks the future twice — once in -r- and again in -ons. What problem is this?",
-        answer:"Isomorphism problem — extended exponence: one meaning (future), expressed by more than one morph.",
-        steps:["Isomorphism expects: one feature ↔ exactly one exponent, no more, no less.","Here the SAME feature (future) shows up twice inside one word.","This is the mirror image of Latin amo — instead of too many meanings in one morph, it's one meaning spread across two morphs."] },
-      { diff:"easy", q:"English <span class='mono'>deer</span> (plural = deer, unchanged). What problem is this?",
-        answer:"Isomorphism problem — a zero affix, same family as sheep and fish." },
-      { diff:"tricky", q:"Arabic <span class='mono'>kutub</span> (\"books\", from root k-t-b + a CuCuC template). Does this word show an isomorphism problem, a contiguity problem, or both? Explain.",
-        answer:"Both — but the more central problem is contiguity (root-and-template); isomorphism is also stretched because 'plural' is expressed by the template pattern as a whole, not one clean affix.",
-        steps:["Contiguity check: the root k-t-b is discontinuous — vowels (u, u) are threaded between its consonants. Fails contiguity.","Isomorphism check: 'plural' isn't spelled by one dedicated bit — it's the CHOICE of template (CuCuC vs. the singular's CiCaaC) that carries the meaning. That's a form of feature-to-exponent mismatch too.","So templatic morphology is a genuine double-whammy: it breaks the neat stem/affix row (contiguity) AND doesn't give plurality one clean exponent (isomorphism)."] },
-      { diff:"easy", q:"English <span class='mono'>embolden</span> (em- + bold + -en). Is this a circumfix like German ge-...-en? Why or why not?",
-        answer:"No — em- and -en attach independently and each carries its own separate meaning (em- = 'cause to become', -en = verb-forming), so this is ordinary, contiguous double affixation, not a circumfix." },
-      { diff:"tricky", q:"Compare <span class='mono'>went</span> (suppletion) and <span class='mono'>sheep</span> (zero plural). Are these the same kind of isomorphism problem?",
-        answer:"No — they are different sub-types. went has an exponent, just an unrelated one (suppletion); sheep has NO exponent at all (zero affix).",
-        steps:["went: the feature 'Past' DOES get an exponent — it's just that the exponent (went) bears no phonological relationship to the base (go). This is suppletion: total root replacement.","sheep: the feature 'Plural' gets NO exponent whatsoever — the surface form is identical to the singular. This is a zero affix: silence standing in for a real feature.","Both break isomorphism's 'one feature, one dedicated exponent' promise, but in opposite directions — one has a 'wrong' exponent, the other has none."] }
-    ]
-  },
-  fst: {
-    label:"⚙️ FST Rules", intro:"Predict the surface form the FST would produce, and name the spelling rule(s) it needs to apply.",
-    items:[
-      { diff:"easy", q:"fox + PLURAL → ?", answer:"foxes — sibilant rule: insert e before -s because the stem ends in x." },
-      { diff:"easy", q:"try + 3rd-person -s → ?", answer:"tries — consonant+y rule: y → i, then -es is added." },
-      { diff:"easy", q:"stop + -ing → ?", answer:"stopping — CVC doubling rule: short stressed Consonant-Vowel-Consonant stem doubles its final consonant." },
-      { diff:"easy", q:"hope + -ed → ?", answer:"hoped — silent-e rule: the stem already ends in e, so just add -d." },
-      { diff:"easy", q:"spy + -ed → ?", answer:"spied — consonant+y rule: y → i before -ed." },
-      { diff:"tricky", q:"quiz + -ing → ? (careful — think about the CVC rule)", answer:"quizzing — the final z doubles before -ing.",
-        steps:["Check the CVC pattern: qu-i-z → the last three letters are Consonant(z)-Vowel(i)... wait, check from the end: z is a consonant, i is a vowel, q(u) counts as the preceding consonant.","Short, one-syllable, stressed, ends Consonant-Vowel-Consonant → the doubling rule fires, same as stop → stopping.","Double the final z, delete the boundary, append -ing → quizzing."] },
-      { diff:"tricky", q:"wolf + PLURAL → ? (this one needs TWO rules, not one)", answer:"wolves — a voicing substitution (f → v) happens first, THEN the regular -es plural attaches.",
-        steps:["Start from the underlying form: wolf + PLURAL.","Rule 1 — voicing: word-final f becomes v before certain suffixes (a lexically-conditioned process, seen in wolf/wolves, leaf/leaves, knife/knives).","Rule 2 — regular pluralization: after voicing, the stem now effectively ends in v, and -es attaches normally.","Two separate FST operations chain together on one path: substitute (f:v), then copy/insert as usual → wolves."] },
-      { diff:"easy", q:"bus + PLURAL → ?", answer:"buses — sibilant rule: insert e before -s because the stem ends in s." },
-      { diff:"tricky", q:"sheep + PLURAL → ? Why can't the regular FST rule produce this?", answer:"sheep — no change at all. The regular FST path (copy stem, insert e if needed, add -s) simply does not apply; sheep must be special-cased as an irregular, zero-affix lexical entry.",
-        steps:["Try the regular path: does sheep end in a sibilant (s/x/z/sh/ch)? No — 'p' doesn't trigger e-insertion.","So the default rule would predict sheep + s → *sheeps.","But the real surface form is sheep, unchanged — the plural feature exists but has zero exponent.","An FST-based system handles this by consulting an exception/irregulars list FIRST, before ever trying the general rule — exactly like the IRREGULAR_PLURAL lookup used in this page's own Playground tool." ] },
-      { diff:"tricky", q:"knife + PLURAL → ? Trace the full FST path, operation by operation.", answer:"knives — copy 'kni', substitute f→v, copy the shared 'e', delete the boundary, then attach -s.",
-        steps:["Copy letters k-n-i unchanged (upper:lower are identical).","At the stem-final consonant, apply a voicing substitution: f becomes v (this is NOT a copy — upper=f, lower=v).","Copy the e that follows (present in both underlying and surface forms).","Delete the morpheme boundary (^:ε) exactly like every other plural.","Copy the plural suffix s:s straight through.","Final surface form, reading the lower tape only: k-n-i-v-e-s = knives."] }
-    ]
-  }
-};
-
-
 /* ============================= UTIL ============================= */
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
@@ -778,45 +639,6 @@ function challengeItemCard(item, mode){
     ${glossHTML(item.gloss)}
     <div class="note">${item.note}</div>
   </div>`);
-}
-
-/* ============================= PRACTICE ZONE RENDERER ============================= */
-function practiceCard(item, i){
-  const stepsHTML = item.steps
-    ? '<ol class="practice-steps">' + item.steps.map(s=>'<li>'+s+'</li>').join('') + '</ol>'
-    : '';
-  const card = el(`<div class="practice-card">
-    <span class="practice-diff ${item.diff}">${item.diff==='easy' ? 'Warm-up' : 'Complicated'}</span>
-    <div class="practice-q"><span class="practice-num">${i+1}</span>${item.q}</div>
-    <button class="reveal-btn" type="button">🔒 Reveal Answer</button>
-    <div class="practice-answer">
-      <div class="practice-answer-inner">
-        <div class="final-answer">${item.answer.split(' — ')[0]}</div>
-        <div>${item.answer.includes(' — ') ? item.answer.split(' — ').slice(1).join(' — ') : ''}</div>
-        ${stepsHTML}
-      </div>
-    </div>
-  </div>`);
-  const btn = card.querySelector('.reveal-btn');
-  const ans = card.querySelector('.practice-answer');
-  btn.onclick = ()=>{
-    const open = ans.classList.toggle('shown');
-    btn.classList.toggle('is-open', open);
-    btn.textContent = open ? '🔓 Hide Answer' : '🔒 Reveal Answer';
-  };
-  return card;
-}
-function renderPractice(topicKey){
-  const subtabs = document.getElementById('practice-subtabs');
-  subtabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.k===topicKey));
-  const mount = document.getElementById('practice-mount');
-  mount.innerHTML='';
-  const topic = PRACTICE[topicKey];
-  const intro = el(`<p style="text-align:center;color:var(--ink-soft);font-size:14.5px;max-width:640px;margin:4px auto 0;">${topic.intro}</p>`);
-  mount.appendChild(intro);
-  const grid = el('<div class="practice-grid"></div>');
-  topic.items.forEach((item,i)=> grid.appendChild(practiceCard(item,i)));
-  mount.appendChild(grid);
 }
 
 /* ============================= FST RENDERER ============================= */
@@ -1013,16 +835,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
   // fst stepper
   makeStepper(document.getElementById('fst-stepper-mount'), FST_PRESETS, fstItemCard);
-
-  // practice zone
-  const practiceSubtabs = document.getElementById('practice-subtabs');
-  const practiceOrder = ['theories','challenges','fst'];
-  practiceOrder.forEach(key=>{
-    const b = el('<button data-k="'+key+'">'+PRACTICE[key].label+'</button>');
-    b.onclick = ()=>renderPractice(key);
-    practiceSubtabs.appendChild(b);
-  });
-  renderPractice('theories');
 
   // playground
   const pgChips = document.getElementById('pg-chips');
