@@ -3,893 +3,1557 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Word Lab · Lexical Analysis Playground</title>
+<title>E.V. Explains: The Secret Web of Morphology</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F5F3FC;
-  --bg2:#EFF3FF;
-  --surface:#FFFFFF;
-  --ink:#191932;
-  --ink-soft:#5B5A78;
-  --stem:#2D5BFF;
-  --stem-soft:#E6ECFF;
-  --prefix:#FF3D81;
-  --prefix-soft:#FFE3EE;
-  --suffix:#FFA800;
-  --suffix-soft:#FFF2D6;
-  --boundary:#8B90A6;
-  --boundary-soft:#E9E9F1;
-  --change:#8B5CF6;
-  --change-soft:#EEE7FF;
-  --supp:#FF5A36;
-  --supp-soft:#FFE4DB;
-  --insert:#17C3A2;
-  --insert-soft:#DAF7F0;
-  --delete:#FF6B6B;
-  --delete-soft:#FFE2E2;
-  --normal:#17C3A2;
-  --critical:#FF5A36;
-  --line:#E3E1F5;
-  --shadow: 0 10px 30px -12px rgba(25,25,50,.18);
+  --lavender:#EAE0FA;
+  --mint:#D3F5E5;
+  --peach:#FFE0C7;
+  --babyblue:#D2ECFB;
+  --yellow:#FFF3C2;
+  --blush:#FFD9E3;
+  --cream:#FFFBF3;
+  --ink:#3A3153;
+  --ink-soft:#6B6285;
+  --web-blue:#5B7FB5;
+  --hero-red:#E88A85;
+  --irregular:#D98CC7;
+  --regular:#6FBF9B;
+  --shadow: 0 8px 24px rgba(90,70,130,0.12);
+  --shadow-lg: 0 16px 40px rgba(90,70,130,0.18);
+  --radius: 22px;
 }
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{
   margin:0;
-  background:
-    radial-gradient(1100px 500px at 8% -10%, #FFE9F5 0%, transparent 55%),
-    radial-gradient(1000px 480px at 100% 0%, #DDEBFF 0%, transparent 55%),
-    var(--bg);
+  font-family:'Nunito',sans-serif;
   color:var(--ink);
-  font-family:'Space Grotesk', sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-h1,h2,h3,.display{font-family:'Baloo 2', cursive; font-weight:700;}
-.mono{font-family:'JetBrains Mono', monospace;}
-::selection{background:var(--stem); color:#fff;}
-a{color:var(--stem);}
-:focus-visible{outline:3px solid var(--stem); outline-offset:2px; border-radius:6px;}
-
-/* ---------- HERO ---------- */
-.hero{
-  padding:64px 24px 40px;
-  text-align:center;
+  background:
+    radial-gradient(circle at 10% 8%, var(--babyblue) 0%, transparent 40%),
+    radial-gradient(circle at 90% 15%, var(--blush) 0%, transparent 42%),
+    radial-gradient(circle at 50% 90%, var(--mint) 0%, transparent 45%),
+    var(--cream);
+  overflow-x:hidden;
   position:relative;
-  overflow:hidden;
 }
-.hero-eyebrow{
-  display:inline-flex; align-items:center; gap:8px;
-  background:var(--surface); border:2px solid var(--line);
-  padding:7px 16px; border-radius:999px; font-size:13px; font-weight:600;
-  color:var(--ink-soft); box-shadow:var(--shadow);
-  animation: floaty 5s ease-in-out infinite;
-}
-.hero h1{
-  font-size:clamp(34px,6vw,64px);
-  line-height:1.02;
-  margin:20px auto 14px;
-  max-width:900px;
-  letter-spacing:-.5px;
-}
-.hero h1 .accent{color:var(--stem);}
-.hero p.lead{
-  max-width:620px; margin:0 auto; color:var(--ink-soft); font-size:17px; line-height:1.55;
-}
-.hero .bricks-hero{
-  display:flex; justify-content:center; gap:10px; margin:34px 0 8px; flex-wrap:wrap;
-}
-@keyframes floaty{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+h1,h2,h3,h4{font-family:'Fredoka',sans-serif;margin:0 0 .4em;color:var(--ink);}
+.mono{font-family:'Space Mono',monospace;}
+p{line-height:1.65;}
+a{color:var(--web-blue);}
+button{font-family:'Fredoka',sans-serif;cursor:pointer;border:none;}
+button:focus-visible, .tab:focus-visible, .scene-choice:focus-visible{outline:3px solid var(--web-blue);outline-offset:3px;}
 
-/* ---------- NAV ---------- */
-.maintabs{
-  position:sticky; top:0; z-index:50;
-  display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
-  padding:12px; margin:0 auto 8px; max-width:920px;
-  background:rgba(245,243,252,.85); backdrop-filter:blur(10px);
-  border-radius:0 0 20px 20px;
-}
-.maintabs button{
-  font-family:'Baloo 2',cursive; font-weight:600; font-size:15px;
-  padding:11px 20px; border-radius:999px; border:2px solid var(--line);
-  background:var(--surface); color:var(--ink-soft); cursor:pointer;
-  transition:.2s;
-}
-.maintabs button:hover{transform:translateY(-2px); box-shadow:var(--shadow);}
-.maintabs button.active{
-  background:var(--ink); color:#fff; border-color:var(--ink);
-}
-main{max-width:1000px; margin:0 auto; padding:8px 20px 80px;}
-.panel{display:none; animation:fadeUp .45s ease;}
-.panel.active{display:block;}
-@keyframes fadeUp{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:translateY(0)}}
+/* ---------- floating web motif background ---------- */
+.web-bg{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;}
+.web-bg svg{position:absolute;}
+.web1{top:-60px;left:-60px;width:260px;animation:float1 14s ease-in-out infinite;}
+.web2{bottom:-80px;right:-40px;width:320px;animation:float2 18s ease-in-out infinite;}
+.web3{top:40%;right:6%;width:140px;animation:float1 11s ease-in-out infinite reverse;}
+@keyframes float1{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-18px) rotate(4deg);}}
+@keyframes float2{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(20px) rotate(-3deg);}}
 
-.section-head{margin:36px 0 18px; text-align:center;}
-.eyebrow{
-  display:inline-block; font-size:12.5px; font-weight:700; letter-spacing:1.5px;
-  text-transform:uppercase; color:var(--stem); background:var(--stem-soft);
-  padding:5px 12px; border-radius:999px; margin-bottom:10px;
-}
-.section-head h2{font-size:clamp(24px,4vw,34px); margin:4px 0 8px;}
-.section-head p{color:var(--ink-soft); max-width:620px; margin:0 auto; font-size:15.5px;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+section{padding:70px 0;position:relative;z-index:1;}
 
-/* subtabs */
-.subtabs{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin:18px 0 6px;}
-.subtabs button{
-  font-family:'Baloo 2',cursive; font-weight:600; font-size:14px;
-  padding:9px 16px; border-radius:14px; border:2px solid var(--line); background:#fff;
-  cursor:pointer; color:var(--ink-soft); transition:.2s;
+/* ---------- hero ---------- */
+.hero{padding-top:60px;text-align:center;}
+.hero .eyebrow{
+  display:inline-block;background:var(--yellow);padding:6px 18px;border-radius:999px;
+  font-weight:800;letter-spacing:.06em;font-size:.8rem;text-transform:uppercase;color:var(--ink-soft);
+  box-shadow:var(--shadow);margin-bottom:22px;
 }
-.subtabs button.active{border-color:var(--stem); color:var(--stem); background:var(--stem-soft);}
+.hero h1{font-size:clamp(2.1rem,5vw,3.4rem);line-height:1.08;}
+.hero h1 .accent{color:var(--hero-red);}
+.hero p.sub{max-width:640px;margin:18px auto 30px;font-size:1.15rem;color:var(--ink-soft);}
+.spidey-badge{
+  width:120px;height:120px;margin:0 auto 26px;border-radius:50%;
+  background:linear-gradient(160deg,var(--hero-red),var(--peach));
+  display:flex;align-items:center;justify-content:center;font-size:3rem;
+  box-shadow:var(--shadow-lg); animation:bob 4s ease-in-out infinite;
+}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-10px) rotate(3deg);}}
+.cta-btn{
+  background:var(--web-blue);color:#fff;padding:16px 34px;border-radius:999px;font-size:1.05rem;font-weight:600;
+  box-shadow:var(--shadow); transition:transform .25s ease, box-shadow .25s ease;
+}
+.cta-btn:hover{transform:translateY(-3px) scale(1.03);box-shadow:var(--shadow-lg);}
 
-/* theory card */
-.theory-card{
-  background:var(--surface); border:2px solid var(--line); border-radius:24px;
-  padding:26px 28px; box-shadow:var(--shadow); margin:18px 0;
-}
-.theory-card .formula{
-  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:17px;
-  background:var(--ink); color:#fff; display:inline-block; padding:10px 16px;
-  border-radius:12px; margin:10px 0 16px;
-}
-.theory-card ol{margin:0; padding-left:20px; color:var(--ink-soft); line-height:1.7;}
-.theory-card ol b{color:var(--ink);}
+/* ---------- section headers ---------- */
+.section-tag{font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;color:var(--web-blue);margin-bottom:6px;}
+.section-head{max-width:680px;margin-bottom:34px;}
+.section-head p{color:var(--ink-soft);font-size:1.05rem;}
 
-/* stepper */
-.stepper{margin:26px 0;}
-.stepper-controls{
-  display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin-bottom:16px;
+/* ---------- comic story ---------- */
+.comic-panel{
+  background:#fff; border-radius:var(--radius); padding:34px; box-shadow:var(--shadow);
+  border:2px solid rgba(90,70,130,0.06); min-height:200px; position:relative; overflow:hidden;
 }
-.mode-toggle{display:inline-flex; background:#fff; border:2px solid var(--line); border-radius:999px; padding:4px;}
-.mode-toggle button{
-  font-family:'Baloo 2',cursive; font-weight:600; border:none; background:transparent;
-  padding:8px 16px; border-radius:999px; cursor:pointer; color:var(--ink-soft); font-size:14px;
+.speech{
+  display:flex; gap:16px; align-items:flex-start; margin-bottom:20px; opacity:0; transform:translateY(14px);
+  animation:reveal .55s ease forwards;
 }
-.mode-toggle button.active.normal{background:var(--normal); color:#fff;}
-.mode-toggle button.active.critical{background:var(--critical); color:#fff;}
-.nav-arrows{display:flex; gap:10px; align-items:center;}
-.nav-arrows button{
-  width:38px; height:38px; border-radius:50%; border:2px solid var(--line); background:#fff;
-  cursor:pointer; font-size:16px; display:flex; align-items:center; justify-content:center;
+.speech .avatar{
+  flex:0 0 54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem; box-shadow:var(--shadow);
 }
-.nav-arrows button:hover{background:var(--ink); color:#fff;}
-.counter{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft); min-width:44px; text-align:center;}
+.speech.spidey .avatar{background:linear-gradient(160deg,var(--hero-red),var(--peach));}
+.speech.karen .avatar{background:linear-gradient(160deg,var(--web-blue),var(--babyblue));}
+.speech .bubble{
+  background:var(--cream); border-radius:18px; padding:14px 18px; font-size:1.08rem; position:relative;
+  border:2px solid rgba(90,70,130,0.08);
+}
+.speech .who{font-family:'Fredoka',sans-serif;font-weight:600;font-size:.85rem;color:var(--ink-soft);margin-bottom:4px;display:block;}
+@keyframes reveal{to{opacity:1;transform:translateY(0);}}
+.story-controls{display:flex;justify-content:space-between;align-items:center;margin-top:20px;flex-wrap:wrap;gap:12px;}
+.dot-row{display:flex;gap:8px;}
+.dot{width:10px;height:10px;border-radius:50%;background:#E3DAF2;transition:.3s;}
+.dot.active{background:var(--web-blue);transform:scale(1.3);}
+.next-btn{background:var(--hero-red);color:#fff;padding:10px 24px;border-radius:999px;font-weight:600;box-shadow:var(--shadow);transition:transform .2s;}
+.next-btn:hover{transform:translateY(-2px);}
+.next-btn:disabled{opacity:.4;cursor:default;transform:none;}
 
-.card-stage{position:relative; min-height:230px;}
-.demo-card{
-  background:var(--surface); border:2px solid var(--line); border-radius:22px;
-  padding:26px 26px 22px; box-shadow:var(--shadow);
-  animation: slideIn .42s cubic-bezier(.2,.8,.3,1);
-}
-@keyframes slideIn{ from{opacity:0; transform:translateX(28px) scale(.98);} to{opacity:1; transform:translateX(0) scale(1);} }
-.demo-card .tag{
-  display:inline-block; font-size:11.5px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
-  padding:4px 10px; border-radius:999px; margin-bottom:12px;
-}
-.tag.normal{background:var(--normal); color:#fff;}
-.tag.critical{background:var(--critical); color:#fff;}
-.demo-card .word-title{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:700; margin:2px 0 14px;}
-.demo-card .note{color:var(--ink-soft); font-size:14.5px; line-height:1.6; margin-top:14px;}
-.demo-card .note b{color:var(--ink);}
-
-/* bricks */
-.brick-row{display:flex; align-items:flex-end; gap:6px; flex-wrap:wrap; margin:6px 0;}
-.brick{
-  position:relative; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:16px;
-  padding:14px 14px 10px; border-radius:8px; color:#fff; display:inline-flex; flex-direction:column;
-  align-items:center; gap:4px; animation: pop .4s cubic-bezier(.3,1.6,.6,1) both;
-  min-width:44px; text-align:center;
-}
-.brick::before{
-  content:""; position:absolute; top:-7px; left:50%; transform:translateX(-50%);
-  width:14px; height:7px; background:inherit; border-radius:5px 5px 0 0; filter:brightness(1.15);
-}
-.brick-label{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:9.5px; text-transform:uppercase; letter-spacing:.4px; opacity:.85;}
-.brick-plus{align-self:center; color:var(--ink-soft); font-weight:700; padding-bottom:16px;}
-.brick-stem{background:var(--stem);}
-.brick-prefix{background:var(--prefix);}
-.brick-suffix{background:var(--suffix); color:#3a2900;}
-.brick-boundary{background:var(--boundary);}
-.brick-change{background:var(--change);}
-.brick-suppletion{background:var(--supp);}
-.brick-zero{background:transparent; color:var(--ink-soft); border:2px dashed var(--boundary);}
-@keyframes pop{from{opacity:0; transform:scale(.4) translateY(10px);} to{opacity:1; transform:scale(1) translateY(0);}}
-.brick:nth-child(1){animation-delay:.05s}.brick:nth-child(3){animation-delay:.16s}.brick:nth-child(5){animation-delay:.27s}.brick:nth-child(7){animation-delay:.38s}
-
-/* paradigm table */
-.paradigm{display:inline-block;}
-.paradigm-lemma{
-  font-family:'Baloo 2',cursive; font-weight:700; font-size:15px; color:var(--stem);
-  background:var(--stem-soft); padding:5px 12px; border-radius:8px; display:inline-block; margin-bottom:10px;
-}
-.paradigm-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px;}
-.para-row{
-  background:var(--bg2); border-radius:10px; padding:8px 12px; animation:pop .4s both;
-}
-.para-key{display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); font-weight:600;}
-.para-val{display:block; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:15px; margin-top:2px;}
-
-/* challenge card language pill */
-.lang-pill{
-  display:inline-block; font-size:11.5px; font-weight:700; background:var(--change-soft); color:var(--change);
-  padding:4px 10px; border-radius:999px; margin-left:8px;
-}
-.gloss-row{display:flex; gap:2px; margin:12px 0; flex-wrap:wrap;}
-.gloss-row span{
-  font-family:'JetBrains Mono',monospace; font-weight:700; padding:8px 6px; border-radius:6px; font-size:15px;
-  animation:pop .4s both;
-}
-
-/* FST track */
-.fst-panel{
-  background:var(--surface); border:2px solid var(--line); border-radius:24px; padding:26px; box-shadow:var(--shadow); margin:18px 0;
-}
-.fst-track{display:flex; align-items:center; overflow-x:auto; padding:20px 4px 8px; gap:0;}
-.fst-state{
-  width:44px; height:44px; min-width:44px; border-radius:50%; background:var(--ink); color:#fff;
-  display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:13px;
-  opacity:0; transform:scale(.4); transition:.35s cubic-bezier(.3,1.6,.6,1); box-shadow:0 4px 10px rgba(0,0,0,.15); z-index:2;
-}
-.fst-state.in{opacity:1; transform:scale(1);}
-.fst-state.final{background:var(--normal);}
-.fst-edge-wrap{display:flex; flex-direction:column; align-items:center; min-width:74px; position:relative;}
-.fst-edge-line{
-  height:3px; width:0%; background:var(--boundary); margin:0 -2px; transition:width .5s ease; position:relative; align-self:stretch; top:0;
-}
-.fst-edge-wrap .fst-edge-track{width:100%; height:3px; background:var(--line); position:relative; border-radius:3px;}
-.fst-edge-wrap .fst-edge-fill{position:absolute; left:0; top:0; height:3px; width:0%; border-radius:3px; transition:width .5s ease;}
-.fst-edge-fill.copy{background:var(--boundary);}
-.fst-edge-fill.insert{background:var(--insert);}
-.fst-edge-fill.delete{background:var(--delete);}
-.fst-edge-fill.substitute{background:var(--change);}
-.fst-edge-label{
-  font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px; padding:4px 8px; border-radius:8px;
-  margin-bottom:6px; opacity:0; transform:translateY(6px); transition:.4s; white-space:nowrap;
-}
-.fst-edge-label.in{opacity:1; transform:translateY(0);}
-.fst-edge-label.copy{background:var(--boundary-soft); color:var(--boundary-dark,#565A6E);}
-.fst-edge-label.insert{background:var(--insert-soft); color:#0C7C67;}
-.fst-edge-label.delete{background:var(--delete-soft); color:#C23434;}
-.fst-edge-label.substitute{background:var(--change-soft); color:#6835E0;}
-.fst-edge-note{
-  position:absolute; top:38px; font-size:10.5px; color:var(--ink-soft); width:100px; text-align:center; left:50%;
-  transform:translateX(-50%); opacity:0; transition:.4s; line-height:1.3;
-}
-.fst-edge-note.in{opacity:1;}
-.fst-tapes{margin-top:56px; display:flex; flex-direction:column; gap:6px;}
-.tape-row{display:flex; gap:4px; align-items:center;}
-.tape-tag{font-size:11px; font-weight:700; color:var(--ink-soft); width:64px; text-transform:uppercase; letter-spacing:.4px;}
-.tape-cell{
-  font-family:'JetBrains Mono',monospace; font-weight:700; min-width:22px; text-align:center; padding:5px 4px;
-  border-radius:5px; background:var(--bg2); opacity:0; transform:translateY(4px); transition:.35s;
-}
-.tape-cell.in{opacity:1; transform:translateY(0);}
-.tape-cell.upper{background:var(--stem-soft); color:var(--stem);}
-.tape-cell.lower{background:var(--insert-soft); color:#0C7C67;}
-.fst-controls{display:flex; gap:10px; align-items:center; justify-content:center; margin-top:18px; flex-wrap:wrap;}
-.btn{
-  font-family:'Baloo 2',cursive; font-weight:600; font-size:14px; border-radius:12px; padding:10px 18px;
-  border:2px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer; transition:.2s;
-}
-.btn:hover{transform:translateY(-2px); box-shadow:var(--shadow);}
-.btn.ghost{background:#fff; color:var(--ink);}
-.fst-explain{
-  margin-top:16px; background:var(--bg2); border-radius:14px; padding:14px 16px; font-size:14px; color:var(--ink-soft); line-height:1.6;
-}
-
-/* playground */
-.playground{
-  background:linear-gradient(135deg,#FFF3E0,#FFE3EE 60%,#E6ECFF); border:2px solid var(--line);
-  border-radius:24px; padding:26px; margin:26px 0; box-shadow:var(--shadow);
-}
-.pg-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:center;}
-.pg-row select, .pg-row input{
-  font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px; padding:11px 14px;
-  border-radius:12px; border:2px solid var(--line); background:#fff; color:var(--ink);
-}
-.pg-row input{width:170px;}
-.chips{display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:12px;}
+/* ---------- word chips ---------- */
+.chip-grid{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;}
 .chip{
-  font-family:'JetBrains Mono',monospace; font-size:12.5px; font-weight:600; background:#fff; border:1.5px solid var(--line);
-  padding:5px 10px; border-radius:999px; cursor:pointer; color:var(--ink-soft);
+  background:#fff;border-radius:16px;padding:14px 18px;box-shadow:var(--shadow);border:2px solid rgba(90,70,130,.06);
+  min-width:150px; transition:transform .2s;
 }
-.chip:hover{border-color:var(--stem); color:var(--stem);}
-#pg-result{margin-top:18px;}
+.chip:hover{transform:translateY(-4px);}
+.chip .w{font-family:'Space Mono',monospace;font-weight:700;font-size:1.15rem;color:var(--web-blue);}
+.chip .tag{display:inline-block;margin-top:6px;font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:3px 10px;border-radius:999px;}
+.chip .desc{margin-top:6px;font-size:.88rem;color:var(--ink-soft);}
+.tag.reg{background:var(--mint);color:#25694A;}
+.tag.irr{background:var(--blush);color:#9C3A5A;}
 
-/* footer */
-footer{
-  text-align:center; padding:44px 20px 60px; color:var(--ink-soft); font-size:13.5px; line-height:1.8;
+/* ---------- tabs ---------- */
+.tabbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:26px;}
+.tab{
+  background:#fff;padding:11px 20px;border-radius:999px;font-weight:600;font-size:.95rem;box-shadow:var(--shadow);
+  border:2px solid transparent; color:var(--ink-soft);
 }
-footer .credit{font-family:'Baloo 2',cursive; font-weight:600; font-size:15px; color:var(--ink);}
-footer a{font-weight:700; text-decoration:none; border-bottom:2px solid var(--stem);}
+.tab.active{border-color:var(--web-blue);color:var(--web-blue);background:var(--babyblue);}
+.tabpanel{display:none;}
+.tabpanel.active{display:block;animation:reveal .4s ease;}
+.theory-card{
+  background:#fff;border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:20px;
+}
+.theory-card h3{color:var(--web-blue);}
+.example-row{
+  display:grid; grid-template-columns: 1fr 30px 1fr; align-items:center; gap:10px;
+  background:var(--cream); border-radius:14px; padding:12px 16px; margin:10px 0; font-family:'Space Mono',monospace;
+}
+.example-row .arrow{text-align:center;color:var(--ink-soft);}
+.example-row .note{grid-column:1/-1;font-family:'Nunito',sans-serif;color:var(--ink-soft);font-size:.92rem;margin-top:4px;}
+.morph-piece{display:inline-block;padding:2px 8px;border-radius:8px;margin:0 2px;}
+.piece-stem{background:var(--babyblue);}
+.piece-affix{background:var(--yellow);}
+.piece-irr{background:var(--blush);}
 
-@media (prefers-reduced-motion: reduce){
-  *{animation-duration:.01ms !important; transition-duration:.01ms !important;}
+.paradigm-table{width:100%;border-collapse:collapse;font-family:'Space Mono',monospace;margin:14px 0;}
+.paradigm-table th,.paradigm-table td{padding:10px 14px;text-align:left;border-bottom:1px solid rgba(90,70,130,.1);}
+.paradigm-table th{color:var(--ink-soft);font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;}
+.paradigm-table tr:hover td{background:var(--cream);}
+
+/* ---------- FST diagram ---------- */
+.fst-card{background:#fff;border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);}
+.fst-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px;}
+select{
+  font-family:'Nunito',sans-serif;font-weight:700;padding:10px 14px;border-radius:12px;border:2px solid var(--babyblue);
+  background:#fff;color:var(--ink);font-size:.95rem;
 }
+.run-btn{background:var(--web-blue);color:#fff;padding:12px 26px;border-radius:999px;font-weight:600;box-shadow:var(--shadow);transition:transform .2s;}
+.run-btn:hover{transform:translateY(-2px);}
+.run-btn:active{transform:translateY(0);}
+#fstSvgWrap{width:100%;overflow-x:auto;}
+svg text{font-family:'Space Mono',monospace;}
+.fst-node-circle{fill:#fff;stroke:var(--web-blue);stroke-width:3;transition:opacity .5s ease;}
+.fst-node-circle.final{stroke:var(--hero-red);}
+.fst-edge{fill:none;stroke:#D8CFEE;stroke-width:3;transition:opacity .4s;}
+.fst-edge.regular-edge{stroke:var(--regular);}
+.fst-edge.irregular-edge{stroke:var(--irregular);stroke-dasharray:6 5;}
+.fst-particle{fill:var(--hero-red);filter:drop-shadow(0 0 4px rgba(232,138,133,.8));}
+.fst-label{font-size:12px;fill:var(--ink-soft);cursor:pointer;}
+.fst-node-label{font-size:13px;fill:var(--ink);font-weight:700;}
+#fstTooltip{
+  position:absolute;background:var(--ink);color:#fff;padding:10px 14px;border-radius:12px;font-size:.85rem;
+  max-width:260px;pointer-events:none;opacity:0;transition:opacity .2s;z-index:20;box-shadow:var(--shadow-lg);
+}
+.trace-box{
+  margin-top:18px;background:var(--cream);border-radius:16px;padding:18px 20px;min-height:56px;
+  font-family:'Space Mono',monospace;font-size:1rem;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+}
+.trace-step{background:#fff;padding:8px 14px;border-radius:10px;box-shadow:var(--shadow);opacity:0;transform:translateY(6px);animation:reveal .4s forwards;}
+.trace-arrow{color:var(--ink-soft);}
+
+.step-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+.step-item{
+  background:#fff;border-radius:14px;padding:14px 18px;box-shadow:var(--shadow);
+  border-left:5px solid var(--regular); opacity:0; transform:translateX(-8px);
+  animation:slideIn .4s ease forwards; font-size:.95rem; line-height:1.55;
+}
+.step-item.irregular{border-left-color:var(--irregular);}
+.step-item b.step-tag{display:block;font-family:'Fredoka',sans-serif;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:4px;}
+@keyframes slideIn{to{opacity:1;transform:translateX(0);}}
+
+.lenses-card{margin-top:26px;border-top:2px dashed rgba(90,70,130,.15);padding-top:22px;}
+.lenses-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;}
+.lens-col{background:var(--cream);border-radius:16px;padding:16px;border:2px solid rgba(90,70,130,.06);transition:box-shadow .3s, border-color .3s, background .3s;}
+.lens-col.pulse{border-color:var(--web-blue);box-shadow:var(--shadow-lg);background:#fff;}
+.lens-head{font-family:'Fredoka',sans-serif;font-weight:600;font-size:.92rem;margin-bottom:8px;color:var(--web-blue);}
+.lens-body{font-size:.9rem;color:var(--ink);min-height:40px;}
+@media (max-width:760px){.lenses-grid{grid-template-columns:1fr;}}
+
+.legend-card{background:var(--yellow);border-radius:16px;padding:16px 20px;margin-bottom:22px;}
+.legend-title{font-family:'Fredoka',sans-serif;font-weight:600;margin-bottom:10px;}
+.legend-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 18px;}
+.legend-item{font-size:.86rem;display:flex;gap:8px;align-items:baseline;}
+.legend-item .sym{font-family:'Space Mono',monospace;font-weight:700;background:#fff;padding:2px 8px;border-radius:8px;white-space:nowrap;}
+
+/* ---------- applications ---------- */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;}
+.app-card{background:#fff;border-radius:18px;padding:22px;box-shadow:var(--shadow);transition:transform .25s;}
+.app-card:hover{transform:translateY(-5px);}
+.app-card .icon{font-size:2rem;margin-bottom:10px;}
+.app-card h4{margin-bottom:6px;font-size:1.05rem;}
+.app-card p{color:var(--ink-soft);font-size:.92rem;margin:0;}
+
+/* ---------- playground ---------- */
+.playground{background:linear-gradient(160deg,var(--lavender),var(--babyblue));border-radius:var(--radius);padding:32px;box-shadow:var(--shadow-lg);}
+.playground .fst-card{background:rgba(255,255,255,.85);}
+
+/* ---------- breaking-the-ideal callouts (theories tab 5) ---------- */
+.break-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0;}
+@media (max-width:760px){.break-grid{grid-template-columns:1fr;}}
+.break-card{background:var(--cream);border-radius:16px;padding:18px 20px;border:2px solid rgba(90,70,130,.08);}
+.break-card h4{margin-bottom:8px;font-size:.98rem;color:var(--hero-red);}
+.break-card .ex{font-family:'Space Mono',monospace;background:#fff;border-radius:10px;padding:8px 12px;display:inline-block;margin:4px 6px 4px 0;font-size:.9rem;box-shadow:var(--shadow);}
+.rescue-note{background:var(--mint);border-radius:14px;padding:16px 20px;margin-top:14px;font-size:.92rem;}
+
+/* ---------- affix rivalry duel ---------- */
+.rivalry-card{background:#fff;border-radius:var(--radius);padding:30px;box-shadow:var(--shadow);}
+.duel-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.duel-row{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;margin:22px 0 6px;}
+.duel-card{flex:1;min-width:200px;background:var(--cream);border-radius:16px;padding:20px;border:3px solid transparent;transition:all .45s ease;position:relative;}
+.duel-card.winner{border-color:var(--regular);background:#fff;box-shadow:var(--shadow-lg);transform:scale(1.03);}
+.duel-card.loser{opacity:.4;}
+.duel-label{font-size:.72rem;text-transform:uppercase;font-weight:800;letter-spacing:.05em;color:var(--ink-soft);margin-bottom:8px;}
+.duel-word{font-family:'Space Mono',monospace;font-weight:700;font-size:1.3rem;color:var(--web-blue);position:relative;display:inline-block;}
+.duel-card.loser .duel-word::after{content:'';position:absolute;left:-2px;right:-2px;top:52%;height:2px;background:var(--hero-red);}
+.duel-badge{display:none;margin-top:8px;font-size:.78rem;font-weight:800;color:#25694A;}
+.duel-card.winner .duel-badge{display:inline-block;}
+.duel-vs{align-self:center;font-family:'Fredoka',sans-serif;font-weight:700;color:var(--ink-soft);font-size:1.3rem;padding:0 4px;}
+.duel-verdict{margin-top:16px;padding:16px 18px;border-radius:14px;background:var(--yellow);font-size:.92rem;opacity:0;transform:translateY(8px);transition:all .4s ease;line-height:1.55;}
+.duel-verdict.show{opacity:1;transform:translateY(0);}
+.own-example-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px;padding-top:18px;border-top:2px dashed rgba(90,70,130,.15);}
+.own-example-row input[type=text]{font-family:'Space Mono',monospace;font-size:.95rem;padding:10px 14px;border-radius:12px;border:2px solid var(--babyblue);min-width:160px;}
+
+/* ---------- inflectional classes ---------- */
+.class-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;}
+.class-chip{background:#fff;border-radius:14px;padding:12px 18px;box-shadow:var(--shadow);border:2px solid transparent;font-family:'Space Mono',monospace;font-weight:700;color:var(--ink);transition:.2s;}
+.class-chip:hover{transform:translateY(-3px);}
+.class-chip.picked{border-color:var(--web-blue);background:var(--babyblue);}
+.class-detail{margin-top:18px;background:var(--cream);border-radius:16px;padding:20px 22px;min-height:60px;}
+.class-detail .class-name{font-family:'Fredoka',sans-serif;font-weight:600;color:var(--web-blue);margin-bottom:6px;}
+.class-detail .phenomenon{display:inline-block;margin-top:10px;background:var(--blush);color:#9C3A5A;font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:4px 12px;border-radius:999px;}
+
+/* ---------- code demo ---------- */
+.code-tabbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.code-panel{background:#211d33;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-lg);}
+.code-header{background:#17142a;color:#EAE0FA;padding:12px 22px;font-family:'Space Mono',monospace;font-size:.8rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.code-header .dots span{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;}
+.code-body{padding:22px;}
+.code-lines{font-family:'Space Mono',monospace;font-size:.86rem;line-height:2;color:#B9AFDD;}
+.code-line{opacity:.35;transition:opacity .3s, background .3s;padding:3px 10px;border-radius:6px;white-space:pre;}
+.code-line.active{opacity:1;background:rgba(255,255,255,.08);color:#fff;}
+.code-line .ln{color:#5F5680;margin-right:16px;user-select:none;}
+.code-explain{margin-top:14px;background:var(--babyblue);color:var(--ink);border-radius:12px;padding:12px 18px;font-size:.88rem;min-height:22px;line-height:1.5;}
+.terminal{margin-top:14px;background:#0d0b18;border-radius:12px;padding:14px 20px;font-family:'Space Mono',monospace;font-size:.84rem;color:#8CF0B4;min-height:50px;white-space:pre-wrap;line-height:1.6;}
+.code-step-controls{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.sim-note{font-size:.78rem;color:var(--ink-soft);margin-top:10px;font-style:italic;}
+
+/* ---------- toy analyzer (playground extension) ---------- */
+.own-word-card{margin-top:26px;padding-top:22px;border-top:2px dashed rgba(255,255,255,.4);}
+.own-word-card input[type=text]{font-family:'Space Mono',monospace;font-size:1rem;padding:12px 16px;border-radius:12px;border:2px solid var(--babyblue);min-width:200px;}
+.morph-guess{margin-top:14px;background:#fff;border-radius:14px;padding:16px 20px;font-family:'Space Mono',monospace;font-size:1.05rem;}
+.morph-guess .piece{display:inline-block;padding:3px 10px;margin:2px;border-radius:8px;}
+
+/* ---------- outro ---------- */
+.outro{text-align:center;background:#fff;border-radius:var(--radius);padding:44px 30px;box-shadow:var(--shadow-lg);}
+.outro .avatar-row{display:flex;justify-content:center;gap:-10px;margin-bottom:18px;}
+
+footer{text-align:center;padding:30px;color:var(--ink-soft);font-size:.85rem;}
+
 @media (max-width:640px){
-  .hero{padding:44px 16px 28px;}
-  .theory-card, .fst-panel, .playground, .demo-card{padding:18px;}
+  .example-row{grid-template-columns:1fr 20px 1fr;font-size:.85rem;}
+  section{padding:50px 0;}
 }
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;}
 </style>
 </head>
 <body>
 
-<header class="hero">
-  <span class="hero-eyebrow">🧬 NLP · BTIT14706 · Unit 3 — Lexical Analysis</span>
-  <h1>Words are just <span class="accent">tiny LEGO sets</span>.<br>Let's take them apart.</h1>
-  <p class="lead">A hands-on tour of how machines figure out what a word is made of — three rival theories, the cases that break them, and a live Finite State Transducer you can actually run.</p>
-  <div class="bricks-hero">
-    <div class="brick-row" style="justify-content:center">
-      <span class="brick brick-prefix">un<span class="brick-label">not</span></span>
-      <span class="brick brick-stem">happy<span class="brick-label">root</span></span>
-      <span class="brick brick-suffix">ness<span class="brick-label">state of</span></span>
+<div class="web-bg" aria-hidden="true">
+  <svg class="web1" viewBox="0 0 200 200"><g stroke="#5B7FB5" stroke-width="1.2" fill="none"><circle cx="100" cy="100" r="30"/><circle cx="100" cy="100" r="55"/><circle cx="100" cy="100" r="80"/><line x1="100" y1="0" x2="100" y2="200"/><line x1="0" y1="100" x2="200" y2="100"/><line x1="30" y1="30" x2="170" y2="170"/><line x1="170" y1="30" x2="30" y2="170"/></g></svg>
+  <svg class="web2" viewBox="0 0 200 200"><g stroke="#E88A85" stroke-width="1.2" fill="none"><circle cx="100" cy="100" r="30"/><circle cx="100" cy="100" r="55"/><circle cx="100" cy="100" r="80"/><line x1="100" y1="0" x2="100" y2="200"/><line x1="0" y1="100" x2="200" y2="100"/><line x1="30" y1="30" x2="170" y2="170"/><line x1="170" y1="30" x2="30" y2="170"/></g></svg>
+  <svg class="web3" viewBox="0 0 200 200"><g stroke="#D98CC7" stroke-width="1.2" fill="none"><circle cx="100" cy="100" r="30"/><circle cx="100" cy="100" r="55"/><circle cx="100" cy="100" r="80"/><line x1="100" y1="0" x2="100" y2="200"/><line x1="0" y1="100" x2="200" y2="100"/></g></svg>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">A Sunny Comic-Book Lecture</div>
+    <div class="spidey-badge" aria-hidden="true">🕸️</div>
+    <h1>E.V. Explains the <span class="accent">Secret Web</span><br>of Morphology</h1>
+    <p class="sub">Spider-Man swings, E.V. talks finite-state machines. Together they show how three classic theories of word-formation are secretly the same little machine wearing three different pastel costumes.</p>
+    <button class="cta-btn" id="heroStartBtn">Start the story ↓</button>
+  </div>
+</section>
+
+<!-- STORY -->
+<section id="story">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene One</div>
+      <h2>A Quick Swing Through Queens</h2>
+      <p>Click through the panels at your own pace — new dialogue, new clues.</p>
+    </div>
+    <div class="comic-panel">
+      <div id="speechFeed"></div>
+      <div class="story-controls">
+        <div class="dot-row" id="dotRow"></div>
+        <button class="next-btn" id="nextSceneBtn">Next beat →</button>
+      </div>
     </div>
   </div>
-</header>
+</section>
 
-<nav class="maintabs" id="maintabs">
-  <button data-panel="theories" class="active">🧱 Word Theories</button>
-  <button data-panel="challenges">⚠️ Morphology Challenges</button>
-  <button data-panel="fst">⚙️ FST Engine</button>
-</nav>
-
-<main>
-  <!-- THEORIES PANEL -->
-  <section class="panel active" id="panel-theories">
+<!-- WORDS -->
+<section id="words">
+  <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Three ways to model a word</span>
-      <h2>Item &amp; Arrangement · Item &amp; Process · Word &amp; Paradigm</h2>
-      <p>Same words, three completely different philosophies. Pick a theory, read the logic, then flip through real cases where it shines — and where it quietly falls apart.</p>
+      <div class="section-tag">Scene Two</div>
+      <h2>The Six Words Worth Investigating</h2>
+      <p>E.V. pulled these straight out of the dialogue. Some play by the rules. Some are total rebels.</p>
     </div>
-    <div class="subtabs" id="theory-subtabs"></div>
-    <div id="theory-mount"></div>
-  </section>
+    <div class="chip-grid" id="wordChips"></div>
+  </div>
+</section>
 
-  <!-- CHALLENGES PANEL -->
-  <section class="panel" id="panel-challenges">
+<!-- THEORIES -->
+<section id="theories">
+  <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Where tidy morphology gets messy</span>
-      <h2>Morphology's Two Real Headaches</h2>
-      <p><b>Isomorphism</b> — does one meaning always equal one neat piece? And <b>contiguity</b> — does a morpheme have to sit together in one block? Regular English says yes to both. The world's languages say... not always.</p>
+      <div class="section-tag">Scene Three</div>
+      <h2>Three Ways Linguists Have Told This Story</h2>
+      <p>Same words, three lenses. Flip between them — none of them is "wrong," they're just different camera angles.</p>
     </div>
-    <div id="challenges-mount"></div>
-  </section>
+    <div class="tabbar" role="tablist" aria-label="Morphology theories">
+      <button class="tab active" data-tab="iaa" role="tab" aria-selected="true">🧱 Item-and-Arrangement</button>
+      <button class="tab" data-tab="iap" role="tab" aria-selected="false">⚙️ Item-and-Process</button>
+      <button class="tab" data-tab="iapd" role="tab" aria-selected="false">📋 Item-and-Paradigm</button>
+      <button class="tab" data-tab="unified" role="tab" aria-selected="false">🕸️ All Three, One FST</button>
+      <button class="tab" data-tab="breaking" role="tab" aria-selected="false">💥 When the Ideal Breaks</button>
+    </div>
 
-  <!-- FST PANEL -->
-  <section class="panel" id="panel-fst">
+    <div class="tabpanel active" id="panel-iaa">
+      <div class="theory-card">
+        <h3>Words are LEGO towers</h3>
+        <p>Item-and-Arrangement says a word is just discrete little morpheme-bricks glued in a row. No transformations, no drama — just concatenation.</p>
+        <div class="example-row"><span><span class="morph-piece piece-stem">hero</span> + <span class="morph-piece piece-affix">es</span></span><span class="arrow">→</span><span>heroes</span></div>
+        <div class="example-row"><span><span class="morph-piece piece-stem">web</span> + <span class="morph-piece piece-affix">ed</span></span><span class="arrow">→</span><span>webbed</span></div>
+        <div class="example-row"><span><span class="morph-piece piece-stem">web</span> + <span class="morph-piece piece-stem">sling</span> + <span class="morph-piece piece-affix">ing</span></span><span class="arrow">→</span><span>web-slinging</span></div>
+        <div class="example-row"><span><span class="morph-piece piece-stem">child</span> + <span class="morph-piece piece-irr">r</span> + <span class="morph-piece piece-irr">en</span></span><span class="arrow">→</span><span>children</span>
+          <span class="note">Awkward but honest: English fossilized <em>two</em> old plural markers onto "child." Great example, terrible advertisement, for pure brick-stacking.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-iap">
+      <div class="theory-card">
+        <h3>Words are recipes, not towers</h3>
+        <p>Item-and-Process says start from a base and apply ordered rules — some rules add material, some just <em>change</em> it. No bricks required.</p>
+        <div class="example-row"><span>swing <span class="mono">+[PAST]</span></span><span class="arrow">→</span><span>apply <b>ablaut</b> (i→u)</span><span class="note">Result: <b>swung</b>. Nothing gets added — the vowel itself mutates.</span></div>
+        <div class="example-row"><span>go <span class="mono">+[PAST]</span></span><span class="arrow">→</span><span>apply <b>suppletion</b></span><span class="note">Result: <b>went</b>. The whole stem is swapped for an unrelated form — the most extreme "process" of all.</span></div>
+        <div class="example-row"><span>hero <span class="mono">+[PL]</span></span><span class="arrow">→</span><span>apply <b>default suffixation</b></span><span class="note">Result: <b>heroes</b>. Regular rule: add "-es" after a vowel-final noun like this.</span></div>
+        <div class="example-row"><span>web (N) <span class="mono">+[V]</span></span><span class="arrow">→</span><span>apply <b>zero-derivation</b></span><span class="note">Result: web (V), no phonology changes at all — just a silent category switch, ready for further suffixing ("webbed").</span></div>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-iapd">
+      <div class="theory-card">
+        <h3>Words live in a grid, waiting to be filled</h3>
+        <p>Item-and-Paradigm ignores "how" entirely. A word is a cell in a table of {stem × features}. The FST's only job is to output whatever sits in that cell — regular or not.</p>
+        <table class="paradigm-table">
+          <tr><th>Feature</th><th>go</th><th>swing</th><th>web (V)</th></tr>
+          <tr><td>PRESENT</td><td>go</td><td>swing</td><td>web</td></tr>
+          <tr><td>PAST</td><td><b>went</b></td><td><b>swung</b></td><td>webbed</td></tr>
+          <tr><td>PROGRESSIVE</td><td>going</td><td>swinging</td><td>webbing</td></tr>
+        </table>
+        <p class="note" style="color:var(--ink-soft);font-size:.9rem;">Notice: the table doesn't care that "went" is weird. It's just the PAST cell for "go." Paradigm theory treats regular and irregular cells as equally legitimate — just filled by different means.</p>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-unified">
+      <div class="theory-card">
+        <h3>The punchline: they were never rivals</h3>
+        <p>Arrangement, Process, and Paradigm are three descriptions of paths through <em>one</em> finite-state transducer — written as rule pairs like <span class="mono">C:C</span>, <span class="mono">^:e</span>, and <span class="mono">PAST:ed</span> — running in parallel, not competing. Scroll down to Scene Four, hit "Run transducer," and watch all three lenses light up together, arc by arc, for the exact same word.</p>
+      </div>
+    </div>
+
+    <div class="tabpanel" id="panel-breaking">
+      <div class="theory-card">
+        <h3>Two quiet promises every word-building machine makes</h3>
+        <p>Every FST we've drawn so far runs on an unspoken instruction-manual logic: <b>🧩 Isomorphism</b> — "one meaning = one brick" (want plural? snap on the <span class="mono">-s</span> brick, never shared, never missing) — and <b>🔗 Contiguity</b> — "the brick only snaps on the outside" (a marker sits at the stem's edge, never buried inside, never reshaping what it attaches to). Both promises sound airtight. Neither survives contact with real language.</p>
+
+        <h4 style="margin-top:22px;color:var(--hero-red);">🧩 Promise #1 breaks: three troublemakers</h4>
+        <div class="break-grid">
+          <div class="break-card">
+            <h4>👻 The Ghost Marker (zero exponence)</h4>
+            <p>The meaning is grammatically real — a listener hears it — but no extra sound shows up to carry it.</p>
+            <span class="ex">I hit the ball today / yesterday</span>
+            <span class="ex">She cuts / cut the cake</span>
+            <span class="ex">one sheep / three sheep</span>
+            <p style="margin-top:8px;font-size:.88rem;color:var(--ink-soft);">🇫🇮 Finnish does it too: <span class="mono">ol-i-n</span> "I was" adds a person suffix… but <span class="mono">ol-i</span> "he/she was" doesn't. 3rd-person-singular shows up empty-handed.</p>
+          </div>
+          <div class="break-card">
+            <h4>🎭 The Two-in-One (bundling / polysemous exponent)</h4>
+            <p>One tiny piece secretly does two+ jobs — or one word bundles several features into a single unsplittable form.</p>
+            <span class="ex">Priya's laptop → possessive</span>
+            <span class="ex">Priya's arriving → "is"</span>
+            <span class="ex">Priya's finished → "has"</span>
+            <p style="margin-top:8px;">And the reverse: <span class="mono">am</span> packs 1st-person + singular + present into one word — no way to point to separate pieces.</p>
+            <p style="margin-top:8px;font-size:.88rem;color:var(--ink-soft);">🇫🇷 French <span class="mono">lentement</span> "slowly" has a mystery <span class="mono">-e-</span> mapping to no feature at all (an <b>empty morpheme</b>). 🇫🇮 Finnish <span class="mono">-mme</span> marks PLURAL <em>and</em> 1st-person at once, just like "am."</p>
+          </div>
+        </div>
+        <div class="break-card" style="margin-top:14px;">
+          <h4>🎰 The Rival Markers</h4>
+          <p>One meaning, a whole menu of competing pieces — <span class="mono">cats / oxen / sheep / geese / children</span> are all "plural," realized five completely different ways. This case gets its own full interactive demo in Scene Five — <b>Disjunctive Affixes</b>.</p>
+        </div>
+        <div class="rescue-note" style="margin-top:14px;">
+          <b>Patching Promise #1:</b> zero affixes (let a feature attach to an invisible Ø marker), empty morphemes (let a syllable exist without carrying any feature), and feature bundling (let one exponent legitimately stand for several features at once) — three small patches, one working machine.
+        </div>
+
+        <h4 style="margin-top:26px;color:var(--hero-red);">🔗 Promise #2 breaks: away from the edges</h4>
+        <div class="break-grid">
+          <div class="break-card">
+            <h4>🎶 The Shape-Shifter (ablaut)</h4>
+            <p>No suffix at all — the stem's own internal vowel morphs to carry the grammar.</p>
+            <span class="ex">sing → sang → sung</span>
+            <span class="ex">ring → rang → rung</span>
+            <span class="ex">drive → drove → driven</span>
+            <span class="ex">mouse → mice</span>
+            <span class="ex">goose → geese</span>
+            <span class="ex">foot → feet</span>
+          </div>
+          <div class="break-card">
+            <h4>🕵️ The Secret Passenger (infixation)</h4>
+            <p>English does this playfully: <span class="ex">un-freaking-believable</span> <span class="ex">abso-bloody-lutely</span> — not official grammar, but the mechanism (insert material INSIDE the word) is a real, obligatory rule in Tagalog:</p>
+            <table class="paradigm-table" style="margin-top:10px;">
+              <tr><th></th><th>sulat "write"</th><th>patay "kill"</th></tr>
+              <tr><td>Active</td><td>s‹um›ulat</td><td>p‹um›atay</td></tr>
+              <tr><td>Passive</td><td>s‹in›ulat</td><td>p‹in›atay</td></tr>
+            </table>
+            <p class="note" style="color:var(--ink-soft);font-size:.85rem;"><span class="mono">-um-</span>/<span class="mono">-in-</span> always land right after the first consonant, splitting the root in two.</p>
+          </div>
+        </div>
+        <div class="break-card" style="margin-top:14px;">
+          <h4>🧬 The Woven Root (root-and-pattern / templatic morphology)</h4>
+          <p>The most extreme break: the root itself never moves — grammar is woven THROUGH it as a vowel pattern, not attached to an edge.</p>
+          <span class="ex">🇸🇦 Arabic r-s-m "draw" → rasām(a) "he drew" / rusim(a) "it was drawn"</span>
+          <span class="ex">🇮🇱 Hebrew g-d-l "grow" → gadal "he grew" / gdila "growth"</span>
+          <p style="margin-top:8px;font-size:.88rem;color:var(--ink-soft);">English's shy cousin: <span class="mono">sing → sang → sung</span> is the same trick in miniature — one fixed skeleton (s-_-ng), different vowels carrying different grammar. Arabic and Hebrew just do it constantly and systematically.</p>
+        </div>
+        <div class="rescue-note" style="margin-top:14px;">
+          <b>Patching Promise #2 — multi-tape transducers:</b> give the FST several tapes running in parallel (one for the consonant skeleton, one for the vowel pattern) and merge them into a single word. For infixes, mark an anchor point inside the stem first, then let a second pass insert material right there. Still finite-state the whole way through — just organized more cleverly.
+        </div>
+        <div class="rescue-note">
+          <b>The bigger fix — the paradigm-based method:</b> Item-and-Paradigm never promised isomorphism or contiguity in the first place. It just says "here's the {stem × features} table — output whatever fills that cell." Whether the cell is filled by a clean suffix, a fused portmanteau, silence, double-marking, or a woven root, the table doesn't blink. Scene Seven builds this out in full.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FST -->
+<section id="fst">
+  <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">The industry workhorse</span>
-      <h2>Finite State Transducers: The Basic Idea</h2>
-      <p>One machine, two tapes, and a set of tiny rules — read the <b>underlying</b> form on top, write the <b>surface</b> form on the bottom, one symbol at a time.</p>
+      <div class="section-tag">Scene Four</div>
+      <h2>One FST, Every Theory at Once</h2>
+      <p>Every word starts the exact same way: the machine grabs the <b>stem</b> untouched at state <span class="mono">in</span>. Each arc is a <b>rule pair</b> written "lexical:surface" — <span class="mono">C:C</span> and <span class="mono">V:V</span> mean "copy this letter," <span class="mono">^:0</span> means "delete the boundary," <span class="mono">^:e</span> means "the boundary triggers an inserted letter," and <span class="mono">TAG:x</span> means "this abstract feature is spelled out as x." Green solid arcs are ordinary, rule-governed pairs. Pink dashed arcs are the rebels — pairs that don't follow the everyday pattern. Click "Run transducer" and read the plain-English steps and the three-lens panel that appear below — or hover/click any arc for a quick tooltip.</p>
+      <div class="legend-card" id="legendCard">
+        <div class="legend-title">🔑 Notation legend</div>
+        <div class="legend-grid" id="legendGrid"></div>
+      </div>
+    </div>
+    <div class="fst-card">
+      <div class="fst-controls">
+        <label for="fstExample" class="sr-only">Choose a word to run</label>
+        <select id="fstExample">
+          <option value="hero_pl">hero + PLURAL (regular)</option>
+          <option value="web_past">web + PAST (regular, doubling)</option>
+          <option value="swing_past">swing + PAST (irregular: ablaut)</option>
+          <option value="go_past">go + PAST (irregular: suppletion)</option>
+          <option value="child_pl">child + PLURAL (irregular: fossil plural)</option>
+        </select>
+        <button class="run-btn" id="runFstBtn">▶ Run transducer</button>
+      </div>
+      <div id="fstSvgWrap" style="position:relative;">
+        <svg id="fstSvg" viewBox="0 0 900 260" width="100%" role="img" aria-label="Finite state transducer diagram with four states"></svg>
+        <div id="fstTooltip"></div>
+      </div>
+      <div class="trace-box" id="traceBox">
+        <span class="mono" style="color:var(--ink-soft);">Pick a word above and hit run — the states will light up here, step by step.</span>
+      </div>
+      <div id="stepList" class="step-list"></div>
+
+      <div class="lenses-card">
+        <h3 style="margin-bottom:6px;">🕸️ Three Theories, Running in Parallel</h3>
+        <p style="color:var(--ink-soft);font-size:.92rem;margin-top:0;">Every arc the machine takes is ONE event that three linguists would describe three different ways — all at once, live, as it happens.</p>
+        <div class="lenses-grid">
+          <div class="lens-col" id="lensArrangement">
+            <div class="lens-head">🧱 Item-and-Arrangement says…</div>
+            <div class="lens-body" id="lensArrangementBody">Run the machine to see this lens light up.</div>
+          </div>
+          <div class="lens-col" id="lensProcess">
+            <div class="lens-head">⚙️ Item-and-Process says…</div>
+            <div class="lens-body" id="lensProcessBody">Run the machine to see this lens light up.</div>
+          </div>
+          <div class="lens-col" id="lensParadigm">
+            <div class="lens-head">📋 Item-and-Paradigm says…</div>
+            <div class="lens-body" id="lensParadigmBody">Run the machine to see this lens light up.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RIVALRY -->
+<section id="rivalry">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene Five</div>
+      <h2>Disjunctive Affixes: One Grammatical Job, Several Rival Affixes</h2>
+      <p>Sometimes a language offers TWO or THREE correct answers for the exact same grammatical job — which one surfaces depends on which word you're dealing with. Very common in inflection-rich languages (Russian, French, Spanish, German). Even English does it, quietly.</p>
     </div>
 
     <div class="theory-card">
-      <div class="formula">Upper tape (underlying) → FST → Lower tape (surface)</div>
-      <ol>
-        <li><b>Two tapes, not one.</b> An FST reads an underlying string and writes a surface string at the same time, moving through labelled states.</li>
-        <li><b>Arc labels are pairs.</b> Every step is <span class="mono">upper : lower</span> — <span class="mono">g:g</span> copies a letter, <span class="mono">^:ε</span> deletes a boundary, <span class="mono">ε:e</span> inserts a letter out of nowhere.</li>
-        <li><b>Fully reversible.</b> Run it one way for <b>analysis</b> (surface → lemma), run it backwards for <b>generation</b> (lemma → surface). Same network, same rules.</li>
-        <li><b>Why it won.</b> It's fast, small, and this built-in reversibility is exactly what parsing <i>and</i> generation both need.</li>
-      </ol>
+      <h3>Even English has it: the past participle's three rival endings</h3>
+      <table class="paradigm-table">
+        <tr><th>Verb</th><th>Past Participle</th><th>Ending used</th></tr>
+        <tr><td>look</td><td><b>looked</b></td><td><span class="mono">-ed</span></td></tr>
+        <tr><td>give</td><td><b>given</b></td><td><span class="mono">-en</span></td></tr>
+        <tr><td>put</td><td><b>put</b></td><td><span class="mono">Ø</span> (nothing at all!)</td></tr>
+      </table>
+      <p class="note" style="color:var(--ink-soft);font-size:.9rem;">Same grammatical job — "past participle" — three completely different solutions. Native speakers just memorize which verb takes which; a computer needs an explicit rule (or class tag) for it.</p>
     </div>
 
-    <div class="section-head" style="margin-top:44px;">
-      <span class="eyebrow">Watch it run</span>
-      <h2>State-by-State Walkthrough</h2>
-      <p>Toggle between plain copy-through cases and the tricky spelling-rule cases, then hit <b>Run</b> to watch the tape fill in, edge by edge.</p>
+    <div class="theory-card">
+      <h3>Meet "karta" (карта = map): one Russian noun, twelve forms</h3>
+      <p>English nouns barely inflect (<span class="mono">map / maps</span>). Russian nouns change their ending by <b>case</b> (grammatical role) <em>and</em> number — and which endings a noun uses depends entirely on its <b>declension class</b>.</p>
+      <table class="paradigm-table">
+        <tr><th>Case</th><th>Class I: zakon</th><th>Class II: karta</th><th>Class III: rukopis'</th><th>Class IV: boloto</th></tr>
+        <tr><td>Nominative</td><td>zakon-Ø</td><td>kart-a</td><td>rukopis'-Ø</td><td>bolot-o</td></tr>
+        <tr><td>Genitive</td><td>zakon-a</td><td>kart-y</td><td>rukopis-i</td><td>bolot-a</td></tr>
+        <tr><td>Instrumental</td><td>zakon-om</td><td>kart-oj</td><td>rukopis-ju</td><td>bolot-om</td></tr>
+      </table>
+      <p class="note" style="color:var(--ink-soft);font-size:.9rem;">Four nouns, four completely different suffix sets for the very same grammatical case — this is disjunctive affixation at full scale. A <b>declension class</b> is just a group of nouns that all follow the same pattern of case/number endings.</p>
     </div>
-    <div id="fst-stepper-mount"></div>
 
-    <div class="section-head" style="margin-top:44px;">
-      <span class="eyebrow">Your turn</span>
-      <h2>Type a Word, Meet Its FST</h2>
-      <p>Pick an operation, type a stem, and this mini-FST will build the surface form live — with the exact rule it used, explained.</p>
+    <div class="rivalry-card">
+      <h3 style="margin-bottom:4px;">🕸️ How an FST Sorts Out Rival Affixes</h3>
+      <p style="color:var(--ink-soft);font-size:.92rem;margin-top:0;">Every stem is tagged with its class number the moment it enters the lexicon — e.g. <span class="mono">&lt;karta +noun 2&gt;</span>. The network routes the stem straight to its matching branch, so the <span class="mono">-a/-y/-oj</span>, <span class="mono">-Ø/-a/-om</span>, <span class="mono">-Ø/-i/-ju</span>, and <span class="mono">-o/-a/-om</span> suffix sets never fight over the same word. Pick a noun and a case below, then run the router.</p>
+      <div class="duel-controls">
+        <label for="routerNoun" class="sr-only">Choose a noun</label>
+        <select id="routerNoun"></select>
+        <label for="routerCase" class="sr-only">Choose a case</label>
+        <select id="routerCase">
+          <option value="nom">Nominative</option>
+          <option value="gen">Genitive</option>
+          <option value="instr">Instrumental</option>
+        </select>
+        <button class="run-btn" id="routerRunBtn">▶ Route through the FST</button>
+      </div>
+      <div class="duel-row" id="routerRow"></div>
+      <div class="duel-verdict" id="routerVerdict"></div>
+    </div>
+
+    <div class="rivalry-card" style="margin-top:22px;">
+      <h3 style="margin-bottom:4px;">Bonus round: quiet rivalry inside English itself</h3>
+      <p style="color:var(--ink-soft);font-size:.92rem;margin-top:0;">This isn't class-based routing — it's the <b>Blocking Principle</b> (Aronoff, 1976): a more specific rule, or an already-lexicalized word, blocks the general default rule for the same slot. Pick a stem to watch two candidate affixes duel it out.</p>
+      <div class="duel-controls">
+        <label for="duelStem" class="sr-only">Choose a stem</label>
+        <select id="duelStem"></select>
+        <button class="run-btn" id="duelRunBtn">▶ Resolve the rivalry</button>
+      </div>
+      <div class="duel-row" id="duelRow"></div>
+      <div class="duel-verdict" id="duelVerdict"></div>
+
+      <div class="own-example-row">
+        <label for="ownStemInput" class="sr-only">Type your own stem</label>
+        <input type="text" id="ownStemInput" placeholder="type any adjective, e.g. 'nervous'">
+        <button class="run-btn" id="ownStemBtn">▶ Test my own word</button>
+      </div>
+      <p class="sim-note" id="ownStemResult"></p>
+    </div>
+  </div>
+</section>
+
+<!-- INFLECTIONAL CLASSES -->
+<section id="classes">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene Six</div>
+      <h2>Inflectional Classes &amp; the Genuinely Hard Cases</h2>
+      <p>An <b>inflectional class</b> is just a group of words that all fill the same grammatical cells (PAST, PLURAL…) using the same recipe. English nouns and verbs don't all belong to one class — click a word to see which class it's in, and which "broken ideal" from Scene Three is responsible.</p>
+    </div>
+    <div class="theory-card">
+      <div class="class-grid" id="classGrid"></div>
+      <div class="class-detail" id="classDetail">Click any word above to see its inflectional class and what makes it tricky.</div>
+    </div>
+
+    <div class="theory-card">
+      <h3>Meet the Rule-Breakers</h3>
+      <p>Even within a class, individual words can break their own class's rules in one specific spot. Every language has them — English: "child" → "children," not "childs." The good news: you don't need a whole new system for exceptions, just a small patch on the existing one.</p>
+      <div class="break-grid">
+        <div class="break-card">
+          <h4>soldat "soldier" — the partial exception</h4>
+          <p>Expected genitive plural: <span class="mono">soldat-ov</span> · Actual: <span class="mono">soldat-Ø</span></p>
+          <p style="margin-top:6px;">Behaves exactly like Class I everywhere else — except in one single cell of its paradigm, where it quietly borrows Class II's zero-suffix pattern. 11 forms out of 12 are perfectly regular; only one breaks rank.</p>
+        </div>
+        <div class="break-card">
+          <h4>pal'to "overcoat" — the indeclinable</h4>
+          <p>Nominative, Genitive, Dative, Instrumental — all: <span class="mono">pal'to</span></p>
+          <p style="margin-top:6px;">This noun simply refuses to inflect — every case and number maps to the same bare stem. It gets its own tiny class where every cell collapses to one unchanging form. Borrowed foreign words often behave this way.</p>
+        </div>
+        <div class="break-card">
+          <h4>brjuki "trousers" — the missing singular</h4>
+          <p>Just like English "scissors" or "pants" — no singular exists at all.</p>
+          <p style="margin-top:6px;">Linguists call this a <b>pluralia tantum</b> noun: it only ever appears in the plural. A morphological analyzer has to know to simply never expect (or produce) a singular form.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PARADIGM -->
+<section id="paradigm">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene Seven</div>
+      <h2>Paradigm-Based Analysis: Think in Tables, Not Chains</h2>
+      <p>Stop building words piece by piece — instead, look up the whole table (<b>paradigm</b>) of forms. The old question was "what piece do I glue onto this stem?" — which assumes there's always a piece to glue on. The new question is simply: "what word fills THIS cell of the table?"</p>
+    </div>
+
+    <div class="theory-card">
+      <h3>Compare GO's table to a totally regular verb: WALK</h3>
+      <table class="paradigm-table">
+        <tr><th>Form ("cell")</th><th>GO's table</th><th>WALK's table</th></tr>
+        <tr><td>Base / Present</td><td>go</td><td>walk</td></tr>
+        <tr><td>3rd Person Singular</td><td>goes</td><td>walks</td></tr>
+        <tr><td>Past Tense</td><td><b>went</b></td><td>walked</td></tr>
+        <tr><td>-ing Form</td><td>going</td><td>walking</td></tr>
+        <tr><td>Past Participle</td><td><b>gone</b></td><td>walked</td></tr>
+      </table>
+      <p class="note" style="color:var(--ink-soft);font-size:.9rem;">Same five cells, same shape of table — GO just fills three of its cells with surprising words. The table doesn't change; only what's written inside it changes. "went" isn't <em>built</em> from "go" — it's simply the answer sitting in GO's Past Tense cell. No affix was ever required.</p>
+    </div>
+
+    <div class="break-grid">
+      <div class="break-card">
+        <h4>↔️ Horizontal relations</h4>
+        <p>Many <em>different</em> words fill their tables the exact same way. <span class="ex">cat/cats</span> <span class="ex">dog/dogs</span> <span class="ex">book/books</span> — hundreds of nouns share the identical "just add -s" pattern. Instead of writing "add -s" thousands of times, we write it once and let every regular noun share it.</p>
+      </div>
+      <div class="break-card">
+        <h4>↕️ Vertical relations</h4>
+        <p>Two cells of the <em>same</em> word's table quietly turn out to be identical. For WALK, Past Tense (walked) and Past Participle (walked) match — true for almost every regular verb. For GO, they don't (went ≠ gone) — spotting that GO breaks the usual vertical pattern is itself useful information.</p>
+      </div>
+    </div>
+
+    <div class="theory-card">
+      <h3>A family tree for words: say the rule once, only override when needed</h3>
+      <p>English nouns come in several classes — regular (cat→cats, just add -s), the fossil "-en" class (ox→oxen), the zero-change class (sheep→sheep), and the vowel-change class (mouse→mice). Facts true for EVERY noun live at the top of a family tree; facts shared only by irregular nouns live one level down; each individual word states only what's truly unique to itself.</p>
+      <div class="class-detail" style="margin-top:10px;">
+        <div class="class-name">ALL ENGLISH NOUNS <span class="mono" style="font-size:.8rem;color:var(--ink-soft);">— default: plural = stem + "-s"</span></div>
+        <div style="margin-top:8px;padding-left:18px;border-left:3px dashed rgba(90,70,130,.25);">
+          <b>Regular class</b> — cat, dog, book… <span class="mono" style="color:var(--ink-soft);">(inherits the default, no override)</span><br>
+          <b>"-en" class</b> — ox → oxen <span class="mono" style="color:var(--ink-soft);">(override: plural = stem + "-en")</span><br>
+          <b>Zero-change class</b> — sheep → sheep <span class="mono" style="color:var(--ink-soft);">(override: plural = same as singular)</span><br>
+          <b>Vowel-change class</b> — mouse → mice <span class="mono" style="color:var(--ink-soft);">(override: plural = change the internal vowel)</span>
+        </div>
+      </div>
+      <p class="note" style="color:var(--ink-soft);font-size:.9rem;margin-top:10px;">This is exactly the DATR-style <b>default inheritance</b> real morphological analyzers use: sheep needs one small note, mouse needs one small note — everything else is inherited automatically, so nobody writes "add -s" separately for tens of thousands of regular nouns.</p>
+    </div>
+
+    <div class="theory-card">
+      <h3>Adjectives work the exact same way</h3>
+      <table class="paradigm-table">
+        <tr><th>Adjective</th><th>Comparative</th><th>Superlative</th><th>Pattern</th></tr>
+        <tr><td>tall</td><td>taller</td><td>tallest</td><td>regular: just add -er/-est</td></tr>
+        <tr><td>happy</td><td>happier</td><td>happiest</td><td>regular, small spelling tweak</td></tr>
+        <tr><td>good</td><td><b>better</b></td><td><b>best</b></td><td>completely different words!</td></tr>
+        <tr><td>bad</td><td><b>worse</b></td><td><b>worst</b></td><td>completely different words!</td></tr>
+      </table>
+    </div>
+
+    <div class="theory-card">
+      <h3>✓ Check yourself</h3>
+      <p style="margin-bottom:12px;">In a paradigm table, how does English explain <span class="mono">sheep → sheep</span> (no change)?</p>
+      <div class="class-grid" id="quizOptions"></div>
+      <div class="class-detail" id="quizResult" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- APPLICATIONS -->
+<section id="applications">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene Eight</div>
+      <h2>Where Does This Magic Actually Get Used?</h2>
+      <p>E.V. isn't just showing off. This tiny machine quietly powers a lot of the internet.</p>
+    </div>
+    <div class="app-grid">
+      <div class="app-card"><div class="icon">🔍</div><h4>Search engines</h4><p>Search "swimming pool" and still find pages about "swim" — the search engine strips inflection with the same kind of FST.</p></div>
+      <div class="app-card"><div class="icon">✍️</div><h4>Spell-checkers</h4><p>Red squiggly lines under "goed" exist because the checker knows the real PAST cell for "go" is irregular.</p></div>
+      <div class="app-card"><div class="icon">🌍</div><h4>Machine translation</h4><p>Turning "I go" into correctly-conjugated Spanish, French, or Hindi verbs leans on morphology modules built this way.</p></div>
+      <div class="app-card"><div class="icon">💬</div><h4>Chatbots</h4><p>When a bot says "she went home" instead of "she goed home," a transducer like this picked the arc.</p></div>
+      <div class="app-card"><div class="icon">🔊</div><h4>Screen readers</h4><p>Reading "children" aloud correctly (not "childs") depends on knowing which paradigm cell a written word came from.</p></div>
+      <div class="app-card"><div class="icon">🌱</div><h4>Low-resource languages</h4><p>For languages with few digital resources, hand-built FSTs like this one are often the <em>only</em> practical way to generate correct word forms.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE DEMO -->
+<section id="codedemo">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene Nine</div>
+      <h2>From Grammar to Code: spaCy, Stanza &amp; Hugging Face</h2>
+      <p>Real NLP pipelines don't hand-write FSTs for every language anymore — they learn similar decisions statistically. Click a tab, then step through the code line by line to see how each tool tackles the same sentence: <span class="mono">"The children were swinging past the heroes."</span></p>
+      <p class="sim-note">Outputs below are realistic sample outputs shown for teaching purposes (this page can't execute Python in the browser) — run the real snippets in Colab/Jupyter to confirm on your machine.</p>
+    </div>
+    <div class="code-tabbar" role="tablist" aria-label="NLP library demos">
+      <button class="tab active" data-code="spacy" role="tab" aria-selected="true">🧵 spaCy — morph tags</button>
+      <button class="tab" data-code="stanza" role="tab" aria-selected="false">🌲 Stanza — UD features</button>
+      <button class="tab" data-code="hf" role="tab" aria-selected="false">🤗 Hugging Face — subword tokenizer</button>
+    </div>
+    <div class="code-panel">
+      <div class="code-header">
+        <span id="codeFileName" class="mono">spacy_morph.py</span>
+        <span class="dots"><span style="background:#E88A85"></span><span style="background:#FFF3C2"></span><span style="background:#6FBF9B"></span></span>
+      </div>
+      <div class="code-body">
+        <div class="code-lines" id="codeLines"></div>
+        <div class="code-explain" id="codeExplain">Click "▶ Step" to walk through this code one line at a time.</div>
+        <div class="terminal" id="codeTerminal">$ python file.py</div>
+        <div class="code-step-controls">
+          <button class="run-btn" id="codeStepBtn">▶ Step</button>
+          <button class="run-btn" id="codeResetBtn" style="background:var(--ink-soft);">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PLAYGROUND -->
+<section id="playground-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="section-tag">Scene Ten</div>
+      <h2>Try It Yourself</h2>
+      <p>Pick a base word and a feature. Watch E.V.'s machine decide: regular arc, or rebel arc?</p>
     </div>
     <div class="playground">
-      <div class="pg-row">
-        <select id="pg-op">
-          <option value="plural">➕ Add plural ( -s )</option>
-          <option value="ing">➕ Add -ing</option>
-          <option value="ed">➕ Add past tense ( -ed )</option>
-        </select>
-        <input id="pg-word" type="text" placeholder="type a word… e.g. fox" maxlength="20">
-        <button class="btn" id="pg-run">Run the FST →</button>
+      <div class="fst-card">
+        <div class="fst-controls">
+          <label for="pgBase" class="sr-only">Base word</label>
+          <select id="pgBase"></select>
+          <label for="pgFeature" class="sr-only">Feature</label>
+          <select id="pgFeature"></select>
+          <button class="run-btn" id="pgRunBtn">▶ Generate</button>
+        </div>
+        <div id="pgSvgWrap" style="position:relative;">
+          <svg id="pgSvg" viewBox="0 0 900 260" width="100%" role="img" aria-label="Playground finite state transducer diagram"></svg>
+          <div id="pgTooltip" style="position:absolute;background:var(--ink);color:#fff;padding:8px 12px;border-radius:10px;font-size:.8rem;opacity:0;pointer-events:none;transition:opacity .2s;"></div>
+        </div>
+        <div class="trace-box" id="pgTraceBox">
+          <span class="mono" style="color:var(--ink-soft);">Your output will appear here.</span>
+        </div>
+        <div id="pgStepList" class="step-list"></div>
       </div>
-      <div class="chips" id="pg-chips"></div>
-      <div id="pg-result"></div>
-    </div>
-  </section>
-</main>
 
-<footer>
-  <div class="credit">Word Lab 🧬</div>
-  NLP · BTIT14706 · Unit 3 — Lexical Analysis Phase · IT‑AIDS, SCET, Surat<br>
-  Taught and created by <a href="https://bhumikaa7981.github.io/meet-bhumika/" target="_blank" rel="noopener">Prof. Bhumika</a>
-</footer>
+      <div class="own-word-card">
+        <h3 style="margin-bottom:4px;">✍️ Or type ANY word — build your own example</h3>
+        <p style="color:var(--ink-soft);font-size:.9rem;margin-top:0;">This runs a tiny, simplified rule-of-thumb splitter (not a real analyzer) so you can propose your own morpheme boundary and discuss whether it's right.</p>
+        <input type="text" id="ownWordInput" placeholder="type a word, e.g. 'unhappiness'">
+        <button class="run-btn" id="ownWordBtn">▶ Guess the morphemes</button>
+        <div class="morph-guess" id="ownWordResult" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTRO -->
+<section id="outro">
+  <div class="wrap">
+    <div class="outro">
+      <h2>Why This Matters, According to a Guy in Spandex</h2>
+      <p style="max-width:640px;margin:0 auto 18px;color:var(--ink-soft);">"Being a hero isn't just strength — it's showing up correctly, every single time, no matter how weird the situation gets," Spider-Man says, catching his breath on a lamppost. "Turns out language does the exact same thing. Whether a word plays by the rules or breaks every single one, this little machine still gets it right. That's not a bug. That's the whole neighborhood, looked after."</p>
+      <p class="mono" style="color:var(--web-blue);font-weight:700;">— with your friendly neighborhood finite-state transducer.</p>
+    </div>
+  </div>
+</section>
+
+<footer>Built for curious undergrads who like their linguistics with a little web fluid. 🕸️</footer>
 
 <script>
-/* ============================= DATA ============================= */
+(function(){
+  "use strict";
 
-function B(text, type, label){ return {text, type, label}; }
+  /* ---------------- STORY ---------------- */
+  const scenes = [
+    {who:'spidey', name:'Spider-Man', text:'E.V., I swung across three buildings and still went the wrong way!'},
+    {who:'karen', name:'E.V.', text:'Impressive multitasking, Peter. But notice: you didn\'t say "swinged." You said "swung." And not "goed" — "went."'},
+    {who:'spidey', name:'Spider-Man', text:'Rules? I thought verbs just slapped on "-ed" and boom, past tense. Like the other heroes I web up.'},
+    {who:'karen', name:'E.V.', text:'Most do! "Web" the noun even turned into "webbed," easy as pie. But English keeps a handful of rebel heroes — irregular forms — doing their own thing. Let\'s see how one machine handles the rule-followers AND the rebels, at the same time.'},
+    {who:'spidey', name:'Spider-Man', text:'Wait — one machine does BOTH? The boring path and the rebel path?'},
+    {who:'karen', name:'E.V.', text:'Same machine, different roads. Every single word starts the same way: I grab your stem — the bare, unchanged base — and hold it at the starting point, state Q0. Nothing has happened yet.'},
+    {who:'spidey', name:'Spider-Man', text:'Okay so far so simple. What happens next?'},
+    {who:'karen', name:'E.V.', text:'Next I check: is there a shortcut for this particular word? If yes, I take the rebel arc straight to the finish line — that\'s "went" and "swung." If no, I take the long way: mark the category, add the right ending, and out comes the surface form — that\'s "heroes" and "webbed."'},
+    {who:'spidey', name:'Spider-Man', text:'Show me. Slowly. Like, super slowly, one arc at a time.'},
+    {who:'karen', name:'E.V.', text:'Deal. Scroll down to Scene Four, pick any word from the menu, and hit Run. I\'ll narrate every arc in plain English, and I\'ll show you what all three grammar theories would call that exact same step — at the same time, side by side.'}
+  ];
+  const speechFeed = document.getElementById('speechFeed');
+  const dotRow = document.getElementById('dotRow');
+  const nextBtn = document.getElementById('nextSceneBtn');
+  let sceneIdx = 0;
 
-const THEORY = {
-  ia: {
-    name:"Item & Arrangement", short:"I&A", formula:"Word = Stem + Affix(es), laid out in a row",
-    steps:[
-      "<b>Break the word</b> into a line of pieces — a stem plus zero or more affixes.",
-      "<b>Each piece keeps its shape.</b> No piece is allowed to change another piece.",
-      "<b>Meaning = sum of the pieces.</b> Add up what each block means and you get the whole word.",
-      "<b>Great for agglutination</b> — languages that just keep bolting pieces onto the end."
-    ],
-    normal:[
-      {word:"cats", bricks:[B("cat","stem","root"),B("-s","suffix","plural")], note:"Two clean pieces in a row — the textbook I&A case."},
-      {word:"unhappy", bricks:[B("un-","prefix","not"),B("happy","stem","root")], note:"A prefix bolts on the front, stem stays untouched."},
-      {word:"replay", bricks:[B("re-","prefix","again"),B("play","stem","root")], note:"Prefix + stem, nothing gets reshaped."},
-      {word:"kindness", bricks:[B("kind","stem","root"),B("-ness","suffix","state of")], note:"Suffix bolts on the end, stem is untouched."},
-      {word:"disagree", bricks:[B("dis-","prefix","not"),B("agree","stem","root")], note:"Straightforward prefixation."},
-      {word:"teacher", bricks:[B("teach","stem","root"),B("-er","suffix","one who")], note:"Agent suffix, clean split."},
-      {word:"rebuild", bricks:[B("re-","prefix","again"),B("build","stem","root")], note:"Prefix + stem in a tidy row."},
-      {word:"unhappiness", bricks:[B("un-","prefix","not"),B("happy","stem","root"),B("-ness","suffix","state of")], note:"Three blocks, three meanings, glued left to right — I&A's dream case."}
-    ],
-    critical:[
-      {word:"sang", bricks:[B("sing → sang","suppletion","no separable affix!")], note:"Past tense lives inside a vowel change, not a bolt-on piece. I&A has nowhere to attach it."},
-      {word:"went", bricks:[B("go → went","suppletion","different root entirely")], note:"Suppletion: the past of GO isn't built from GO at all — arrangement breaks down completely."},
-      {word:"mice", bricks:[B("mouse → mice","change","internal change")], note:"Plural marked by swapping a vowel — there's no '-s' to point to."},
-      {word:"better", bricks:[B("good → better","suppletion","new root")], note:"Comparative of GOOD borrows an unrelated word. No stem+affix arithmetic works."},
-      {word:"cacti", bricks:[B("cactus → cacti","change","borrowed plural")], note:"Latin-style plural — where exactly does the 'stem' end and the 'affix' begin?"},
-      {word:"sheep", bricks:[B("sheep","zero","plural = singular")], note:"Zero affix: the plural marker is literally nothing. Hard to arrange 'nothing' in a row."},
-      {word:"children", bricks:[B("child","stem","root"),B("+ vowel shift","change"),B("-ren","suffix","rare plural")], note:"A stem mutation stacked with an unusual suffix — two irregularities at once."},
-      {word:"am / is / are", bricks:[B("BE → am/is/are/was","suppletion","4+ unrelated roots")], note:"One lemma, several totally unrelated surface roots. Arrangement has no formula for this."}
-    ]
-  },
-  ip: {
-    name:"Item & Process", short:"I&P", formula:"Affixation TRIGGERS a process on the base",
-    steps:[
-      "<b>Start from a base form</b> and a grammatical feature you want to add (e.g. Past, Plural).",
-      "<b>The feature triggers a process</b> — a rule that changes sounds or spelling, not just glues on a piece.",
-      "<b>The process can replace, insert, delete, or mutate</b> — sing→sang is a vowel-change process, not an addition.",
-      "<b>This is morphonology's home turf</b> — it's built exactly to describe sound/spelling shifts at word edges."
-    ],
-    normal:[
-      {word:"sing → sang", bricks:[B("i → a","change","Past-tense process")], note:"Trigger: Past. Process: swap the vowel. I&P names this cleanly as one rule."},
-      {word:"foot → feet", bricks:[B("oo → ee","change","Plural process")], note:"Trigger: Plural. Process: front the vowel. No affix needed, just a rule."},
-      {word:"fox → foxes", bricks:[B("fox","stem"),B("insert e","insert","before -s after sibilant")], note:"Trigger: Plural after a hissing sound. Process: insert a linking e."},
-      {word:"wolf → wolves", bricks:[B("f → v","change"),B("+es","suffix")], note:"Trigger: Plural. Process: voice the final consonant, then add -es."},
-      {word:"leaf → leaves", bricks:[B("f → v","change"),B("+es","suffix")], note:"Same voicing process as wolf → wolves — a predictable family of words."},
-      {word:"run → running", bricks:[B("double n","insert","CVC doubling"),B("+ing","suffix")], note:"Trigger: -ing. Process: double the final consonant first."},
-      {word:"hope → hoping", bricks:[B("drop e","delete"),B("+ing","suffix")], note:"Trigger: -ing. Process: delete the silent e before adding it."},
-      {word:"bus → buses", bricks:[B("insert e","insert"),B("+s","suffix")], note:"Trigger: Plural after -s. Process: insert e, exactly like fox → foxes."}
-    ],
-    critical:[
-      {word:"go → went", bricks:[B("total replacement","suppletion")], note:"Not a 'process' on GO at all — the base is swapped wholesale. I&P needs a rule that isn't really a rule."},
-      {word:"good → better", bricks:[B("total replacement","suppletion")], note:"Same problem: comparative isn't a phonological process, it's a different word."},
-      {word:"sheep → sheep", bricks:[B("do nothing","zero")], note:"Is 'apply no process' actually a process? I&P has to stipulate a null rule, which feels unmotivated."},
-      {word:"person → people", bricks:[B("opaque swap","suppletion")], note:"No phonological relationship at all between the two forms — nothing to write a rule over."},
-      {word:"ox → oxen", bricks:[B("+en","change","archaic, unproductive")], note:"A one-off historical leftover. The 'process' applies to essentially one word."},
-      {word:"child → children", bricks:[B("mutation + -ren","change")], note:"Two irregular things bundled together — the rule has to be hand-stipulated, not general."},
-      {word:"read (pres) / read (past)", bricks:[B("invisible in spelling","zero")], note:"The vowel changes in speech (/riːd/→/rɛd/) but not in text — a process a text-based system can't even see."},
-      {word:"deer / fish (no change)", bricks:[B("null plural class","zero")], note:"A whole closed class needs a 'do-nothing' rule — awkward for a framework built around processes happening."}
-    ]
-  },
-  wp: {
-    name:"Word & Paradigm", short:"W&P", formula:"Lemma → whole table of forms (a paradigm)",
-    steps:[
-      "<b>Forget stem+affix math.</b> A lemma is linked directly to a table of every inflected form.",
-      "<b>Meaning comes from position</b> in the table — 'past tense of GO' is just a cell, however it's spelled.",
-      "<b>No decomposition needed.</b> went isn't parsed into pieces — it's simply looked up.",
-      "<b>Cost:</b> every lemma needs its own table, and tables can get huge fast."
-    ],
-    normal:[
-      {word:"GO", table:{present:"go", "3rd sg":"goes", past:"went", "-ing":"going", "past part.":"gone"}, note:"Five cells, one lemma. No arithmetic — just a lookup."},
-      {word:"BE", table:{"1sg":"am", "3sg":"is", plural:"are", past:"was / were", "-ing":"being"}, note:"English's most irregular verb is trivial for W&P — it's just a (big) table."},
-      {word:"GOOD", table:{positive:"good", comparative:"better", superlative:"best"}, note:"Suppletion stops being a 'problem' — it's simply three cells of one paradigm."},
-      {word:"CHILD", table:{singular:"child", plural:"children"}, note:"Two cells, no decomposition of '-ren' required."},
-      {word:"I (pronoun)", table:{subject:"I", object:"me", "possessive det.":"my", "possessive pron.":"mine"}, note:"Four unrelated-looking forms, one tidy paradigm."},
-      {word:"MOUSE", table:{singular:"mouse", plural:"mice"}, note:"Vowel-change plural handled the same way as any other cell."},
-      {word:"SING", table:{base:"sing", "3sg":"sings", past:"sang", "-ing":"singing", "past part.":"sung"}, note:"Every irregular form is just another entry in the table."},
-      {word:"THIS / THAT", table:{"near, sg":"this", "near, pl":"these", "far, sg":"that", "far, pl":"those"}, note:"A tiny 2×2 paradigm of demonstratives."}
-    ],
-    critical:[
-      {word:"\"to google\" (new verb)", table:{present:"google", past:"googled?", "-ing":"googling?"}, note:"No paradigm exists yet for a brand-new word — W&P needs the table pre-built, so it can't productively handle novel coinages as gracefully as a rule can."},
-      {word:"\"walk\" (fully regular)", table:{base:"walk", "3sg":"walks", past:"walked", "-ing":"walking"}, note:"Storing a whole table for something 100% predictable is wasteful — a simple rule would do the same job for free."},
-      {word:"Turkish verb forms", table:{"possible forms":"100,000+ per verb"}, note:"Agglutinative languages generate huge numbers of legal forms per word — an explicit table becomes computationally infeasible."},
-      {word:"read / read (syncretism)", table:{present:"read", past:"read"}, note:"Two different paradigm cells, identical spelling — the table has to represent an ambiguity, not just a form."},
-      {word:"\"scissors\" (defective)", table:{singular:"— (missing)", plural:"scissors"}, note:"Some paradigm cells are simply empty. What does W&P do with a hole in the table?"},
-      {word:"octopus (competing plurals)", table:{"plural, option A":"octopuses", "plural, option B":"octopi", "plural, option C":"octopodes"}, note:"Three forms compete for the same cell — which one is 'correct' isn't obvious."},
-      {word:"\"snowmageddon\" (blend)", table:{lemma:"no entry exists"}, note:"Novel blends have no paradigm to link to at all — nothing to look up."},
-      {word:"Finnish noun cases", table:{cases:"15 cases × sg/pl = 30 cells", "per noun":"× thousands of nouns"}, note:"Real paradigms can be enormous — elegant per word, expensive at the scale of a whole lexicon."}
-    ]
-  }
-};
-
-const CHALLENGES = {
-  normal:[
-    {word:"cats", lang:"English", gloss:[["cat","stem"],["-s","suffix"]], note:"One feature (plural), one contiguous affix. Isomorphism ✅ Contiguity ✅"},
-    {word:"teacher", lang:"English", gloss:[["teach","stem"],["-er","suffix"]], note:"One meaning, one clean piece, sitting right next to the stem."},
-    {word:"unkind", lang:"English", gloss:[["un-","prefix"],["kind","stem"]], note:"Prefix carries exactly one meaning ('not'), attached at one edge."},
-    {word:"redo", lang:"English", gloss:[["re-","prefix"],["do","stem"]], note:"Simple, contiguous, one-to-one."},
-    {word:"hopeful", lang:"English", gloss:[["hope","stem"],["-ful","suffix"]], note:"'Full of hope' — one suffix, one meaning, no gymnastics."},
-    {word:"quickly", lang:"English", gloss:[["quick","stem"],["-ly","suffix"]], note:"Adverb-forming suffix, textbook concatenation."},
-    {word:"played", lang:"English", gloss:[["play","stem"],["-ed","suffix"]], note:"Regular past tense — one piece, one feature, edge-attached."},
-    {word:"smallest", lang:"English", gloss:[["small","stem"],["-est","suffix"]], note:"Superlative suffix, no isomorphism or contiguity problems at all."}
-  ],
-  critical:[
-    {word:"hablo (\"I speak\")", lang:"Spanish · Cumulative exponence", gloss:[["habl","stem"],["-o","suffix: 1st+Sg+Pres+Indic, all at once"]], note:"One tiny suffix encodes FOUR features simultaneously. You can't pull out 'just the tense part' — isomorphism breaks: many meanings, one morph."},
-    {word:"chanterons (\"we will sing\")", lang:"French · Extended exponence", gloss:[["chant","stem"],["-er-","future (again)"],["-ons","future + 1pl (again)"]], note:"Future tense gets marked more than once in the same word — the opposite problem: one meaning, several morphs."},
-    {word:"kataba / kitab (\"wrote\" / \"book\")", lang:"Arabic · Discontinuous root", gloss:[["k _ t _ b","root, woven apart"],["-a-a-","vowel pattern threading through it"]], note:"The consonantal root k-t-b isn't a contiguous string at all — vowels are interleaved between its letters. Contiguity ❌"},
-    {word:"sheep (plural)", lang:"English · Zero morpheme", gloss:[["sheep","stem"],["∅","plural, no sound at all"]], note:"A real grammatical feature (plurality) with literally zero phonetic exponent. Isomorphism ❌ — meaning with no matching form."},
-    {word:"go → went", lang:"English · Suppletion", gloss:[["go / went","two unrelated roots, one lemma"]], note:"The 'past tense morpheme' isn't attachable to anything — the whole word is swapped."},
-    {word:"sumulat (\"wrote\")", lang:"Tagalog · Infixation", gloss:[["s","s"],["-um-","infix: Past"],["ulat","rest of stem"]], note:"The affix -um- is inserted INSIDE the stem sulat, not glued to either edge. Contiguity ❌"},
-    {word:"gemacht (\"made\")", lang:"German · Circumfix", gloss:[["ge-","prefix half"],["mach","stem"],["-t","suffix half"]], note:"ge-...-t wraps around the stem from both sides at once — one participle marker, split into two non-adjacent pieces."},
-    {word:"katav / kotev (\"wrote\" / \"writing\")", lang:"Hebrew · Templatic morphology", gloss:[["k-t-v","discontinuous root"],["CaCaC / CoCeC","discontinuous vowel template"]], note:"The whole word is built by interleaving TWO abstract, non-contiguous units — root and template — shattering the 'stem + affix in a row' assumption entirely."}
-  ]
-};
-
-// FST transition helpers
-function copyLetters(str){ return str.split('').map(c=>({u:c,l:c})); }
-const BOUND = {u:'^', l:'ε', note:'Delete the morpheme boundary'};
-function ins(ch, note){ return {u:'ε', l:ch, note: note||('Insert "'+ch+'"')}; }
-function del(ch, note){ return {u:ch, l:'ε', note: note||('Delete "'+ch+'"')}; }
-function sub(u,l,note){ return {u,l,note}; }
-
-const FST_PRESETS = {
-  normal:[
-    {word:"cats", trans:[...copyLetters("cat"), BOUND, {u:'s',l:'s'}], explain:"Every symbol just copies across. The boundary quietly disappears — no visible spelling change at all."},
-    {word:"dogs", trans:[...copyLetters("dog"), BOUND, {u:'s',l:'s'}], explain:"Same story: plain concatenation, nothing to insert or delete."},
-    {word:"played", trans:[...copyLetters("play"), BOUND, ...copyLetters("ed")], explain:"Regular past tense of a stem ending in y (preceded by a vowel) — pure copy-through."},
-    {word:"books", trans:[...copyLetters("book"), BOUND, {u:'s',l:'s'}], explain:"No sibilant, no y, no silent e — the easiest kind of plural for an FST."},
-    {word:"teacher", trans:[...copyLetters("teach"), BOUND, ...copyLetters("er")], explain:"Agent suffix -er, stem unaffected — a straight copy path start to finish."},
-    {word:"blackness", trans:[...copyLetters("black"), BOUND, ...copyLetters("ness")], explain:"Suffix -ness added with zero spelling changes."},
-    {word:"jumping", trans:[...copyLetters("jump"), BOUND, ...copyLetters("ing")], explain:"Stem ends in two consonants (mp) so no doubling is needed — just copy and append."},
-    {word:"wanted", trans:[...copyLetters("want"), BOUND, ...copyLetters("ed")], explain:"Stem already ends in t — -ed just tacks straight on."}
-  ],
-  critical:[
-    {word:"glasses", trans:[...copyLetters("glass"), BOUND, ins('e','Insert linking e — required after s/x/sh/ch'), {u:'s',l:'s'}], explain:"Plural after a sibilant (-ss) needs a linking e before the -s, or you'd get an unpronounceable *glasss."},
-    {word:"foxes", trans:[...copyLetters("fox"), BOUND, ins('e','Insert linking e after x'), {u:'s',l:'s'}], explain:"Same insertion rule as glasses — any stem ending in s, x, z, sh or ch triggers it."},
-    {word:"flies", trans:[...copyLetters("fl"), sub('y','i','y → i before -es (consonant + y rule)'), BOUND, ins('e'), {u:'s',l:'s'}], explain:"Two operations stack up: a substitution (y→i) AND an insertion (e) on the same path."},
-    {word:"running", trans:[...copyLetters("run"), ins('n','Double the final consonant (CVC pattern)'), BOUND, ...copyLetters("ing")], explain:"Short stressed syllable ending Consonant-Vowel-Consonant → double that last consonant before a vowel suffix."},
-    {word:"hoping", trans:[...copyLetters("hop"), del('e','Delete the silent e before -ing'), BOUND, ...copyLetters("ing")], explain:"Silent e is dropped whenever the next piece starts with a vowel."},
-    {word:"bigger", trans:[...copyLetters("big"), ins('g','Double the final consonant (CVC pattern)'), BOUND, ...copyLetters("er")], explain:"Same doubling rule as running, this time before the comparative -er."},
-    {word:"churches", trans:[...copyLetters("church"), BOUND, ins('e','Insert linking e after the ch sound'), {u:'s',l:'s'}], explain:"-ch is a sibilant-like ending too, so it takes the same -es insertion rule."},
-    {word:"knives", trans:[...copyLetters("kni"), sub('f','v','f → v before the plural (voicing)'), {u:'e',l:'e'}, BOUND, {u:'s',l:'s'}], explain:"A voicing substitution (f→v) happens BEFORE the regular plural attaches — two rule types, one word."}
-  ]
-};
-
-const IRREGULAR_PLURAL = {mouse:"mice", man:"men", woman:"women", child:"children", foot:"feet", tooth:"teeth", goose:"geese", person:"people", ox:"oxen", sheep:"sheep", deer:"deer", fish:"fish"};
-const IRREGULAR_PAST = {go:"went", sing:"sang", sit:"sat", eat:"ate", see:"saw", take:"took", catch:"caught", buy:"bought", think:"thought", bring:"brought", run:"ran", make:"made", have:"had", do:"did", say:"said", come:"came", write:"wrote", know:"knew", give:"gave", get:"got", find:"found", tell:"told", speak:"spoke", break:"broke", begin:"began", drink:"drank", swim:"swam", fly:"flew", drive:"drove", ride:"rode", fall:"fell", feel:"felt", keep:"kept", leave:"left", mean:"meant", read:"read", sleep:"slept", stand:"stood", teach:"taught"};
-
-/* ============================= UTIL ============================= */
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function el(html){ const t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
-function brickHTML(b){
-  const label = b.label ? '<span class="brick-label">'+escapeHtml(b.label)+'</span>' : '';
-  return '<span class="brick brick-'+b.type+'">'+escapeHtml(b.text)+label+'</span>';
-}
-function bricksRow(bricks){
-  return '<div class="brick-row">' + bricks.map(brickHTML).join('<span class="brick-plus">+</span>') + '</div>';
-}
-function tableHTML(lemma, table){
-  const rows = Object.entries(table).map(([k,v])=>
-    '<div class="para-row"><span class="para-key">'+escapeHtml(k)+'</span><span class="para-val">'+escapeHtml(v)+'</span></div>'
-  ).join('');
-  return '<div class="paradigm"><div class="paradigm-lemma">'+escapeHtml(lemma)+'</div><div class="paradigm-grid">'+rows+'</div></div>';
-}
-function glossHTML(gloss){
-  return '<div class="gloss-row">' + gloss.map(([t,lbl],i)=>{
-    const colors=['var(--stem)','var(--prefix)','var(--suffix)','var(--change)'];
-    const bg = colors[i % colors.length];
-    const textcol = (bg==='var(--suffix)') ? '#3a2900' : '#fff';
-    return '<span style="background:'+bg+';color:'+textcol+'" title="'+escapeHtml(lbl)+'">'+escapeHtml(t)+'</span>';
-  }).join('') + '</div>';
-}
-
-/* ============================= STEPPER (generic) ============================= */
-function makeStepper(mount, dataset, renderItem, titleWord){
-  let mode='normal', idx=0;
-  const wrap = el(`<div class="stepper">
-    <div class="stepper-controls">
-      <div class="mode-toggle">
-        <button data-m="normal" class="active normal">✅ Normal cases</button>
-        <button data-m="critical" class="critical">⚠️ Critical cases</button>
-      </div>
-      <div class="nav-arrows">
-        <button aria-label="previous" class="prev">←</button>
-        <span class="counter"></span>
-        <button aria-label="next" class="next">→</button>
-      </div>
-    </div>
-    <div class="card-stage"></div>
-  </div>`);
-  mount.appendChild(wrap);
-  const stage = wrap.querySelector('.card-stage');
-  const counter = wrap.querySelector('.counter');
-
-  function render(){
-    const list = dataset[mode];
-    idx = ((idx % list.length) + list.length) % list.length;
-    const item = list[idx];
-    stage.innerHTML = '';
-    stage.appendChild(renderItem(item, mode));
-    counter.textContent = (idx+1)+' / '+list.length;
-    wrap.querySelectorAll('.mode-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.m===mode));
-  }
-  wrap.querySelector('.prev').onclick = ()=>{ idx--; render(); };
-  wrap.querySelector('.next').onclick = ()=>{ idx++; render(); };
-  wrap.querySelectorAll('.mode-toggle button').forEach(b=>{
-    b.onclick = ()=>{ mode=b.dataset.m; idx=0; render(); };
-  });
-  render();
-  return {refresh:render};
-}
-
-function theoryItemCard(item, mode){
-  const body = item.table ? tableHTML(item.word, item.table) : bricksRow(item.bricks);
-  return el(`<div class="demo-card">
-    <span class="tag ${mode}">${mode==='normal'?'Works cleanly':'Breaks the theory'}</span>
-    <div class="word-title">${escapeHtml(item.word)}</div>
-    ${body}
-    <div class="note">${item.note}</div>
-  </div>`);
-}
-function challengeItemCard(item, mode){
-  return el(`<div class="demo-card">
-    <span class="tag ${mode}">${mode==='normal'?'Clean case':'Breaks isomorphism / contiguity'}</span>
-    <div class="word-title">${escapeHtml(item.word)} <span class="lang-pill">${escapeHtml(item.lang)}</span></div>
-    ${glossHTML(item.gloss)}
-    <div class="note">${item.note}</div>
-  </div>`);
-}
-
-/* ============================= FST RENDERER ============================= */
-function edgeType(t){
-  if(t.u==='ε') return 'insert';
-  if(t.l==='ε') return 'delete';
-  if(t.u!==t.l) return 'substitute';
-  return 'copy';
-}
-function buildFST(container, trans, explainText){
-  container.innerHTML='';
-  const wrap = el(`<div>
-    <div class="fst-track"></div>
-    <div class="fst-tapes">
-      <div class="tape-row upper-row"><span class="tape-tag">Upper</span></div>
-      <div class="tape-row lower-row"><span class="tape-tag">Lower</span></div>
-    </div>
-    <div class="fst-explain"></div>
-    <div class="fst-controls"><button class="btn run-btn">▶ Run</button><button class="btn ghost reset-btn">⟲ Reset</button></div>
-  </div>`);
-  container.appendChild(wrap);
-  const track = wrap.querySelector('.fst-track');
-  const upperRow = wrap.querySelector('.upper-row');
-  const lowerRow = wrap.querySelector('.lower-row');
-  const explainBox = wrap.querySelector('.fst-explain');
-  explainBox.textContent = explainText || '';
-
-  // build DOM: state0, [edge, state]...
-  track.appendChild(el('<div class="fst-state" data-i="0">S0</div>'));
-  trans.forEach((t,i)=>{
-    const type = edgeType(t);
-    const edge = el(`<div class="fst-edge-wrap">
-      <div class="fst-edge-label ${type}">${escapeHtml(t.u)}:${escapeHtml(t.l)}</div>
-      <div class="fst-edge-track"><div class="fst-edge-fill ${type}"></div></div>
-      <div class="fst-edge-note">${escapeHtml(t.note||'')}</div>
-    </div>`);
-    track.appendChild(edge);
-    const st = el('<div class="fst-state" data-i="'+(i+1)+'">S'+(i+1)+'</div>');
-    if(i===trans.length-1) st.classList.add('final');
-    track.appendChild(st);
-    if(t.u!=='ε') upperRow.appendChild(el('<span class="tape-cell upper">'+escapeHtml(t.u)+'</span>'));
-    if(t.l!=='ε') lowerRow.appendChild(el('<span class="tape-cell lower">'+escapeHtml(t.l)+'</span>'));
+  scenes.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===0?' active':'');
+    dotRow.appendChild(d);
   });
 
-  function reset(){
-    wrap.querySelectorAll('.fst-state').forEach(s=>s.classList.remove('in'));
-    wrap.querySelectorAll('.fst-edge-label, .fst-edge-note').forEach(s=>s.classList.remove('in'));
-    wrap.querySelectorAll('.fst-edge-fill').forEach(s=>s.style.width='0%');
-    wrap.querySelectorAll('.tape-cell').forEach(s=>s.classList.remove('in'));
+  function renderScene(i){
+    const s = scenes[i];
+    const row = document.createElement('div');
+    row.className = 'speech '+s.who;
+    row.innerHTML = `<div class="avatar">${s.who==='spidey'?'🕷️':'🤖'}</div>
+      <div class="bubble"><span class="who">${s.name}</span>${s.text}</div>`;
+    speechFeed.appendChild(row);
+    [...dotRow.children].forEach((d,idx)=>d.classList.toggle('active', idx<=i));
+    row.scrollIntoView({behavior:'smooth', block:'nearest'});
   }
-  function play(){
-    reset();
-    const states = wrap.querySelectorAll('.fst-state');
-    const edgeWraps = wrap.querySelectorAll('.fst-edge-wrap');
-    const upperCells = upperRow.querySelectorAll('.tape-cell');
-    const lowerCells = lowerRow.querySelectorAll('.tape-cell');
-    let uCount=0, lCount=0;
-    states[0].classList.add('in');
-    trans.forEach((t,i)=>{
-      const delay = i*520;
-      setTimeout(()=>{
-        const ew = edgeWraps[i];
-        ew.querySelector('.fst-edge-label').classList.add('in');
-        ew.querySelector('.fst-edge-note').classList.add('in');
-        ew.querySelector('.fst-edge-fill').style.width='100%';
-        states[i+1].classList.add('in');
-        if(t.u!=='ε'){ upperCells[uCount].classList.add('in'); uCount++; }
-        if(t.l!=='ε'){ lowerCells[lCount].classList.add('in'); lCount++; }
-      }, delay+180);
-    });
-  }
-  wrap.querySelector('.run-btn').onclick = play;
-  wrap.querySelector('.reset-btn').onclick = reset;
-  setTimeout(play, 250);
-  return {play, reset};
-}
+  renderScene(0);
 
-function fstItemCard(item, mode){
-  const card = el(`<div class="demo-card">
-    <span class="tag ${mode}">${mode==='normal'?'Copy-through':'Spelling rule needed'}</span>
-    <div class="word-title">${escapeHtml(item.word)}</div>
-    <div class="fst-mount"></div>
-  </div>`);
-  buildFST(card.querySelector('.fst-mount'), item.trans, item.explain);
-  return card;
-}
-
-/* ============================= RULE ENGINE (playground) ============================= */
-function isVowel(c){ return 'aeiou'.includes(c); }
-function endsSibilant(w){ return /(?:[sxz]|ch|sh)$/i.test(w); }
-function endsConsonantY(w){ return /[^aeiou]y$/i.test(w); }
-function endsSilentE(w){ return /[^aeiou]e$/i.test(w) && !/(ee|oe)$/i.test(w); }
-function isCVCdoubling(w){
-  w = w.toLowerCase();
-  if(w.length<3) return false;
-  const last=w[w.length-1], mid=w[w.length-2], before=w[w.length-3];
-  if(!/[a-z]/.test(last) || isVowel(last) || 'wxy'.includes(last)) return false;
-  if(!isVowel(mid)) return false;
-  if(isVowel(before)) return false;
-  return w.length<=5; // heuristic: short stressed monosyllables, for demo purposes
-}
-
-function buildPlural(stem){
-  const s = stem.toLowerCase();
-  if(IRREGULAR_PLURAL[s]){
-    return {irregular:true, surface:IRREGULAR_PLURAL[s],
-      msg:"<b>"+escapeHtml(s)+" → "+escapeHtml(IRREGULAR_PLURAL[s])+"</b> is irregular — it's stored whole, not built by a copy/insert/delete FST rule. This is exactly the kind of case that pushed linguists toward Word &amp; Paradigm thinking."};
-  }
-  if(endsSibilant(s)){
-    const trans=[...copyLetters(s), BOUND, ins('e','Insert linking e — needed after s/x/z/sh/ch'), {u:'s',l:'s'}];
-    return {trans, rule:"Sibilant rule: stems ending in s, x, z, sh or ch insert a linking e before -s (→ -es)."};
-  }
-  if(endsConsonantY(s)){
-    const trans=[...copyLetters(s.slice(0,-1)), sub('y','i','y → i before -es (consonant + y rule)'), BOUND, ins('e'), {u:'s',l:'s'}];
-    return {trans, rule:"Consonant+y rule: final y (after a consonant) becomes i, then -es is added."};
-  }
-  const trans=[...copyLetters(s), BOUND, {u:'s',l:'s'}];
-  return {trans, rule:"Regular rule: no special spelling condition met — just copy the stem and append -s."};
-}
-function buildIng(stem){
-  const s = stem.toLowerCase();
-  if(endsSilentE(s)){
-    const trans=[...copyLetters(s.slice(0,-1)), del('e','Delete the silent e before a vowel-initial suffix'), BOUND, ...copyLetters('ing')];
-    return {trans, rule:"Silent-e rule: drop the final e before adding -ing."};
-  }
-  if(isCVCdoubling(s)){
-    const trans=[...copyLetters(s), ins(s[s.length-1],'Double the final consonant (CVC pattern)'), BOUND, ...copyLetters('ing')];
-    return {trans, rule:"CVC doubling rule: a short stressed syllable ending Consonant-Vowel-Consonant doubles that consonant before -ing."};
-  }
-  const trans=[...copyLetters(s), BOUND, ...copyLetters('ing')];
-  return {trans, rule:"Regular rule: no doubling or e-deletion condition met — just copy and append -ing."};
-}
-function buildEd(stem){
-  const s = stem.toLowerCase();
-  if(IRREGULAR_PAST[s]){
-    return {irregular:true, surface:IRREGULAR_PAST[s],
-      msg:"<b>"+escapeHtml(s)+" → "+escapeHtml(IRREGULAR_PAST[s])+"</b> is irregular — ablaut or suppletion, not affixation. A regular -ed rule literally cannot produce this form; it has to be listed."};
-  }
-  if(endsSilentE(s)){
-    const trans=[...copyLetters(s), {u:'d',l:'d',note:'Just add d — the e is already there'}];
-    return {trans, rule:"Silent-e rule: stems already ending in e just take a bare -d."};
-  }
-  if(endsConsonantY(s)){
-    const trans=[...copyLetters(s.slice(0,-1)), sub('y','i','y → i before -ed'), ...copyLetters('ed')];
-    return {trans, rule:"Consonant+y rule: final y becomes i before -ed."};
-  }
-  if(isCVCdoubling(s)){
-    const trans=[...copyLetters(s), ins(s[s.length-1],'Double the final consonant (CVC pattern)'), BOUND, ...copyLetters('ed')];
-    return {trans, rule:"CVC doubling rule: short stressed CVC stems double the consonant before -ed."};
-  }
-  const trans=[...copyLetters(s), BOUND, ...copyLetters('ed')];
-  return {trans, rule:"Regular rule: no special condition met — just copy and append -ed."};
-}
-
-/* ============================= WIRE UP ============================= */
-document.addEventListener('DOMContentLoaded', ()=>{
-
-  // main tabs
-  document.querySelectorAll('#maintabs button').forEach(btn=>{
-    btn.onclick = ()=>{
-      document.querySelectorAll('#maintabs button').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-      document.getElementById('panel-'+btn.dataset.panel).classList.add('active');
-    };
-  });
-
-  // theory subtabs
-  const subtabs = document.getElementById('theory-subtabs');
-  const theoryMount = document.getElementById('theory-mount');
-  const order = ['ia','ip','wp'];
-  order.forEach(key=>{
-    const b = el('<button data-k="'+key+'">'+THEORY[key].short+' — '+THEORY[key].name+'</button>');
-    subtabs.appendChild(b);
-  });
-  function renderTheory(key){
-    subtabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active', b.dataset.k===key));
-    const th = THEORY[key];
-    theoryMount.innerHTML='';
-    const card = el(`<div class="theory-card">
-      <div class="formula">${th.formula}</div>
-      <ol>${th.steps.map(s=>'<li>'+s+'</li>').join('')}</ol>
-    </div>`);
-    theoryMount.appendChild(card);
-    const stepMount = el('<div></div>');
-    theoryMount.appendChild(stepMount);
-    makeStepper(stepMount, {normal:th.normal, critical:th.critical}, theoryItemCard);
-  }
-  subtabs.querySelectorAll('button').forEach(b=> b.onclick = ()=>renderTheory(b.dataset.k));
-  renderTheory('ia');
-
-  // challenges
-  makeStepper(document.getElementById('challenges-mount'), CHALLENGES, challengeItemCard);
-
-  // fst stepper
-  makeStepper(document.getElementById('fst-stepper-mount'), FST_PRESETS, fstItemCard);
-
-  // playground
-  const pgChips = document.getElementById('pg-chips');
-  const pgWordInput = document.getElementById('pg-word');
-  const pgOp = document.getElementById('pg-op');
-  const pgResult = document.getElementById('pg-result');
-  const chipWords = {
-    plural:['fox','fly','glass','cat','box','city','church','sheep','mouse'],
-    ing:['run','hope','jump','big','play','write','stop','die'],
-    ed:['jump','hope','try','stop','go','sing','eat','play']
-  };
-  function renderChips(){
-    pgChips.innerHTML='';
-    chipWords[pgOp.value].forEach(w=>{
-      const c = el('<span class="chip">'+w+'</span>');
-      c.onclick = ()=>{ pgWordInput.value=w; runPlayground(); };
-      pgChips.appendChild(c);
-    });
-  }
-  function runPlayground(){
-    const raw = pgWordInput.value.trim();
-    if(!raw){ pgResult.innerHTML = '<div class="fst-explain">Type a word first — try one of the chips below 👆</div>'; return; }
-    const stem = raw.toLowerCase().replace(/[^a-z]/g,'');
-    if(!stem){ pgResult.innerHTML = '<div class="fst-explain">Letters only, please — try again.</div>'; return; }
-    let built;
-    if(pgOp.value==='plural') built = buildPlural(stem);
-    else if(pgOp.value==='ing') built = buildIng(stem);
-    else built = buildEd(stem);
-
-    pgResult.innerHTML='';
-    const card = el(`<div class="demo-card"><div class="word-title">${escapeHtml(stem)}</div></div>`);
-    pgResult.appendChild(card);
-
-    if(built.irregular){
-      const box = el('<div class="fst-explain" style="background:var(--supp-soft);color:#7A2A16;">'+built.msg+'</div>');
-      card.appendChild(box);
-      card.querySelector('.tag')?.remove();
-      const tag = el('<span class="tag critical">Irregular — no regular FST rule applies</span>');
-      card.insertBefore(tag, card.firstChild);
-    } else {
-      const surface = built.trans.map(t=>t.l).filter(x=>x!=='ε').join('');
-      const tag = el('<span class="tag normal">'+escapeHtml(stem)+' → '+escapeHtml(surface)+'</span>');
-      card.insertBefore(tag, card.firstChild);
-      const mount = el('<div class="fst-mount"></div>');
-      card.appendChild(mount);
-      buildFST(mount, built.trans, built.rule);
+  function advanceScene(){
+    if(sceneIdx < scenes.length-1){
+      sceneIdx++;
+      renderScene(sceneIdx);
+      if(sceneIdx === scenes.length-1){
+        nextBtn.textContent = 'That\'s the setup! ✓';
+        nextBtn.disabled = true;
+      }
     }
   }
-  pgOp.addEventListener('change', ()=>{ renderChips(); });
-  document.getElementById('pg-run').onclick = runPlayground;
-  pgWordInput.addEventListener('keydown', e=>{ if(e.key==='Enter') runPlayground(); });
-  renderChips();
-  pgWordInput.value='fox';
-  setTimeout(runPlayground, 300);
-});
+  nextBtn.addEventListener('click', advanceScene);
+  document.getElementById('heroStartBtn').addEventListener('click', ()=>{
+    document.getElementById('story').scrollIntoView({behavior:'smooth'});
+  });
+
+  /* ---------------- WORD CHIPS ---------------- */
+  const words = [
+    {w:'swung', reg:false, desc:'PAST of "swing" — vowel changes (ablaut), no suffix.'},
+    {w:'went', reg:false, desc:'PAST of "go" — total suppletion, a different word entirely.'},
+    {w:'webbed', reg:true, desc:'Noun "web" → verb (zero-derivation) → +PAST suffix.'},
+    {w:'heroes', reg:true, desc:'PLURAL of "hero" — regular "-es" suffix.'},
+    {w:'children', reg:false, desc:'PLURAL of "child" — a fossilized double plural marker.'},
+    {w:'web-slinging', reg:true, desc:'Compound stem + regular "-ing" suffix.'}
+  ];
+  const wordChips = document.getElementById('wordChips');
+  words.forEach(item=>{
+    const c = document.createElement('div');
+    c.className='chip';
+    c.innerHTML = `<div class="w">${item.w}</div>
+      <span class="tag ${item.reg?'reg':'irr'}">${item.reg?'regular':'irregular'}</span>
+      <div class="desc">${item.desc}</div>`;
+    wordChips.appendChild(c);
+  });
+
+  /* ---------------- TABS ---------------- */
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      tabs.forEach(t=>{t.classList.remove('active'); t.setAttribute('aria-selected','false');});
+      tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+      document.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+      document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ---------------- FST ENGINE (shared builder) ---------------- */
+  // Notation legend: C = any consonant, V = any vowel, ^ = morpheme boundary,
+  // 0 = nothing (epsilon / empty string), "x:y" = "lexical symbol x is realized as surface symbol y"
+  const NOTATION_LEGEND = [
+    ['C:C / V:V', 'a consonant or vowel is copied through unchanged'],
+    ['^:0', 'the morpheme boundary is silently deleted — it never appears on the surface'],
+    ['^:e', 'the boundary triggers insertion of a linking letter (here, "e")'],
+    ['0:C', 'a consonant is inserted that wasn\u2019t in the lexical string at all (gemination)'],
+    ['i:u', 'one lexical vowel is realized as a different surface vowel (mutation)'],
+    ['TAG:x', 'an abstract feature tag (like PL or PAST) is realized as real letters']
+  ];
+
+  // edge examples library: each has ordered two-level rule arcs and a matching surface trace
+  const fstLibrary = {
+    hero_pl: {
+      input:'h e r o ^ PL',
+      arcs:[
+        {label:'C:C, V:V', type:'regular-edge',
+          tip:'Every consonant maps to itself and every vowel maps to itself — the stem is copied through unchanged.',
+          simple:'Rule 1 — C:C, V:V: every letter of the stem "hero" is a consonant or vowel mapping to itself. Nothing is added or removed yet.',
+          lenses:{iaa:'Brick #1 is placed: "hero".', iap:'Base form loaded, no rule applied yet.', iapd:'We\'ve located the row for "hero" in the table.'}},
+        {label:'^:e', type:'regular-edge',
+          tip:'Boundary-insertion rule: after a vowel-final noun like "hero," the boundary (^) is realized as a linking letter "e" instead of disappearing silently.',
+          simple:'Rule 2 — ^:e: the morpheme boundary "^" between stem and suffix doesn\u2019t vanish here — it is realized as an inserted "e," which is why we get the "-oes" spelling instead of just "-os."',
+          lenses:{iaa:'Brick #2 (a linking "e") is glued in.', iap:'Apply a boundary-insertion spelling rule.', iapd:'Prep work before the PLURAL cell can be filled.'}},
+        {label:'PL:s', type:'regular-edge',
+          tip:'The abstract feature tag PLURAL is realized as the letter "s" — the ordinary, default plural rule.',
+          simple:'Rule 3 — PL:s: the abstract tag PLURAL turns into the actual letter "s." hero + e + s = heroes.',
+          lenses:{iaa:'Brick #3 "s" snaps on: heroe + s = heroes.', iap:'Apply the default plural-suffixation rule.', iapd:'We\'ve landed on the PLURAL cell for "hero": heroes.'}}
+      ],
+      trace:['hero','hero','heroe','heroes']
+    },
+    web_past: {
+      input:'w e b ^ V ^ PAST',
+      arcs:[
+        {label:'0:0 (cat. shift)', type:'regular-edge',
+          tip:'Zero-derivation: the lexical category flips from Noun to Verb, but the rule pair is 0:0 — empty maps to empty. No letters are touched.',
+          simple:'Rule 1 — 0:0: "web" the noun silently becomes "web" the verb. The rule pair is empty-to-empty — literally no letters change.',
+          lenses:{iaa:'Same brick "web" reused, no new piece added.', iap:'Apply a category-changing rule with zero phonology.', iapd:'Hop from the Noun paradigm to the Verb paradigm.'}},
+        {label:'0:C (gemination)', type:'regular-edge',
+          tip:'Gemination rule: before a vowel-initial suffix, a short-vowel-plus-single-consonant stem doubles its final consonant. Nothing in the lexical string asked for it — a "b" is inserted from nowhere.',
+          simple:'Rule 2 — 0:C: because "web" has a short vowel and ends in one consonant, English spelling inserts an EXTRA copy of that consonant before the ending: web → webb-. The 0 means this "b" wasn\u2019t in the lexical string at all — it\u2019s purely inserted.',
+          lenses:{iaa:'An extra "b" brick appears out of nowhere.', iap:'Apply the consonant-doubling (gemination) rule.', iapd:'Still prep work before the PAST cell can be filled.'}},
+        {label:'PAST:ed', type:'regular-edge',
+          tip:'The abstract feature tag PAST is realized as the letters "ed" — the ordinary, default past-tense rule.',
+          simple:'Rule 3 — PAST:ed: the abstract tag PAST turns into the actual letters "ed." webb + ed = webbed.',
+          lenses:{iaa:'Final brick "ed" snaps on: webb + ed = webbed.', iap:'Apply the default past-tense suffixation rule.', iapd:'We\'ve landed on the PAST cell for "web (V)": webbed.'}}
+      ],
+      trace:['web(N)','web(V)','webb','webbed']
+    },
+    swing_past: {
+      input:'s w i n g ^ PAST',
+      arcs:[
+        {label:'i:u (ablaut)', type:'irregular-edge',
+          tip:'Rebel rule: the surrounding consonants are still C:C (s,w,n,g copied straight through), but the vowel "i" is NOT copied — it maps to "u" instead. This single mismatched pair is the entire past-tense signal.',
+          simple:'Rule 1 (rebel!) — i:u: everything except the middle vowel follows plain C:C copying. But this rule swaps the lexical "i" for a surface "u": sw[i]ng → sw[u]ng. That vowel-swap alone carries the whole meaning of "past tense" here.',
+          lenses:{iaa:'No new brick — the existing brick is reshaped from inside. Awkward for pure "stacking" theory!', iap:'Apply an internal vowel-change rule (ablaut) instead of adding material.', iapd:'We land directly on the PAST cell for "swing": swung.'}},
+        {label:'PAST:0', type:'irregular-edge',
+          tip:'Because the vowel change already signaled past tense, the PAST tag itself is realized as nothing — an empty string. No "-ed" is added on top.',
+          simple:'Rule 2 (rebel!) — PAST:0: the abstract PAST tag maps to zero letters. It doesn\u2019t need an ending because Rule 1 already did the job.',
+          lenses:{iaa:'No plural brick gets added at all — the tag is "silent."', iap:'The suffixation rule is blocked; ablaut already expressed PAST.', iapd:'The PAST cell for "swing" is filled by the vowel change alone: swung.'}}
+      ],
+      trace:['swing','swung','swung']
+    },
+    go_past: {
+      input:'g o ^ PAST',
+      arcs:[
+        {label:'"go^PAST" : "went"  (suppletion)', type:'irregular-edge',
+          tip:'Total suppletion: there is no letter-by-letter correspondence at all. The whole lexical string "go^PAST" is treated as one unanalyzable unit that surfaces as the unrelated word "went." No C:C, no V:V — the regular rule machinery simply does not apply.',
+          simple:'Rule 1 (the biggest rebel of all!) — the entire lexical string "go^PAST" is swapped, as one lump, for the surface word "went." There is no g:w or o:e correspondence you could point to — the whole word is just replaced. This is what makes suppletion different from every other irregular arc: it can\u2019t be broken into smaller rule pairs.',
+          lenses:{iaa:'The brick itself is swapped for an unrelated brick — breaks the "just stack pieces" idea completely.', iap:'Apply suppletion: replace the whole stem, the most extreme process there is.', iapd:'We land directly on the PAST cell for "go": went — the entry is simply irregular, and that\u2019s fine.'}}
+      ],
+      trace:['go','went']
+    },
+    child_pl: {
+      input:'c h i l d ^ PL',
+      arcs:[
+        {label:'C:C, V:V', type:'regular-edge',
+          tip:'Every consonant maps to itself and every vowel maps to itself — the stem is copied through unchanged.',
+          simple:'Rule 1 — C:C, V:V: every letter of "child" is copied straight through. Same as any regular stem so far.',
+          lenses:{iaa:'Brick #1 is placed: "child".', iap:'Base form loaded, no rule applied yet.', iapd:'We\'ve located the row for "child" in the table.'}},
+        {label:'^:r, PL:en (fossil)', type:'irregular-edge',
+          tip:'A once-common Old English plural pattern, frozen onto just a couple of words: the boundary is realized as "r" AND the PLURAL tag is realized as "en" — instead of the modern default PL:s.',
+          simple:'Rule 2 (rebel!) — ^:r, PL:en: instead of the everyday PL:s rule, this fossilized pattern turns the boundary into "r" and the PLURAL tag into "en" at the same time: child + r + en = children.',
+          lenses:{iaa:'Two old bricks glue on together: "r" then "en" — a fossil of double marking.', iap:'Apply a frozen, non-productive plural rule instead of the modern default.', iapd:'We land directly on the PLURAL cell for "child": children — irregular, but filled all the same.'}}
+      ],
+      trace:['child','child','children']
+    }
+  };
+
+  function buildFstSvg(svgEl, tooltipEl, arcs, opts){
+    opts = opts||{};
+    while(svgEl.firstChild) svgEl.removeChild(svgEl.firstChild);
+    const NS='http://www.w3.org/2000/svg';
+
+    // defs marker
+    const defs=document.createElementNS(NS,'defs');
+    ['regular-edge','irregular-edge'].forEach(cls=>{
+      const marker=document.createElementNS(NS,'marker');
+      marker.setAttribute('id','arrow-'+cls);
+      marker.setAttribute('viewBox','0 0 10 10');
+      marker.setAttribute('refX','8'); marker.setAttribute('refY','5');
+      marker.setAttribute('markerWidth','7'); marker.setAttribute('markerHeight','7');
+      marker.setAttribute('orient','auto-start-reverse');
+      const path=document.createElementNS(NS,'path');
+      path.setAttribute('d','M0,0 L10,5 L0,10 z');
+      path.setAttribute('fill', cls==='irregular-edge'?'#D98CC7':'#6FBF9B');
+      marker.appendChild(path); defs.appendChild(marker);
+    });
+    svgEl.appendChild(defs);
+
+    // Build a linear chain of N+1 states for N arcs, spaced evenly across the canvas.
+    const n = arcs.length;
+    const marginX = 90, canvasW = 900, y = 130;
+    const step = n>0 ? (canvasW - 2*marginX) / n : 0;
+    const states = [];
+    for(let i=0;i<=n;i++){
+      states.push({x: marginX + step*i, y:y, id:'S'+i, isFinal: i===n});
+    }
+
+    function pathFor(a,b){
+      return `M${a.x+30},${a.y} L${b.x-30},${b.y}`;
+    }
+
+    const activeEdgeEls = [];
+    arcs.forEach((arc,idx)=>{
+      const a = states[idx], b = states[idx+1];
+      const p = document.createElementNS(NS,'path');
+      p.setAttribute('d', pathFor(a,b));
+      p.setAttribute('class','fst-edge '+arc.type);
+      p.setAttribute('marker-end','url(#arrow-'+arc.type+')');
+      p.setAttribute('data-idx', idx);
+      p.style.opacity = opts.animateReveal ? '0' : '1';
+      svgEl.appendChild(p);
+      activeEdgeEls.push(p);
+
+      const lx = (a.x+b.x)/2;
+      const lbl = document.createElementNS(NS,'text');
+      lbl.setAttribute('x', lx); lbl.setAttribute('y', a.y-16);
+      lbl.setAttribute('text-anchor','middle');
+      lbl.setAttribute('class','fst-label mono');
+      lbl.textContent = arc.label;
+      lbl.style.opacity = opts.animateReveal ? '0' : '1';
+      lbl.addEventListener('mouseenter',(ev)=>showTip(ev, arc.tip));
+      lbl.addEventListener('mousemove',(ev)=>moveTip(ev));
+      lbl.addEventListener('mouseleave', hideTip);
+      lbl.addEventListener('click',(ev)=>showTip(ev, arc.tip));
+      p.addEventListener('mouseenter',(ev)=>showTip(ev, arc.tip));
+      p.addEventListener('mousemove',(ev)=>moveTip(ev));
+      p.addEventListener('mouseleave', hideTip);
+      svgEl.appendChild(lbl);
+    });
+
+    function showTip(ev, text){
+      tooltipEl.textContent = text;
+      tooltipEl.style.opacity = '1';
+      moveTip(ev);
+    }
+    function moveTip(ev){
+      const wrapRect = svgEl.parentElement.getBoundingClientRect();
+      tooltipEl.style.left = (ev.clientX - wrapRect.left + 14) + 'px';
+      tooltipEl.style.top = (ev.clientY - wrapRect.top + 10) + 'px';
+    }
+    function hideTip(){ tooltipEl.style.opacity='0'; }
+
+    // draw states on top
+    const byId = {};
+    states.forEach((s,i)=>{
+      byId[s.id]=s;
+      const g = document.createElementNS(NS,'g');
+      g.style.opacity = opts.animateReveal ? '0' : '1';
+      g.setAttribute('data-node-idx', i);
+      const circ = document.createElementNS(NS,'circle');
+      circ.setAttribute('cx',s.x); circ.setAttribute('cy',s.y); circ.setAttribute('r', s.isFinal?32:26);
+      circ.setAttribute('class','fst-node-circle'+(s.isFinal?' final':''));
+      g.appendChild(circ);
+      if(s.isFinal){
+        const circ2 = document.createElementNS(NS,'circle');
+        circ2.setAttribute('cx',s.x); circ2.setAttribute('cy',s.y); circ2.setAttribute('r', 25);
+        circ2.setAttribute('fill','none'); circ2.setAttribute('stroke','var(--hero-red)'); circ2.setAttribute('stroke-width','2');
+        g.appendChild(circ2);
+      }
+      const t = document.createElementNS(NS,'text');
+      t.setAttribute('x',s.x); t.setAttribute('y', s.y+4);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('class','fst-node-label');
+      t.textContent = i===0 ? 'in' : (s.isFinal ? 'out' : 'S'+i);
+      g.appendChild(t);
+      svgEl.appendChild(g);
+    });
+
+    const particle = document.createElementNS(NS,'circle');
+    particle.setAttribute('r','9');
+    particle.setAttribute('class','fst-particle');
+    particle.style.opacity='0';
+    svgEl.appendChild(particle);
+
+    return {activeEdgeEls, particle, byId, states, pathFor};
+  }
+
+  function animateRun(svgEl, tooltipEl, exampleKey, traceBoxEl, library, stepListEl, lensEls){
+    const ex = library[exampleKey];
+    const built = buildFstSvg(svgEl, tooltipEl, ex.arcs, {animateReveal:true});
+    const NS='http://www.w3.org/2000/svg';
+
+    // reveal nodes progressively
+    const nodeGs = [...svgEl.querySelectorAll('g[data-node-idx]')];
+    nodeGs.forEach((g,i)=>{
+      setTimeout(()=>{ g.style.transition='opacity .4s ease'; g.style.opacity='1'; }, i*160);
+    });
+
+    traceBoxEl.innerHTML = '';
+    const introSpan = document.createElement('span');
+    introSpan.className='mono'; introSpan.style.color='var(--ink-soft)';
+    introSpan.textContent = 'input: '+ex.input;
+    traceBoxEl.appendChild(introSpan);
+
+    if(stepListEl){
+      stepListEl.innerHTML='';
+    }
+    if(lensEls){
+      lensEls.arrangement.textContent = 'Watching…';
+      lensEls.process.textContent = 'Watching…';
+      lensEls.paradigm.textContent = 'Watching…';
+      [lensEls.colA, lensEls.colP, lensEls.colD].forEach(c=>c && c.classList.remove('pulse'));
+    }
+
+    let cumulativeDelay = nodeGs.length*160 + 200;
+
+    ex.arcs.forEach((arc, i)=>{
+      const edgeEl = built.activeEdgeEls[i];
+      const labelEls = [...svgEl.querySelectorAll('.fst-label')];
+      setTimeout(()=>{
+        edgeEl.style.transition='opacity .3s ease';
+        edgeEl.style.opacity='1';
+        if(labelEls[i]){ labelEls[i].style.transition='opacity .3s ease'; labelEls[i].style.opacity='1'; }
+
+        // animate particle along path
+        const len = edgeEl.getTotalLength();
+        built.particle.style.opacity='1';
+        const dur = 650;
+        const start = performance.now();
+        function step(now){
+          const t = Math.min(1,(now-start)/dur);
+          const pt = edgeEl.getPointAtLength(t*len);
+          built.particle.setAttribute('cx',pt.x);
+          built.particle.setAttribute('cy',pt.y);
+          if(t<1) requestAnimationFrame(step);
+          else {
+            // reveal trace step (token bubble)
+            const arrow = document.createElement('span');
+            arrow.className='trace-arrow'; arrow.textContent='→';
+            const box = document.createElement('span');
+            box.className='trace-step'; box.textContent = ex.trace[i+1];
+            traceBoxEl.appendChild(arrow);
+            traceBoxEl.appendChild(box);
+
+            // reveal plain-language step explanation
+            if(stepListEl && arc.simple){
+              const item = document.createElement('div');
+              item.className = 'step-item'+(arc.type==='irregular-edge'?' irregular':'');
+              item.innerHTML = `<b class="step-tag">${arc.from} → ${arc.to} · ${arc.type==='irregular-edge'?'rebel arc':'regular arc'}</b>${arc.simple}`;
+              stepListEl.appendChild(item);
+            }
+
+            // update the three parallel lenses simultaneously
+            if(lensEls && arc.lenses){
+              lensEls.arrangement.textContent = arc.lenses.iaa;
+              lensEls.process.textContent = arc.lenses.iap;
+              lensEls.paradigm.textContent = arc.lenses.iapd;
+              [lensEls.colA, lensEls.colP, lensEls.colD].forEach(c=>{
+                if(!c) return;
+                c.classList.add('pulse');
+                setTimeout(()=>c.classList.remove('pulse'), 600);
+              });
+            }
+          }
+        }
+        requestAnimationFrame(step);
+      }, cumulativeDelay);
+      cumulativeDelay += 750;
+    });
+  }
+
+  // initial static draw + first run wiring for main FST
+  const fstSvg = document.getElementById('fstSvg');
+  const fstTooltip = document.getElementById('fstTooltip');
+  const fstSelect = document.getElementById('fstExample');
+  const traceBox = document.getElementById('traceBox');
+
+  buildFstSvg(fstSvg, fstTooltip, fstLibrary.hero_pl.arcs, {animateReveal:false});
+
+  const legendGrid = document.getElementById('legendGrid');
+  NOTATION_LEGEND.forEach(([sym,desc])=>{
+    const item = document.createElement('div');
+    item.className='legend-item';
+    item.innerHTML = `<span class="sym">${sym}</span><span>${desc}</span>`;
+    legendGrid.appendChild(item);
+  });
+
+  const stepList = document.getElementById('stepList');
+  const lensEls = {
+    arrangement: document.getElementById('lensArrangementBody'),
+    process: document.getElementById('lensProcessBody'),
+    paradigm: document.getElementById('lensParadigmBody'),
+    colA: document.getElementById('lensArrangement'),
+    colP: document.getElementById('lensProcess'),
+    colD: document.getElementById('lensParadigm')
+  };
+
+  document.getElementById('runFstBtn').addEventListener('click', ()=>{
+    animateRun(fstSvg, fstTooltip, fstSelect.value, traceBox, fstLibrary, stepList, lensEls);
+  });
+
+  /* ---------------- PLAYGROUND ---------------- */
+  // playground uses a small generative lookup so any base+feature combo has a defined path,
+  // expressed as two-level rule arcs just like the main FST above.
+  const pgWords = {
+    go:   {label:'go',   past:{form:'went', irregular:true,  rule:'"go^PAST" : "went" (suppletion)', tip:'The whole lexical string is swapped, as one lump, for an unrelated surface word — no letter-by-letter correspondence exists.'},
+           plural:null, prog:{form:'going', irregular:false, rule:'PROG:ing', tip:'The abstract PROGRESSIVE tag is realized as the regular ending "-ing."'}},
+    swing:{label:'swing',past:{form:'swung', irregular:true,  rule:'i:u (ablaut)', tip:'The middle vowel "i" is realized as "u" instead of being copied — the vowel change alone signals past tense.'},
+           plural:null, prog:{form:'swinging', irregular:false, rule:'PROG:ing', tip:'The abstract PROGRESSIVE tag is realized as the regular ending "-ing."'}},
+    jump: {label:'jump', past:{form:'jumped', irregular:false, rule:'PAST:ed', tip:'The abstract PAST tag is realized as the regular ending "-ed" — nothing irregular here.'},
+           plural:null, prog:{form:'jumping', irregular:false, rule:'PROG:ing', tip:'The abstract PROGRESSIVE tag is realized as the regular ending "-ing."'}},
+    web:  {label:'web (V)', past:{form:'webbed', irregular:false, rule:'0:C, PAST:ed', tip:'A consonant is inserted from nowhere (gemination: web→webb-), then the regular PAST:ed rule applies.'},
+           plural:null, prog:{form:'webbing', irregular:false, rule:'0:C, PROG:ing', tip:'A consonant is inserted from nowhere (gemination: web→webb-), then the regular PROG:ing rule applies.'}},
+    hero: {label:'hero', past:null, plural:{form:'heroes', irregular:false, rule:'^:e, PL:s', tip:'The boundary is realized as a linking "e," then the regular PL:s rule applies.'}, prog:null},
+    child:{label:'child', past:null, plural:{form:'children', irregular:true, rule:'^:r, PL:en (fossil)', tip:'A frozen historical plural pattern realizes the boundary as "r" and the PLURAL tag as "en," instead of the modern default PL:s.'}, prog:null}
+  };
+  const pgBase = document.getElementById('pgBase');
+  const pgFeature = document.getElementById('pgFeature');
+  Object.keys(pgWords).forEach(k=>{
+    const o=document.createElement('option'); o.value=k; o.textContent=pgWords[k].label; pgBase.appendChild(o);
+  });
+  function refreshFeatureOptions(){
+    const w = pgWords[pgBase.value];
+    pgFeature.innerHTML='';
+    if(w.past){ const o=document.createElement('option'); o.value='past'; o.textContent='+ PAST'; pgFeature.appendChild(o); }
+    if(w.plural){ const o=document.createElement('option'); o.value='plural'; o.textContent='+ PLURAL'; pgFeature.appendChild(o); }
+    if(w.prog){ const o=document.createElement('option'); o.value='prog'; o.textContent='+ PROGRESSIVE'; pgFeature.appendChild(o); }
+  }
+  pgBase.addEventListener('change', refreshFeatureOptions);
+  refreshFeatureOptions();
+
+  const pgSvg = document.getElementById('pgSvg');
+  const pgTooltip = document.getElementById('pgTooltip');
+  const pgTraceBox = document.getElementById('pgTraceBox');
+
+  buildFstSvg(pgSvg, pgTooltip, fstLibrary.hero_pl.arcs, {animateReveal:false});
+
+  document.getElementById('pgRunBtn').addEventListener('click', ()=>{
+    const w = pgWords[pgBase.value];
+    const feat = pgFeature.value;
+    const data = w[feat];
+    if(!data) return;
+    const featLabel = feat==='past' ? '[PAST]' : feat==='plural' ? '[PLURAL]' : '[PROGRESSIVE]';
+    const stemLetters = w.label.replace(' (V)','');
+    const copyArc = {label:'C:C, V:V', type:'regular-edge', tip:'Every consonant and vowel of the stem is copied through unchanged.',
+      simple:`Rule 1 — C:C, V:V: every letter of "${stemLetters}" maps to itself. Nothing is added or removed yet.`};
+    const ruleArc = {label:data.rule, type: data.irregular?'irregular-edge':'regular-edge', tip:data.tip,
+      simple:`Rule 2${data.irregular?' (rebel!)':''} — ${data.rule}: ${data.tip} Result: "${data.form}."`};
+    const arcs = data.irregular && (data.rule.indexOf('suppletion')>-1)
+      ? [{label:data.rule, type:'irregular-edge', tip:data.tip,
+          simple:`Rule 1 (the biggest rebel of all!) — the entire lexical string is swapped, as one lump, for the surface word "${data.form}." ${data.tip}`}]
+      : [copyArc, ruleArc];
+    const trace = arcs.length===1 ? [stemLetters, data.form] : [stemLetters, stemLetters, data.form];
+    const tempLib = {run:{input: stemLetters + ' ^ ' + featLabel.replace(/[\[\]]/g,''), arcs:arcs, trace:trace}};
+    const pgStepList = document.getElementById('pgStepList');
+    animateRun(pgSvg, pgTooltip, 'run', pgTraceBox, tempLib, pgStepList);
+  });
+
+  /* ---------------- DISJUNCTIVE AFFIX ROUTER (karta declension classes) ---------------- */
+  const routerClasses = {
+    zakon:    {label:'zakon "law"', cls:1, nom:'zakon-\u00d8', gen:'zakon-a', instr:'zakon-om'},
+    karta:    {label:'karta "map"', cls:2, nom:'kart-a', gen:'kart-y', instr:'kart-oj'},
+    rukopis:  {label:"rukopis' \"manuscript\"", cls:3, nom:"rukopis'-\u00d8", gen:'rukopis-i', instr:'rukopis-ju'},
+    boloto:   {label:'boloto "swamp"', cls:4, nom:'bolot-o', gen:'bolot-a', instr:'bolot-om'}
+  };
+  const routerNounSel = document.getElementById('routerNoun');
+  Object.keys(routerClasses).forEach(k=>{
+    const o=document.createElement('option'); o.value=k; o.textContent=routerClasses[k].label; routerNounSel.appendChild(o);
+  });
+  const routerCaseSel = document.getElementById('routerCase');
+  const routerCaseNames = {nom:'Nominative', gen:'Genitive', instr:'Instrumental'};
+
+  function renderRouter(){
+    const row = document.getElementById('routerRow');
+    row.innerHTML = Object.keys(routerClasses).map(k=>{
+      const c = routerClasses[k];
+      return `<div class="duel-card" id="branch-${k}">
+        <div class="duel-label">Class ${c.cls}</div>
+        <div class="duel-word">${c.label.split(' ')[0]}</div>
+        <div class="duel-badge">\u2713 routed here</div>
+      </div>`;
+    }).join('');
+    document.getElementById('routerVerdict').classList.remove('show');
+  }
+  renderRouter();
+  routerNounSel.addEventListener('change', renderRouter);
+  routerCaseSel.addEventListener('change', renderRouter);
+  document.getElementById('routerRunBtn').addEventListener('click', ()=>{
+    renderRouter();
+    const nounKey = routerNounSel.value;
+    const caseKey = routerCaseSel.value;
+    const winnerData = routerClasses[nounKey];
+    const verdict = document.getElementById('routerVerdict');
+    setTimeout(()=>{
+      Object.keys(routerClasses).forEach(k=>{
+        const card = document.getElementById('branch-'+k);
+        if(k===nounKey){ card.classList.add('winner'); }
+        else { card.classList.add('loser'); }
+      });
+      const form = winnerData[caseKey];
+      verdict.innerHTML = `<b>Routed to Class ${winnerData.cls}.</b> Stem entered the lexicon tagged <span class="mono">&lt;${nounKey} +noun ${winnerData.cls}&gt;</span>, so the network sent it straight down the Class ${winnerData.cls} branch. ${routerCaseNames[caseKey]} form: <b class="mono">${form}</b>. The other three branches\u2019 suffix sets (Class ${Object.values(routerClasses).filter(c=>c.cls!==winnerData.cls).map(c=>c.cls).join(', ')}) never even got a chance to compete — that\u2019s exactly how an FST sorts out rival affixes.`;
+      verdict.classList.add('show');
+    }, 300);
+  });
+
+  /* ---------------- AFFIX RIVALRY ---------------- */
+  // Each stem has two rival realizations for the SAME grammatical job.
+  // winner is decided by a simple, named linguistic principle — exactly
+  // the kind of "specific rule blocks general rule" logic an FST encodes
+  // as arc ordering / priority.
+  const duelData = {
+    big:      {job:'COMPARATIVE', a:{label:'-er suffix', form:'bigger'}, b:{label:'periphrastic "more"', form:'more big'},
+               winner:'a', rule:'Prosodic weight rule', explain:'"Big" is a single, light syllable — English\u2019s default comparative rule attaches "-er" to short (mono-/some disyllabic) adjectives. The periphrastic "more" candidate is blocked here because a more specific phonological rule already claims short stems.'},
+    beautiful:{job:'COMPARATIVE', a:{label:'-er suffix', form:'*beautifuler'}, b:{label:'periphrastic "more"', form:'more beautiful'},
+               winner:'b', rule:'Prosodic weight rule', explain:'"Beautiful" is three syllables — too heavy for the "-er" suffixation rule, which is restricted to short stems. With the specific suffixation rule inapplicable, the general periphrastic "more" construction steps in by default (the Elsewhere Condition).'},
+    happy:    {job:'NOMINALIZATION', a:{label:'-ness suffix', form:'happiness'}, b:{label:'-ity suffix', form:'*happity'},
+               winner:'a', rule:'Base-selection restriction', explain:'"-ity" is choosy: it only attaches to learned/Latinate bases that already carry certain suffixes (like -able, -al, -ic). "Happy" doesn\u2019t qualify, so the maximally general "-ness" rule wins by default — the specific rule simply never had a chance to compete.'},
+    curious:  {job:'NOMINALIZATION', a:{label:'-ness suffix', form:'curiousness'}, b:{label:'-ity suffix', form:'curiosity'},
+               winner:'b', rule:'Blocking Principle (lexicalization)', explain:'Here BOTH rules could apply — "curious" is Latinate enough for either. But "curiosity" is already a stored, high-frequency lexical item, and the Blocking Principle says an existing word blocks the productive rule from generating a rival for the same meaning. "Curiousness" is grammatical but dispreferred exactly because "curiosity" got there first.'},
+    quick:    {job:'COMPARATIVE', a:{label:'-er suffix', form:'quicker'}, b:{label:'periphrastic "more"', form:'more quick'},
+               winner:'a', rule:'Prosodic weight rule', explain:'One syllable, ends in a single consonant — squarely inside the "-er" rule\u2019s territory. The general "more" construction is blocked for exactly the same reason "bigger" blocked it.'},
+    global:   {job:'NOMINALIZATION', a:{label:'-ity suffix', form:'globality'}, b:{label:'-ization suffix', form:'globalization'},
+               winner:'tie', rule:'Different meanings, not true rivals', explain:'This pair looks like a duel but isn\u2019t: "-ity" derives a state/quality noun (the property of being global), while "-ization" derives a process noun (the process of becoming global). No blocking happens because the two winners occupy two different meaning-slots, not one — a good reminder that rivalry only exists when the candidates compete for the exact same cell.'}
+  };
+  const duelStemSel = document.getElementById('duelStem');
+  Object.keys(duelData).forEach(k=>{
+    const o=document.createElement('option'); o.value=k; o.textContent=k; duelStemSel.appendChild(o);
+  });
+  function renderDuel(stem){
+    const d = duelData[stem];
+    const row = document.getElementById('duelRow');
+    const verdict = document.getElementById('duelVerdict');
+    row.innerHTML = `
+      <div class="duel-card" id="duelA">
+        <div class="duel-label">Candidate A · ${d.a.label}</div>
+        <div class="duel-word">${d.a.form}</div>
+        <div class="duel-badge">🏆 wins</div>
+      </div>
+      <div class="duel-vs">vs</div>
+      <div class="duel-card" id="duelB">
+        <div class="duel-label">Candidate B · ${d.b.label}</div>
+        <div class="duel-word">${d.b.form}</div>
+        <div class="duel-badge">🏆 wins</div>
+      </div>`;
+    verdict.classList.remove('show');
+    verdict.textContent='';
+    return d;
+  }
+  renderDuel(duelStemSel.value);
+  duelStemSel.addEventListener('change', ()=>renderDuel(duelStemSel.value));
+  document.getElementById('duelRunBtn').addEventListener('click', ()=>{
+    const d = renderDuel(duelStemSel.value);
+    const cardA = document.getElementById('duelA'), cardB = document.getElementById('duelB');
+    const verdict = document.getElementById('duelVerdict');
+    setTimeout(()=>{
+      if(d.winner==='tie'){
+        verdict.innerHTML = `<b>No knockout — both survive.</b> Job: ${d.job}. ${d.explain}`;
+      } else {
+        const winCard = d.winner==='a'?cardA:cardB, loseCard = d.winner==='a'?cardB:cardA;
+        winCard.classList.add('winner');
+        loseCard.classList.add('loser');
+        verdict.innerHTML = `<b>${d.rule}.</b> Job: ${d.job}. ${d.explain}`;
+      }
+      verdict.classList.add('show');
+    }, 300);
+  });
+
+  // free-text "test my own word" — simplified heuristic, clearly a teaching toy
+  document.getElementById('ownStemBtn').addEventListener('click', ()=>{
+    const w = document.getElementById('ownStemInput').value.trim().toLowerCase();
+    const out = document.getElementById('ownStemResult');
+    if(!w){ out.textContent='Type a word first!'; return; }
+    const syll = (w.match(/[aeiouy]+/g)||[]).length;
+    if(w in duelData){
+      out.textContent = `"${w}" is already in the dropdown above — pick it there to see the full duel!`;
+    } else if(syll<=2 && !/e$/.test(w)){
+      out.textContent = `Heuristic guess for "${w}" (${syll} syllable${syll===1?'':'s'}): short enough that the "-er" comparative rule likely wins over "more ${w}" — but always check a dictionary, this is a rough rule of thumb, not a real analyzer.`;
+    } else {
+      out.textContent = `Heuristic guess for "${w}" (${syll} syllable${syll===1?'':'s'}): long/heavy enough that periphrastic "more ${w}" likely wins over "*${w}er" — but always check a dictionary, this is a rough rule of thumb, not a real analyzer.`;
+    }
+  });
+
+  /* ---------------- INFLECTIONAL CLASS SORTER ---------------- */
+  const classData = {
+    'cats':      {cls:'Class 1 — Default (-s/-es)', phenom:'Regular, isomorphic', text:'Overwhelming majority class: PLURAL is spelled out as a suffix, one form = one meaning. The unmarked, "boring" default every new noun in English joins automatically.'},
+    'sheep':     {cls:'Class 2 — Zero-marked', phenom:'Zero exponence', text:'The PLURAL cell is filled by... nothing. "sheep" (singular) and "sheep" (plural) are homophonous. The feature is grammatically real (verb agreement shows it: "the sheep ARE grazing") even though no letters mark it.'},
+    'oxen':      {cls:'Class 3 — Fossil -en', phenom:'Non-productive fossil suffix', text:'A once-common Old English plural class, now down to a handful of survivors (oxen, children, brethren). You can\u2019t use "-en" to pluralize a NEW noun today — it\u2019s frozen, unproductive.'},
+    'children':  {cls:'Class 3 — Fossil -en (+ extra marking)', phenom:'Extended exponence', text:'"child" already got an old "-r-" plural marker historically; "-en" was piled on top later when speakers stopped recognizing the first one. Two markers, one meaning — a classic multiple-exponence fossil.'},
+    'feet':      {cls:'Class 4 — Ablaut plural', phenom:'Non-concatenative (mutation)', text:'No suffix at all — the internal vowel changes instead (foot→feet, mouse→mice, goose→geese). This whole class is a tiny, closed set inherited from a much older, once-productive sound pattern.'},
+    'cacti':     {cls:'Class 5 — Foreign/Latin-Greek plural', phenom:'Borrowed paradigm import', text:'Borrowed straight from Latin\u2019s own inflectional class (cactus/cacti, like Latin -us/-i nouns), imported wholesale along with the loanword instead of being nativized to "cactuses."'},
+    'went':      {cls:'Verb class: Suppletive', phenom:'Cumulative exponence (portmanteau)', text:'The PAST cell for "go" is filled by a totally unrelated stem. GO+PAST is realized as one indivisible chunk — you cannot point to a "go" part and a "past" part inside "went."'},
+    'sang':      {cls:'Verb class: Strong (ablaut)', phenom:'Non-concatenative (mutation)', text:'"sing/sang/sung" — the vowel itself is the entire past-tense signal, an inherited "strong verb" pattern shared by dozens of English verbs (drink/drank/drunk, swim/swam/swum…).'},
+    'cut':       {cls:'Verb class: Zero-change', phenom:'Syncretism', text:'PRESENT "cut" and PAST "cut" are identical strings — two different paradigm cells happen to share one surface form. You only know which cell you\u2019re in from context ("I cut it yesterday" vs "I cut it every day").'},
+    'jumped':    {cls:'Verb class: Weak (regular)', phenom:'Regular, isomorphic', text:'The default, fully productive class every new English verb joins automatically: PAST is spelled out as "-ed," one clean suffix for one clean meaning.'}
+  };
+  const classGrid = document.getElementById('classGrid');
+  const classDetail = document.getElementById('classDetail');
+  Object.keys(classData).forEach(w=>{
+    const chip = document.createElement('button');
+    chip.className='class-chip'; chip.type='button'; chip.textContent=w;
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('.class-chip').forEach(c=>c.classList.remove('picked'));
+      chip.classList.add('picked');
+      const d = classData[w];
+      classDetail.innerHTML = `<div class="class-name">"${w}" → ${d.cls}</div><div>${d.text}</div><span class="phenomenon">${d.phenom}</span>`;
+    });
+    classGrid.appendChild(chip);
+  });
+
+  /* ---------------- PARADIGM QUIZ ---------------- */
+  const quizOpts = [
+    {label:'A. Hidden zero affix, just like a normal suffix', correct:false},
+    {label:'B. The "Plural" cell is simply written as identical to the "Singular" cell', correct:true},
+    {label:'C. It\u2019s treated as a spelling mistake to be corrected', correct:false},
+    {label:'D. Sheep is not considered a real plural form', correct:false}
+  ];
+  const quizGrid = document.getElementById('quizOptions');
+  const quizResult = document.getElementById('quizResult');
+  quizOpts.forEach(opt=>{
+    const chip = document.createElement('button');
+    chip.className='class-chip'; chip.type='button'; chip.style.fontFamily="'Nunito',sans-serif";
+    chip.textContent = opt.label;
+    chip.addEventListener('click', ()=>{
+      document.querySelectorAll('#quizOptions .class-chip').forEach(c=>c.classList.remove('picked'));
+      chip.classList.add('picked');
+      quizResult.style.display='block';
+      quizResult.innerHTML = opt.correct
+        ? `<b>\u2713 Correct!</b> No special machinery needed — the table just states that two of its cells happen to hold the same word.`
+        : `<b>Not quite.</b> The right answer: the "Plural" cell is simply written as identical to the "Singular" cell — no hidden zero affix, no error, no denial that it\u2019s a real plural.`;
+    });
+    quizGrid.appendChild(chip);
+  });
+
+  /* ---------------- CODE DEMO STEPPER ---------------- */
+  const codeScripts = {
+    spacy: {
+      file:'spacy_morph.py',
+      lines:[
+        {code:'import spacy', explain:'Load the spaCy library. spaCy\u2019s tokenizer and lemmatizer use rule tables and statistical models descended straight from the FST-style thinking in Scene Four.'},
+        {code:'nlp = spacy.load("en_core_web_sm")', explain:'en_core_web_sm = English + core pipeline + web-trained + small. It already knows POS tags, lemmas, morphological features, and dependency parsing.'},
+        {code:'doc = nlp("The foxes are running.")', explain:'The sentence is passed through the model in one call: tokenization → POS tagging → lemmatization → morphological analysis, all automatically, producing a Doc object.'},
+        {code:'token = doc[3]', explain:'Index into the Doc like a list. Token 0="The", 1="foxes", 2="are", 3="running", 4="." — token 3 is our target: "running."'},
+        {code:'print(token.text)\nprint(token.lemma_)\nprint(token.morph)', explain:'.text is the surface form as written; .lemma_ recovers the dictionary base form; .morph is the exact "recipe" bundle — spaCy\u2019s .morph attribute is literally the lemma + feature bundle we\u2019ve been decoding by hand all lecture.',
+         output:'running\nrun\nAspect=Prog|Tense=Pres|VerbForm=Part'}
+      ]
+    },
+    stanza: {
+      file:'stanza_ud.py',
+      lines:[
+        {code:'import stanza', explain:'Stanza is Stanford\u2019s multilingual pipeline, built on Universal Dependencies (UD) treebanks for over 70 languages — English, Hindi, Gujarati, Russian, Finnish, Turkish, Arabic, Chinese, Spanish and more.'},
+        {code:'nlp = stanza.Pipeline("en", processors="tokenize,pos,lemma,mwt")', explain:'Build an English pipeline with just the processors we need — many of the 70+ languages Stanza supports are exactly the inflection-rich ones from Scene Five (Russian) and Scene Three (Finnish, Arabic).'},
+        {code:'doc = nlp("The foxes are running.")', explain:'Same sentence as the spaCy tab, so we can compare outputs directly. Stanza returns a Document of Sentences of Words, each carrying UD-style annotations.'},
+        {code:'for w in doc.sentences[0].words:', explain:'Iterate over the analyzed words in the (only) sentence.'},
+        {code:'    print(w.text, w.lemma, w.feats)', explain:'w.feats is a pipe-separated UD feature string — Stanza\u2019s morphological-features layer outputs exactly the kind of Case/Number/Tense bundle that paradigm-based analysis (Scene Seven) formalizes as a table cell.',
+         output:'The    the    _\nfoxes  fox    Number=Plur\nare    be     Mood=Ind|Tense=Pres|VerbForm=Fin\nrunning run   Tense=Pres|VerbForm=Part'}
+      ]
+    },
+    hf: {
+      file:'hf_tokenizer.py',
+      lines:[
+        {code:'from transformers import AutoTokenizer', explain:'Hugging Face subword tokenizers (BPE, WordPiece) are NOT morphological analyzers — they split unfamiliar words into frequency-driven chunks so a neural model never sees a truly "unknown" word. A data-driven cousin of morpheme splitting.'},
+        {code:'tok = AutoTokenizer.from_pretrained("bert-base-uncased")', explain:'BERT\u2019s tokenizer uses WordPiece — a statistical algorithm that learned its vocabulary from raw text. Nobody told it what a "morpheme" is.'},
+        {code:'print(tok.tokenize("unhappily"))', explain:'Watch closely: WordPiece happens to land remarkably close to the real linguistic morphemes here (un / happ / ily) purely because those chunks were frequent in training data — modern deep learning didn\u2019t abandon morphology, it learned to approximate it statistically.',
+         output:"['un', '##happ', '##ily']"},
+        {code:'print(tok.tokenize("looked"), tok.tokenize("given"), tok.tokenize("put"))', explain:'Compare to Scene Five\u2019s three rival past-participle endings: WordPiece doesn\u2019t "know" about -ed/-en/Ø rivalry, but frequent whole words survive intact while rarer combinations get chopped — a statistical echo of the same disjunctive-affix problem.',
+         output:"['looked']   ['given']   ['put']"}
+      ]
+    }
+  };
+  let codeState = {key:'spacy', idx:-1};
+  const codeLinesEl = document.getElementById('codeLines');
+  const codeExplainEl = document.getElementById('codeExplain');
+  const codeTerminalEl = document.getElementById('codeTerminal');
+  const codeFileNameEl = document.getElementById('codeFileName');
+  function renderCodeLines(key){
+    const script = codeScripts[key];
+    codeFileNameEl.textContent = script.file;
+    codeLinesEl.innerHTML = script.lines.map((l,i)=>
+      `<div class="code-line" data-i="${i}"><span class="ln">${i+1}</span>${l.code.replace(/</g,'&lt;')}</div>`
+    ).join('');
+    codeExplainEl.textContent = 'Click "▶ Step" to walk through this code one line at a time.';
+    codeTerminalEl.textContent = '$ python '+script.file;
+  }
+  function resetCode(){
+    codeState.idx = -1;
+    renderCodeLines(codeState.key);
+  }
+  renderCodeLines(codeState.key);
+  document.querySelectorAll('.code-tabbar .tab').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('.code-tabbar .tab').forEach(t=>{t.classList.remove('active'); t.setAttribute('aria-selected','false');});
+      tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+      codeState.key = tab.dataset.code;
+      resetCode();
+    });
+  });
+  document.getElementById('codeResetBtn').addEventListener('click', resetCode);
+  document.getElementById('codeStepBtn').addEventListener('click', ()=>{
+    const script = codeScripts[codeState.key];
+    if(codeState.idx >= script.lines.length-1) return;
+    codeState.idx++;
+    const lineEls = [...codeLinesEl.querySelectorAll('.code-line')];
+    lineEls.forEach((el,i)=>el.classList.toggle('active', i===codeState.idx));
+    lineEls[codeState.idx].scrollIntoView({behavior:'smooth', block:'nearest'});
+    const l = script.lines[codeState.idx];
+    codeExplainEl.textContent = l.explain;
+    if(l.output){
+      codeTerminalEl.textContent += '\n'+l.output;
+    }
+  });
+
+  /* ---------------- FREE-WORD MORPHEME GUESSER (playground toy) ---------------- */
+  const KNOWN_SUFFIXES = ['ization','ational','iveness','fulness','ousness','ability','ibility','ation','ition',
+    'ology','ology','ility','ness','ment','ship','hood','less','ful','ist','ism','ity','ize','ise','ify',
+    'able','ible','ing','ers','er','ed','es','s','ly'];
+  const KNOWN_PREFIXES = ['un','re','dis','mis','non','pre','post','anti','de','over','under','out','inter','sub'];
+  function guessMorphemes(word){
+    let w = word.toLowerCase();
+    let prefix = null, suffix = null, core = w;
+    for(const p of KNOWN_PREFIXES){
+      if(core.length > p.length+2 && core.startsWith(p)){ prefix = p; core = core.slice(p.length); break; }
+    }
+    for(const s of KNOWN_SUFFIXES){
+      if(core.length > s.length+2 && core.endsWith(s)){ suffix = s; core = core.slice(0, core.length-s.length); break; }
+    }
+    return {prefix, core, suffix};
+  }
+  document.getElementById('ownWordBtn').addEventListener('click', ()=>{
+    const raw = document.getElementById('ownWordInput').value.trim();
+    const box = document.getElementById('ownWordResult');
+    if(!raw){ box.style.display='none'; return; }
+    const g = guessMorphemes(raw);
+    let html = '';
+    if(g.prefix) html += `<span class="piece piece-affix">${g.prefix}</span>`;
+    html += `<span class="piece piece-stem">${g.core}</span>`;
+    if(g.suffix) html += `<span class="piece piece-affix">${g.suffix}</span>`;
+    if(!g.prefix && !g.suffix) html += ` <span style="color:var(--ink-soft);font-family:'Nunito',sans-serif;font-size:.85rem;">— no known prefix/suffix pattern matched; may be a bare stem, or this toy simply doesn\u2019t know it.</span>`;
+    else html += ` <span style="color:var(--ink-soft);font-family:'Nunito',sans-serif;font-size:.85rem;">← naive guess, always double-check! Real tools like spaCy/Stanza (Scene Eight) use trained statistical models, not a hand-list like this one.</span>`;
+    box.innerHTML = html;
+    box.style.display = 'block';
+  });
+
+})();
 </script>
 </body>
 </html>
