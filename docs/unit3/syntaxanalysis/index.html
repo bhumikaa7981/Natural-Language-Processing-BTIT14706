@@ -1,1 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parser Playground — Top-Down · Bottom-Up · LR(0)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFF7EC; --card:#FFFFFF; --ink:#241C3D; --ink-soft:#6B6285;
+  --coral:#FF6B6B; --coral-d:#C23A4F; --coral-bg:#FFE4E4;
+  --sun:#FFC93C; --sun-d:#8A5E00; --sun-bg:#FFF3D2;
+  --sky:#4CC9F0; --sky-d:#0B7A99; --sky-bg:#DEF6FD;
+  --grape:#8B5CF6; --grape-d:#5B3FA6; --grape-bg:#EEE6FF;
+  --mint:#3DDC97; --mint-d:#0E8F63; --mint-bg:#DFFBEF;
+  --line:#EFE1F5; --shadow-ink: rgba(36,28,61,0.16);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;}
+h1,h2,h3,h4,.display{font-family:'Baloo 2',sans-serif;font-weight:700;}
+.mono{font-family:'JetBrains Mono',monospace;}
+.wrap{max-width:1220px;margin:0 auto;padding:0 22px;}
+::selection{background:var(--sun);color:var(--ink);}
+button{font-family:'Inter',sans-serif;}
 
+/* ---------- NAV ---------- */
+.topbar{position:sticky;top:0;z-index:60;background:rgba(255,247,236,.94);backdrop-filter:blur(8px);border-bottom:3px solid var(--ink);}
+.topbar-inner{max-width:1220px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.brand{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:19px;white-space:nowrap;}
+.brand span{color:var(--coral);}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;}
+.tabbtn{
+  font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:10px 18px;border-radius:999px;
+  border:2.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;
+  box-shadow:3px 3px 0 var(--ink);transition:.15s;
+}
+.tabbtn:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);}
+.tabbtn.active{background:var(--ink);color:#fff;}
+
+/* ---------- HERO ---------- */
+.hero{padding:46px 0 30px;}
+.hero .kicker{
+  display:inline-block;font-family:'JetBrains Mono',monospace;font-size:12.5px;background:var(--ink);color:var(--sun);
+  padding:6px 14px;border-radius:999px;transform:rotate(-1.5deg);margin-bottom:14px;
+}
+.hero h1{font-size:38px;line-height:1.08;margin:0 0 10px;}
+.hero h1 .hl{color:var(--coral);}
+.hero p{color:var(--ink-soft);font-size:16px;max-width:70ch;margin:0;}
+
+/* ---------- PANELS ---------- */
+.panel{display:none;padding-bottom:60px;}
+.panel.active{display:block;}
+section.block{padding:26px 0;}
+.block-head{margin-bottom:18px;}
+.block-head .eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:1px;color:var(--grape-d);text-transform:uppercase;margin-bottom:6px;}
+.block-head h2{font-size:25px;margin:0 0 6px;}
+.block-head p{color:var(--ink-soft);font-size:14.5px;margin:0;max-width:80ch;}
+
+.card{background:var(--card);border:2.5px solid var(--ink);border-radius:18px;padding:22px;box-shadow:5px 5px 0 var(--shadow-ink);}
+.card + .card{margin-top:16px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr;}}
+
+/* ---------- BUTTONS / CHIPS ---------- */
+.btn{
+  font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:10px 20px;border-radius:999px;
+  border:2.5px solid var(--ink);cursor:pointer;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink);
+  transition:.15s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover:not(:disabled){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);}
+.btn:active:not(:disabled){transform:translate(0,0);box-shadow:1px 1px 0 var(--ink);}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-primary{background:var(--coral);color:#fff;}
+.btn-sun{background:var(--sun);color:var(--ink);}
+.btn-sky{background:var(--sky);color:#04333A;}
+.btn-grape{background:var(--grape);color:#fff;}
+.btn-mint{background:var(--mint);color:#04331F;}
+.btn-ghost{background:#fff;}
+.btn.small{padding:7px 14px;font-size:12.5px;}
+
+.chip{
+  display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:12.5px;
+  padding:5px 12px;border-radius:999px;border:2px solid var(--ink);background:#fff;
+}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px;}
+
+/* ---------- STEP PLAYER ---------- */
+.stepbar{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--ink);border-radius:16px;
+  padding:12px 16px;margin-bottom:16px;color:#fff;
+}
+.stepbar .counter{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--sun);margin-left:auto;}
+.stepbar .btn{box-shadow:none;border-color:#fff;}
+.stepbar .btn.small{padding:6px 12px;}
+.progressdots{display:flex;gap:5px;flex-wrap:wrap;max-width:340px;}
+.pdot{width:9px;height:9px;border-radius:50%;background:#554b78;flex-shrink:0;}
+.pdot.done{background:var(--mint);}
+.pdot.now{background:var(--sun);transform:scale(1.4);}
+
+.logicbox{
+  background:var(--sun-bg);border:2.5px dashed var(--sun-d);border-radius:14px;padding:14px 18px;
+  font-size:14px;color:var(--ink);margin-top:14px;
+}
+.logicbox b{color:var(--sun-d);}
+.logicbox.conflict{background:var(--coral-bg);border-color:var(--coral-d);}
+.logicbox.conflict b{color:var(--coral-d);}
+.logicbox.accept{background:var(--mint-bg);border-color:var(--mint-d);}
+.logicbox.accept b{color:var(--mint-d);}
+
+/* ---------- STACK / TAPE ---------- */
+.machine{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-start;}
+.stackzone{display:flex;flex-direction:column-reverse;gap:6px;min-height:60px;min-width:120px;}
+.stacklabel{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.stacktoken{
+  padding:9px 14px;border-radius:10px;border:2px solid var(--ink);font-family:'JetBrains Mono',monospace;font-weight:700;
+  font-size:14px;text-align:center;min-width:64px;animation:pop .25s ease;
+}
+.stacktoken.term{background:var(--sky-bg);color:var(--sky-d);}
+.stacktoken.nonterm{background:var(--grape-bg);color:var(--grape-d);}
+.stacktoken.state{background:var(--ink);color:var(--sun);font-size:12px;padding:6px 10px;min-width:44px;}
+@keyframes pop{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+.tapezone{display:flex;gap:6px;flex-wrap:wrap;align-items:center;}
+.tapetoken{
+  padding:9px 14px;border-radius:10px;border:2px dashed var(--ink-soft);font-family:'JetBrains Mono',monospace;
+  font-weight:600;font-size:14px;color:var(--ink-soft);background:#fff;
+}
+.tapetoken.next{border-style:solid;border-color:var(--coral);color:var(--coral-d);background:var(--coral-bg);}
+
+/* ---------- ITEM CARDS ---------- */
+.itemset-card{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:14px 16px;min-width:220px;}
+.itemset-card .stateid{
+  font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;display:inline-block;background:var(--ink);color:var(--sun);
+  padding:2px 10px;border-radius:8px;margin-bottom:8px;
+}
+.itemline{font-family:'JetBrains Mono',monospace;font-size:13px;padding:3px 0;}
+.itemline .dot{color:var(--coral);font-weight:800;}
+.itemline.new{background:var(--mint-bg);border-radius:6px;padding:3px 6px;animation:highlightIn .6s ease;}
+@keyframes highlightIn{from{background:var(--sun);}to{background:var(--mint-bg);}}
+.itemline.complete{color:var(--coral-d);font-weight:700;}
+
+/* ---------- TABLES ---------- */
+.lrtable{border-collapse:collapse;width:100%;font-size:13px;}
+.lrtable th,.lrtable td{border:1.5px solid var(--line);padding:8px 10px;text-align:center;font-family:'JetBrains Mono',monospace;}
+.lrtable th{background:var(--ink);color:#fff;font-family:'Baloo 2',sans-serif;font-size:12.5px;}
+.lrtable td.statecol{background:var(--grape-bg);color:var(--grape-d);font-weight:700;font-family:'Baloo 2',sans-serif;}
+.lrtable td.cellhi{background:var(--sun) !important;box-shadow:inset 0 0 0 3px var(--coral-d);animation:flashcell .5s ease;}
+.lrtable td.conflictcell{background:var(--coral-bg);color:var(--coral-d);font-weight:700;}
+.lrtable td.shiftcell{color:var(--sky-d);font-weight:700;}
+.lrtable td.reducecell{color:var(--grape-d);}
+.lrtable td.acceptcell{color:var(--mint-d);font-weight:800;}
+@keyframes flashcell{from{background:#fff;}to{background:var(--sun);}}
+.tablewrap{overflow-x:auto;}
+
+/* ---------- GRAPH ---------- */
+.graphwrap{background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:6px;overflow-x:auto;}
+.gnode circle{stroke:var(--ink);stroke-width:2.5px;}
+.gnode.accept circle{fill:var(--mint);}
+.gnode.reduce circle{fill:var(--sun-bg);stroke:var(--sun-d);}
+.gnode.normal circle{fill:#fff;}
+.gnode.current circle{fill:var(--coral);stroke:var(--coral-d);}
+.gnode text{font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;fill:var(--ink);}
+.gedge{stroke:var(--ink-soft);stroke-width:2px;fill:none;}
+.gedge.hi{stroke:var(--coral-d);stroke-width:3px;}
+.gedgelabel{font-family:'JetBrains Mono',monospace;font-size:11px;fill:var(--grape-d);font-weight:700;}
+
+/* ---------- MISC ---------- */
+.note{font-size:13px;color:var(--ink-soft);margin-top:6px;}
+.badge{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.badge.accept{background:var(--mint-bg);color:var(--mint-d);}
+.badge.reject{background:var(--coral-bg);color:var(--coral-d);}
+.rulelist{display:flex;flex-direction:column;gap:4px;font-family:'JetBrains Mono',monospace;font-size:13.5px;}
+.rulelist .rn{color:var(--grape-d);font-weight:700;margin-right:8px;}
+.inputrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px;}
+.inputrow input[type=text]{
+  flex:1;min-width:220px;padding:10px 14px;border:2.5px solid var(--ink);border-radius:10px;font-family:'JetBrains Mono',monospace;font-size:14px;
+}
+.examplebtn{
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;padding:7px 12px;border-radius:10px;border:2px solid var(--ink);
+  cursor:pointer;background:#fff;
+}
+.examplebtn.accept{background:var(--mint-bg);}
+.examplebtn.reject{background:var(--coral-bg);}
+.examplebtn:hover{background:var(--sun);}
+.grammarpicker{display:flex;flex-wrap:wrap;gap:10px;}
+.gpick{
+  border:2.5px solid var(--ink);border-radius:14px;padding:10px 16px;cursor:pointer;background:#fff;font-family:'Baloo 2',sans-serif;
+  font-weight:700;font-size:13.5px;box-shadow:3px 3px 0 var(--ink);transition:.15s;
+}
+.gpick.active{background:var(--grape);color:#fff;}
+.gpick:hover{transform:translate(-1px,-1px);}
+footer{padding:34px 0;text-align:center;color:var(--ink-soft);font-size:12.5px;border-top:2.5px solid var(--ink);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">Parser <span>Playground</span></div>
+    <div class="tabbar" id="tabbar">
+      <button class="tabbtn active" data-tab="topdown">⬇️ Top-Down</button>
+      <button class="tabbtn" data-tab="bottomup">⬆️ Bottom-Up</button>
+      <button class="tabbtn" data-tab="lr">🧩 LR Parser</button>
+    </div>
+  </div>
+</div>
+
+<div class="hero wrap">
+  <span class="kicker">syntax analysis · blackboard mode · click your way through</span>
+  <h1>Parsers, But You're <span class="hl">Driving</span></h1>
+  <p>Every step below is generated live by an actual parsing algorithm running in your browser — not a pre-recorded gif. Click through slowly, type your own sentences, and watch exactly where a parser says yes, where it says no, and why.</p>
+</div>
+
+<div class="wrap">
+  <div id="panel-topdown" class="panel active"></div>
+  <div id="panel-bottomup" class="panel"></div>
+  <div id="panel-lr" class="panel"></div>
+</div>
+
+<footer>Built for Syntax Analysis · LR Parsing &middot; runs entirely client-side, no data leaves your browser</footer>
+
+<script>
+/* ============================================================
+   ENGINE (validated against the deck's exact I0-I10 states,
+   ACTION/GOTO tables, and conflicts — see build notes)
+   ============================================================ */
+/* ============================================================
+   ENGINE — validated against the deck's exact I0-I10 states,
+   ACTION/GOTO tables, and conflicts (see build notes)
+   ============================================================ */
+
+/* ---------- Generic LR(0) automaton builder ---------- */
+function buildLR0(productions, startSymbol){
+  const nonterminals = new Set(productions.map(p=>p.lhs));
+  const augStart = startSymbol + "'";
+  const allProds = [{lhs:augStart, rhs:[startSymbol]}, ...productions];
+  nonterminals.add(augStart);
+
+  const allSymbols = new Set();
+  allProds.forEach(p=>{ allSymbols.add(p.lhs); p.rhs.forEach(s=>allSymbols.add(s)); });
+  const terminals = Array.from(allSymbols).filter(s=>!nonterminals.has(s));
+
+  function itemKey(it){ return it.p+"."+it.dot; }
+  function itemsKey(items){ return items.map(itemKey).sort().join("|"); }
+
+  function closureSteps(items){
+    // returns {result, log[]}  log entries explain WHY each item was added
+    const map = new Map();
+    const log = [];
+    items.forEach(it=>{ map.set(itemKey(it), it); });
+    let changed = true;
+    while(changed){
+      changed = false;
+      for(const it of Array.from(map.values())){
+        const prod = allProds[it.p];
+        const sym = prod.rhs[it.dot];
+        if(sym && nonterminals.has(sym)){
+          allProds.forEach((pr, idx)=>{
+            if(pr.lhs === sym){
+              const newIt = {p: idx, dot:0};
+              const k = itemKey(newIt);
+              if(!map.has(k)){
+                map.set(k, newIt);
+                changed = true;
+                log.push({from: it, addedBecauseOf: sym, added: newIt});
+              }
+            }
+          });
+        }
+      }
+    }
+    const result = Array.from(map.values()).sort((a,b)=> a.p-b.p || a.dot-b.dot);
+    return {result, log};
+  }
+  function closure(items){ return closureSteps(items).result; }
+
+  function gotoFn(items, X){
+    const moved = [];
+    items.forEach(it=>{
+      const prod = allProds[it.p];
+      if(prod.rhs[it.dot] === X) moved.push({p:it.p, dot:it.dot+1});
+    });
+    if(moved.length===0) return null;
+    return closure(moved);
+  }
+
+  const states = [];
+  const stateKeyMap = new Map();
+  const transitions = [];
+  const buildLog = []; // sequential log of state creation, for animation
+
+  const I0 = closure([{p:0, dot:0}]);
+  states.push(I0);
+  stateKeyMap.set(itemsKey(I0), 0);
+  transitions.push({});
+  buildLog.push({type:'seed', state:0, items:I0});
+
+  let frontier = [0];
+  while(frontier.length){
+    const newFrontier = [];
+    for(const idx of frontier){
+      const items = states[idx];
+      const symbolsAfterDot = [];
+      const seen = new Set();
+      items.forEach(it=>{
+        const prod = allProds[it.p];
+        const sym = prod.rhs[it.dot];
+        if(sym && !seen.has(sym)){ seen.add(sym); symbolsAfterDot.push(sym); }
+      });
+      for(const X of symbolsAfterDot){
+        const target = gotoFn(items, X);
+        if(!target) continue;
+        const key = itemsKey(target);
+        let ti, isNew=false;
+        if(stateKeyMap.has(key)){
+          ti = stateKeyMap.get(key);
+        } else {
+          ti = states.length;
+          states.push(target);
+          stateKeyMap.set(key, ti);
+          transitions.push({});
+          newFrontier.push(ti);
+          isNew = true;
+        }
+        transitions[idx][X] = ti;
+        buildLog.push({type:'goto', from: idx, symbol: X, to: ti, isNew, items: target});
+      }
+    }
+    frontier = newFrontier;
+  }
+
+  const actionTable = states.map(()=>({}));
+  const gotoTable = states.map(()=>({}));
+
+  states.forEach((items, i)=>{
+    Object.entries(transitions[i]).forEach(([sym, target])=>{
+      if(nonterminals.has(sym)) gotoTable[i][sym] = target;
+      else {
+        actionTable[i][sym] = actionTable[i][sym] || [];
+        actionTable[i][sym].push({type:'shift', target});
+      }
+    });
+    items.forEach(it=>{
+      const prod = allProds[it.p];
+      if(it.dot === prod.rhs.length){
+        if(prod.lhs === augStart){
+          actionTable[i]['$'] = actionTable[i]['$'] || [];
+          actionTable[i]['$'].push({type:'accept'});
+        } else {
+          terminals.concat(['$']).forEach(t=>{
+            actionTable[i][t] = actionTable[i][t] || [];
+            actionTable[i][t].push({type:'reduce', prod: it.p});
+          });
+        }
+      }
+    });
+  });
+
+  const conflicts = [];
+  states.forEach((items,i)=>{
+    Object.entries(actionTable[i]).forEach(([sym, acts])=>{
+      if(acts.length>1) conflicts.push({state:i, symbol:sym, actions:acts});
+    });
+  });
+
+  return {allProds, nonterminals, terminals, states, transitions, actionTable, gotoTable, conflicts, closureSteps, itemKey, itemsKey, augStart};
+}
+
+function itemToString(auto, it){
+  const prod = auto.allProds[it.p];
+  const rhs = [...prod.rhs];
+  rhs.splice(it.dot, 0, '•');
+  return `${prod.lhs} → ${rhs.length? rhs.join(' ') : '•'}`;
+}
+function prodToString(auto, idx){
+  const prod = auto.allProds[idx];
+  return `${prod.lhs} → ${prod.rhs.join(' ')}`;
+}
+
+/* ---------- Table-driven LR(0) parse with full step trace ---------- */
+function parseWithLR0(auto, tokens){
+  const input = [...tokens, '$'];
+  let pos = 0;
+  const stateStack = [0];
+  const symStack = [];
+  const steps = [];
+  let guard = 0;
+
+  while(guard++ < 500){
+    const state = stateStack[stateStack.length-1];
+    const word = input[pos];
+    const acts = (auto.actionTable[state] && auto.actionTable[state][word]) || [];
+    if(acts.length === 0){
+      steps.push({
+        type:'reject', state, word, pos,
+        stackSym:[...symStack], stackState:[...stateStack],
+        remaining: input.slice(pos, -1),
+        reason: `ACTION[I${state}, "${word}"] is blank — no legal shift or reduce here.`
+      });
+      return {accepted:false, steps};
+    }
+    let chosen = acts.find(a=>a.type==='shift') || acts[0];
+    const conflict = acts.length>1;
+
+    if(chosen.type === 'shift'){
+      steps.push({
+        type:'shift', state, word, target: chosen.target, pos,
+        stackSym:[...symStack], stackState:[...stateStack],
+        remaining: input.slice(pos, -1), conflict, allActions: acts
+      });
+      symStack.push(word);
+      stateStack.push(chosen.target);
+      pos++;
+    } else if(chosen.type === 'reduce'){
+      const prod = auto.allProds[chosen.prod];
+      const d = prod.rhs.length;
+      const poppedSym = symStack.slice(symStack.length-d);
+      const poppedState = stateStack.slice(stateStack.length-d);
+      for(let k=0;k<d;k++){ symStack.pop(); stateStack.pop(); }
+      const under = stateStack[stateStack.length-1];
+      const gotoTarget = auto.gotoTable[under] ? auto.gotoTable[under][prod.lhs] : undefined;
+      steps.push({
+        type:'reduce', state, word, prod: chosen.prod, pos,
+        stackSym:[...symStack, ...poppedSym], stackState:[...stateStack, ...poppedState],
+        poppedSym, poppedState, under, gotoTarget, lhs: prod.lhs,
+        remaining: input.slice(pos, -1), conflict, allActions: acts
+      });
+      symStack.push(prod.lhs);
+      if(gotoTarget === undefined){
+        steps.push({type:'reject', reason:`GOTO(I${under}, ${prod.lhs}) is undefined.`, stackSym:[...symStack], stackState:[...stateStack]});
+        return {accepted:false, steps};
+      }
+      stateStack.push(gotoTarget);
+    } else if(chosen.type === 'accept'){
+      steps.push({
+        type:'accept', state, word, pos,
+        stackSym:[...symStack], stackState:[...stateStack],
+        remaining: [], conflict, allActions: acts
+      });
+      return {accepted:true, steps};
+    }
+  }
+  steps.push({type:'reject', reason:'Parser did not terminate (possible grammar issue).'});
+  return {accepted:false, steps};
+}
+
+/* ---------- Simple predictive top-down parser (shallow 2-level grammars) ---------- */
+/* Grammar shape assumed: each nonterminal has one or more productions;
+   "leaf" productions (rhs length 1, a terminal) are chosen by matching the
+   current input word; nonterminals with a single production always expand. */
+function topDownParse(grammarRules, startSymbol, tokens, terminalSet){
+  const trace = [];
+  let form = [startSymbol];
+  let pos = 0;
+  trace.push({form:[...form], rule:'— (start symbol)', check:'begin derivation'});
+
+  function isTerminal(sym){ return terminalSet.has(sym); }
+
+  let guard = 0;
+  while(guard++ < 200){
+    const idx = form.findIndex(s=>!isTerminal(s));
+    if(idx === -1) break; // all terminals now
+    const sym = form[idx];
+    const options = grammarRules[sym];
+    if(!options){
+      trace.push({form:[...form], rule:`no rule for ${sym}`, check:'✗ dead end', fail:true});
+      return {accepted:false, trace};
+    }
+    let chosen = null;
+    if(options.length === 1){
+      chosen = options[0];
+    } else {
+      // pick alternative whose rhs is exactly one terminal equal to the word this position will need
+      // find how many terminals are already consumed before idx to know which input word we're predicting
+      const consumedBefore = form.slice(0, idx).filter(s=>isTerminal(s)).length;
+      const targetWord = tokens[consumedBefore];
+      chosen = options.find(o => o.length===1 && isTerminal(o[0]) && o[0]===targetWord);
+      if(!chosen){
+        trace.push({form:[...form], rule:`${sym} → (no alternative matches "${targetWord||'∅'}")`, check:`✗ predicted none of {${options.map(o=>o.join(' ')).join(' | ')}} match input`, fail:true});
+        return {accepted:false, trace};
+      }
+    }
+    const newForm = [...form.slice(0,idx), ...chosen, ...form.slice(idx+1)];
+    const ruleStr = `${sym} → ${chosen.join(' ')}`;
+    form = newForm;
+    // now check any newly-terminal symbol at position idx against input, left to right consuming
+    let checkMsgs = [];
+    let localFail = false;
+    // recompute consumed count and verify all terminals so far are in-order
+    let consumed = 0;
+    for(let i=0;i<form.length;i++){
+      if(isTerminal(form[i])){
+        if(consumed < tokens.length && form[i]===tokens[consumed]){
+          consumed++;
+        } else if(consumed < tokens.length){
+          localFail = true;
+          checkMsgs.push(`✗ predicted "${form[i]}", but input word ${consumed+1} = "${tokens[consumed]}"`);
+          break;
+        } else {
+          localFail = true;
+          checkMsgs.push(`✗ predicted "${form[i]}", but input has ended`);
+          break;
+        }
+      } else break; // stop at first remaining nonterminal
+    }
+    if(localFail){
+      trace.push({form:[...form], rule:ruleStr, check:checkMsgs.join(' '), fail:true});
+      return {accepted:false, trace};
+    }
+    const justMatched = chosen.length===1 && isTerminal(chosen[0]) ? `✓ "${chosen[0]}" = input word ${consumed}` : 'expand';
+    trace.push({form:[...form], rule:ruleStr, check: options.length>1? justMatched : 'expand'});
+  }
+  // all terminal now — compare full form to tokens
+  const allTerms = form;
+  let ok = allTerms.length === tokens.length && allTerms.every((t,i)=>t===tokens[i]);
+  if(ok){
+    trace[trace.length-1].check += ' → ACCEPT';
+    trace[trace.length-1].accept = true;
+  } else {
+    trace.push({form:[...form], rule:'(final check)', check: allTerms.length!==tokens.length ? `✗ length mismatch: derived ${allTerms.length} words, input has ${tokens.length}` : '✗ mismatch', fail:true});
+    return {accepted:false, trace};
+  }
+  return {accepted:true, trace};
+}
+
+/* ---------- Simple stack shift-reduce driver (symbol-only display) ---------- */
+/* Uses an LR(0) automaton under the hood to make correct decisions, but the
+   caller only shows the SYMBOL stack (like the deck's "[Det] [NP] ..." trace),
+   matching the manual shift-reduce presentation style. */
+function shiftReduceTrace(auto, tokens){
+  const r = parseWithLR0(auto, tokens);
+  // convert into a simplified [stack] / remaining-input / action log
+  const out = [];
+  r.steps.forEach(s=>{
+    if(s.type==='shift'){
+      out.push({stack:[...s.stackSym, s.word], remaining: s.remaining.slice(1), action:`SHIFT "${s.word}"`, kind:'shift'});
+    } else if(s.type==='reduce'){
+      const prod = auto.allProds[s.prod];
+      out.push({stack:[...s.stackSym.slice(0,s.stackSym.length-s.poppedSym.length), s.lhs], remaining: s.remaining, action:`REDUCE ${prod.lhs}→${prod.rhs.join(' ')}`, kind:'reduce'});
+    } else if(s.type==='accept'){
+      out.push({stack:[...s.stackSym], remaining: [], action:`ACCEPT ✓`, kind:'accept'});
+    } else if(s.type==='reject'){
+      out.push({stack:[...(s.stackSym||[])], remaining: s.remaining||[], action:`REJECT — ${s.reason}`, kind:'reject'});
+    }
+  });
+  return {accepted:r.accepted, steps:out};
+}
+
+</script>
+<script>
+/* ============================================================
+   GRAMMAR DATA + STEPPERS + UI  (added next)
+   ============================================================ */
+/* ============================================================
+   GRAMMAR DATA
+   ============================================================ */
+const SVO_GRAMMAR = {
+  S:[['NP','VP']], NP:[['Det','N']], VP:[['V','N']],
+  Det:[['the'],['a']], N:[['cat'],['ball'],['boy'],['girl'],['dog'],['book']],
+  V:[['chased'],['reads'],['likes'],['sees']]
+};
+const SVO_TERMS = new Set(['the','a','cat','ball','boy','girl','dog','book','chased','reads','likes','sees']);
+const SVO_NONTERMS = ['S','NP','VP','Det','N','V'];
+
+function svoProdList(){
+  const out = [];
+  SVO_NONTERMS.forEach(nt=> SVO_GRAMMAR[nt].forEach(rhs=> out.push({lhs:nt, rhs})));
+  return out;
+}
+
+const GRAMMARS = {
+  english: {
+    key:'english', name:'English (ambiguous NBar)', flag:'🇬🇧',
+    productions:[
+      {lhs:'S', rhs:['NP','VP']},
+      {lhs:'NP', rhs:['Det','NBar']},
+      {lhs:'NBar', rhs:['Adj']},
+      {lhs:'NBar', rhs:['Noun']},
+      {lhs:'NBar', rhs:['Adj','Noun']},
+      {lhs:'VP', rhs:['Verb']},
+      {lhs:'VP', rhs:['Verb','NP']},
+    ],
+    start:'S',
+    vocab:{Det:['the','a'], Adj:['old','big','good','small'], Noun:['man','ship','dog','cat','book'], Verb:['barks','chases','likes','reads']},
+    blurb:"The deck's own running example — genuinely ambiguous on purpose (NBar can be Adj, Noun, or Adj+Noun).",
+    presets:[
+      {label:'"the old man a ship" — tricky ACCEPT', words:['the','old','man','a','ship'], tokens:['Det','Adj','Verb','Det','Noun']},
+      {label:'"the dog barks" — ACCEPT', sentence:'the dog barks'},
+      {label:'"the big dog barks" — ACCEPT', sentence:'the big dog barks'},
+      {label:'"the dog chases a cat" — ACCEPT', sentence:'the dog chases a cat'},
+      {label:'"the ship" — REJECT (no VP)', sentence:'the ship'},
+      {label:'"old man a ship" — REJECT (bad start)', words:['old','man','a','ship'], tokens:['Adj','Verb','Det','Noun']},
+    ]
+  },
+  svo: {
+    key:'svo', name:'Simple SVO (no conflicts)', flag:'🟢',
+    productions: svoProdList(),
+    start:'S',
+    vocab:{Det:['the','a'], N:['cat','ball','boy','girl','dog','book'], V:['chased','reads','likes','sees']},
+    blurb:"S→NP VP, NP→Det N, VP→V N — completely deterministic, zero conflicts. A clean contrast to the English grammar.",
+    presets:[
+      {label:'"the cat chased ball" — ACCEPT', sentence:'the cat chased ball'},
+      {label:'"a boy reads book" — ACCEPT', sentence:'a boy reads book'},
+      {label:'"boy reads a book" — REJECT (bad start)', sentence:'boy reads a book'},
+    ]
+  },
+  arithmetic: {
+    key:'arithmetic', name:'Arithmetic Expressions', flag:'➕',
+    productions:[
+      {lhs:'E', rhs:['E','+','T']},
+      {lhs:'E', rhs:['T']},
+      {lhs:'T', rhs:['T','*','F']},
+      {lhs:'T', rhs:['F']},
+      {lhs:'F', rhs:['(','E',')']},
+      {lhs:'F', rhs:['id']},
+    ],
+    start:'E',
+    vocab:{'id':['x','y','z','n','num']},
+    catchAllCategory:'id',
+    blurb:"The classic compiler-theory grammar for E + T * F. Recursion on the left makes for a meatier automaton — and LR(0) alone can't fully resolve it either!",
+    presets:[
+      {label:'"id + id * id" — ACCEPT', sentence:'id + id * id'},
+      {label:'"( id + id ) * id" — ACCEPT', sentence:'( id + id ) * id'},
+      {label:'"id +" — REJECT (dangling operator)', sentence:'id +'},
+    ]
+  },
+  hindi: {
+    key:'hindi', name:'Hindi (transliterated toy)', flag:'🇮🇳',
+    productions:[
+      {lhs:'S', rhs:['NP','VP']},
+      {lhs:'NP', rhs:['Det','N']},
+      {lhs:'VP', rhs:['V']},
+      {lhs:'VP', rhs:['V','NP']},
+    ],
+    start:'S',
+    vocab:{Det:['yeh','voh'], N:['ladka','kitab','kutta','ladki'], V:['khata','padhta','bhagta','dekhta']},
+    blurb:"A toy SOV-flavoured grammar using transliterated Hindi words — same LR(0) machinery, different vocabulary entirely.",
+    presets:[
+      {label:'"yeh ladka bhagta" — ACCEPT', sentence:'yeh ladka bhagta'},
+      {label:'"voh kutta dekhta yeh kitab" — ACCEPT', sentence:'voh kutta dekhta yeh kitab'},
+      {label:'"ladka bhagta" — REJECT (bad start)', sentence:'ladka bhagta'},
+    ]
+  },
+  list: {
+    key:'list', name:'Recursive List (self-loop demo)', flag:'🔁',
+    productions:[
+      {lhs:'List', rhs:['List',',','id']},
+      {lhs:'List', rhs:['id']},
+    ],
+    start:'List',
+    vocab:{'id':['a','b','c','x','y']},
+    catchAllCategory:'id',
+    blurb:"Left recursion, on purpose — watch a state loop back into itself, exactly like Example 3's A→aA earlier.",
+    presets:[
+      {label:'"id" — ACCEPT', sentence:'id'},
+      {label:'"id , id , id" — ACCEPT', sentence:'id , id , id'},
+      {label:'", id" — REJECT (bad start)', sentence:', id'},
+    ]
+  }
+};
+
+function tokenizeWithVocab(sentence, grammar, auto){
+  const words = sentence.trim().split(/\s+/).filter(Boolean);
+  const terminalSet = new Set(auto.terminals);
+  const tokens = words.map(w=>{
+    if(terminalSet.has(w)) return w; // grammar's terminal alphabet IS literal words (e.g. SVO, arithmetic operators)
+    if(grammar.vocab){
+      for(const [cat, list] of Object.entries(grammar.vocab)){
+        if(list.includes(w) && terminalSet.has(cat)) return cat;
+      }
+    }
+    if(grammar.catchAllCategory && terminalSet.has(grammar.catchAllCategory)) return grammar.catchAllCategory;
+    return null;
+  });
+  return {words, tokens};
+}
+
+/* ============================================================
+   SHARED UI HELPERS
+   ============================================================ */
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* A simple step-through player. steps: array; renderFn(i)->html string.
+   Mounts stepbar + content into container. Returns {goto(i)}. */
+function mountStepper(container, steps, renderFn, opts={}){
+  container.innerHTML = '';
+  const bar = el('div','stepbar');
+  const prev = el('button','btn small','⬅ Prev');
+  const next = el('button','btn small','Next ➡');
+  const dots = el('div','progressdots');
+  const counter = el('div','counter');
+  steps.forEach((_,i)=>dots.appendChild(el('span','pdot')));
+  bar.append(prev,dots,counter,next);
+  const content = el('div','stepcontent');
+  container.append(bar, content);
+  let idx = 0;
+  function render(){
+    content.innerHTML = renderFn(idx, steps[idx], steps);
+    counter.textContent = `Step ${idx+1} / ${steps.length}`;
+    Array.from(dots.children).forEach((d,i)=>{
+      d.className = 'pdot' + (i<idx?' done':'') + (i===idx?' now':'');
+    });
+    prev.disabled = idx===0;
+    next.disabled = idx===steps.length-1;
+    if(opts.onRender) opts.onRender(idx);
+  }
+  prev.onclick = ()=>{ if(idx>0){idx--; render();} };
+  next.onclick = ()=>{ if(idx<steps.length-1){idx++; render();} };
+  render();
+  return { goto(i){ idx=Math.max(0,Math.min(steps.length-1,i)); render(); }, current: ()=>idx };
+}
+
+/* Build ACTION+GOTO table HTML for an LR(0) automaton, with rule numbering,
+   Si / rN notation, and optional cell highlight {state, symbol}. */
+function buildLRTableHTML(auto, opts={}){
+  const terms = auto.terminals.filter(t=>t!=='$' ? true : true);
+  const cols = [...auto.terminals, '$'].filter((v,i,a)=>a.indexOf(v)===i);
+  const nonterms = Array.from(auto.nonterminals).filter(n=>n!==auto.augStart);
+  const hi = opts.highlight; // {state, symbol}
+  let html = `<div class="tablewrap"><table class="lrtable"><thead><tr><th>State</th>`;
+  cols.forEach(c=> html += `<th>${esc(c)}</th>`);
+  nonterms.forEach(n=> html += `<th>${esc(n)}</th>`);
+  html += `</tr></thead><tbody>`;
+  auto.states.forEach((items,i)=>{
+    html += `<tr><td class="statecol">I${i}</td>`;
+    cols.forEach(c=>{
+      const acts = auto.actionTable[i][c];
+      let cellHtml = '—', cls='';
+      if(acts && acts.length){
+        cellHtml = acts.map(a=>{
+          if(a.type==='shift') return `<span class="shiftcell">S${a.target}</span>`;
+          if(a.type==='reduce') return `<span class="reducecell">r${a.prod}</span>`;
+          if(a.type==='accept') return `<span class="acceptcell">ACC</span>`;
+        }).join(' / ');
+        if(acts.length>1) cls='conflictcell';
+      }
+      const isHi = hi && hi.state===i && hi.symbol===c;
+      html += `<td class="${cls}${isHi?' cellhi':''}">${cellHtml}</td>`;
+    });
+    nonterms.forEach(n=>{
+      const g = auto.gotoTable[i][n];
+      const isHi = hi && hi.state===i && hi.symbol===n;
+      html += `<td class="${isHi?'cellhi':''}">${g!==undefined?g:'—'}</td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table></div>`;
+  return html;
+}
+
+function buildRuleListHTML(auto){
+  let html = `<div class="rulelist">`;
+  auto.allProds.forEach((p,i)=>{
+    html += `<div><span class="rn">${i}.</span>${esc(p.lhs)} → ${esc(p.rhs.join(' ')||'ε')}</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+/* Build a simple layered SVG graph of the canonical collection */
+function buildGraphSVG(auto, opts={}){
+  const n = auto.states.length;
+  // BFS layering from state 0
+  const level = new Array(n).fill(-1);
+  level[0]=0;
+  const queue=[0];
+  while(queue.length){
+    const s = queue.shift();
+    Object.values(auto.transitions[s]).forEach(t=>{
+      if(level[t]===-1){ level[t]=level[s]+1; queue.push(t); }
+    });
+  }
+  const maxLevel = Math.max(...level);
+  const byLevel = {};
+  level.forEach((l,i)=>{ (byLevel[l]=byLevel[l]||[]).push(i); });
+  const colW = 165, rowH = 96, pad=50;
+  const pos = {};
+  for(let l=0; l<=maxLevel; l++){
+    const items = byLevel[l]||[];
+    items.forEach((s,idx)=>{
+      pos[s] = { x: pad + l*colW, y: pad + idx*rowH + (idx%2? 20:0) };
+    });
+  }
+  const width = pad*2 + (maxLevel+1)*colW;
+  const height = pad*2 + Math.max(...Object.values(byLevel).map(a=>a.length))*rowH + 40;
+
+  let edges = '';
+  auto.states.forEach((_,i)=>{
+    Object.entries(auto.transitions[i]).forEach(([sym,t])=>{
+      const p1=pos[i], p2=pos[t];
+      if(!p1||!p2) return;
+      const midx=(p1.x+p2.x)/2, midy=(p1.y+p2.y)/2 - 12;
+      const isSelf = i===t;
+      if(isSelf){
+        edges += `<path class="gedge" d="M ${p1.x+18} ${p1.y-18} C ${p1.x+60} ${p1.y-60}, ${p1.x-20} ${p1.y-60}, ${p1.x-18} ${p1.y-18}" />`;
+        edges += `<text class="gedgelabel" x="${p1.x}" y="${p1.y-58}" text-anchor="middle">${esc(sym)}</text>`;
+      } else {
+        edges += `<line class="gedge" x1="${p1.x+20}" y1="${p1.y}" x2="${p2.x-20}" y2="${p2.y}" marker-end="url(#arrow)"/>`;
+        edges += `<text class="gedgelabel" x="${midx}" y="${midy}" text-anchor="middle">${esc(sym)}</text>`;
+      }
+    });
+  });
+  let nodes = '';
+  auto.states.forEach((items,i)=>{
+    const p = pos[i]; if(!p) return;
+    const isAccept = items.some(it=> auto.allProds[it.p].lhs===auto.augStart && it.dot===1);
+    const isReduce = items.some(it=> it.dot===auto.allProds[it.p].rhs.length && auto.allProds[it.p].lhs!==auto.augStart);
+    const cls = (opts.current===i)?'current':(isAccept?'accept':(isReduce?'reduce':'normal'));
+    nodes += `<g class="gnode ${cls}"><circle cx="${p.x}" cy="${p.y}" r="20"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle">I${i}</text></g>`;
+  });
+  return `<svg viewBox="0 0 ${width} ${Math.max(height,200)}" xmlns="http://www.w3.org/2000/svg" style="min-width:${width}px">
+    <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B6285"/></marker></defs>
+    ${edges}${nodes}
+  </svg>`;
+}
+
+function itemsetCardHTML(auto, idx, opts={}){
+  const items = auto.states[idx];
+  const isAccept = items.some(it=> auto.allProds[it.p].lhs===auto.augStart && it.dot===1);
+  const reduceItems = items.filter(it=> it.dot===auto.allProds[it.p].rhs.length && auto.allProds[it.p].lhs!==auto.augStart);
+  let html = `<div class="itemset-card"><div class="stateid">I${idx}${isAccept?' · ACCEPT':''}</div>`;
+  items.forEach(it=>{
+    const isNew = opts.newItems && opts.newItems.has(it.p+'.'+it.dot);
+    const isComplete = it.dot===auto.allProds[it.p].rhs.length;
+    html += `<div class="itemline${isNew?' new':''}${isComplete?' complete':''}">${esc(itemToString(auto,it))}</div>`;
+  });
+  if(reduceItems.length) html += `<div class="note">⚡ reduce state</div>`;
+  html += `</div>`;
+  return html;
+}
+
+/* ============================================================
+   TOP-DOWN PANEL
+   ============================================================ */
+function renderTopDownPanel(){
+  const panel = document.getElementById('panel-topdown');
+  panel.innerHTML = `
+  <section class="block">
+    <div class="block-head">
+      <div class="eyebrow">Part 2 · Predict First, Verify After</div>
+      <h2>⬇️ Top-Down Parsing — Guess the Rule, Then Check the Words</h2>
+      <p>Top-down parsing starts at <b>S</b> and keeps expanding non-terminals using grammar rules until only real words are left — then checks those words against the input, left to right.</p>
+    </div>
+    <div class="card">
+      <b>The logic, in 5 steps</b>
+      <div class="grid2" style="margin-top:12px;">
+        <div class="logicbox"><b>1 · Start at the top</b> — begin with S, nothing else.</div>
+        <div class="logicbox"><b>2 · Expand</b> — replace a symbol with a rule's right side.</div>
+        <div class="logicbox"><b>3 · Keep expanding</b> — repeat until only terminals remain.</div>
+        <div class="logicbox"><b>4 · Match left to right</b> — compare each terminal to the next input word the instant it appears.</div>
+      </div>
+      <div class="logicbox" style="margin-top:12px;"><b>5 · Accept or reject</b> — all terminals matched in order → ACCEPT. Any mismatch → REJECT immediately, no need to continue.</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head">
+      <div class="eyebrow">Grammar for this demo</div>
+      <h2>A small, friendly grammar</h2>
+    </div>
+    <div class="card">
+      <div class="rulelist">
+        <div>S → NP VP</div><div>NP → Det N</div><div>VP → V N</div>
+        <div>Det → the | a</div><div>N → cat | ball | boy | girl | dog | book</div>
+        <div>V → chased | reads | likes | sees</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">Worked trace</div><h2>Watch the derivation happen, one click at a time</h2></div>
+    <div class="card">
+      <div class="pillrow" id="td-preset-pills"></div>
+      <div id="td-stepper" style="margin-top:14px;"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">Try it yourself</div><h2>Type any sentence in this grammar and run it</h2></div>
+    <div class="card">
+      <div class="inputrow">
+        <input type="text" id="td-input" placeholder='e.g. "a girl likes dog"' value="the cat chased ball">
+        <button class="btn btn-primary" id="td-run">▶ Run Top-Down Parse</button>
+      </div>
+      <p class="note">Vocabulary: Det = the, a &nbsp;·&nbsp; N = cat, ball, boy, girl, dog, book &nbsp;·&nbsp; V = chased, reads, likes, sees</p>
+      <div id="td-result" style="margin-top:14px;"></div>
+    </div>
+  </section>`;
+
+  const pillrow = document.getElementById('td-preset-pills');
+  const presets = [
+    {label:'✓ the cat chased ball', s:'the cat chased ball'},
+    {label:'✓ a boy reads book', s:'a boy reads book'},
+    {label:'✓ a girl likes dog', s:'a girl likes dog'},
+    {label:'✗ boy reads a book', s:'boy reads a book'},
+  ];
+  presets.forEach(p=>{
+    const b = el('button', 'examplebtn '+(p.label[0]==='✓'?'accept':'reject'), esc(p.label));
+    b.onclick = ()=> runTopDownDemo(p.s, 'td-stepper');
+    pillrow.appendChild(b);
+  });
+  runTopDownDemo(presets[0].s, 'td-stepper');
+
+  document.getElementById('td-run').onclick = ()=>{
+    const s = document.getElementById('td-input').value.trim();
+    if(!s) return;
+    const tokens = s.split(/\s+/);
+    const res = topDownParse(SVO_GRAMMAR, 'S', tokens, SVO_TERMS);
+    document.getElementById('td-result').innerHTML = renderTopDownFullTrace(res, s);
+  };
+}
+
+function renderTopDownFullTrace(res, sentenceLabel){
+  let html = `<div class="logicbox ${res.accepted?'accept':'conflict'}"><b>${res.accepted?'✓ ACCEPT':'✗ REJECT'}</b> — "${esc(sentenceLabel)}"</div>`;
+  html += `<div class="tablewrap" style="margin-top:12px;"><table class="lrtable"><thead><tr><th>Step</th><th>Sentential Form</th><th>Rule Applied</th><th>Check Against Input</th></tr></thead><tbody>`;
+  res.trace.forEach((t,i)=>{
+    html += `<tr><td>${i+1}</td><td style="text-align:left;">${esc(t.form.join(' '))}</td><td style="text-align:left;">${esc(t.rule)}</td><td style="text-align:left;" class="${t.fail?'conflictcell':(t.accept?'acceptcell':'')}">${esc(t.check)}</td></tr>`;
+  });
+  html += `</tbody></table></div>`;
+  if(!res.accepted){
+    html += `<div class="logicbox conflict" style="margin-top:10px;"><b>Why it fails</b> — the moment a predicted terminal doesn't match the next input word (or the grammar has no alternative that could produce that word), top-down parsing stops immediately. There's no point continuing: that branch of the guess was wrong.</div>`;
+  }
+  return html;
+}
+
+function runTopDownDemo(sentence, mountId){
+  const tokens = sentence.split(/\s+/);
+  const res = topDownParse(SVO_GRAMMAR, 'S', tokens, SVO_TERMS);
+  const container = document.getElementById(mountId);
+  mountStepper(container, res.trace, (i,step)=>{
+    const isLast = i===res.trace.length-1;
+    let cls = step.fail ? 'conflict' : (step.accept ? 'accept' : '');
+    return `
+      <div class="machine" style="justify-content:center;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+          ${step.form.map(sym=> `<div class="stacktoken ${SVO_TERMS.has(sym)?'term':'nonterm'}">${esc(sym)}</div>`).join('')}
+        </div>
+      </div>
+      <div class="logicbox ${cls}"><b>Rule:</b> ${esc(step.rule)} &nbsp;·&nbsp; <b>Check:</b> ${esc(step.check)}</div>
+      <p class="note">Sentence: <span class="mono">${esc(sentence)}</span> — ${res.accepted? '✓ this derivation ACCEPTS.' : '✗ this derivation REJECTS.'}</p>
+    `;
+  });
+}
+
+/* ============================================================
+   BOTTOM-UP (SHIFT-REDUCE) PANEL
+   ============================================================ */
+let SVO_AUTO = null;
+function getSvoAuto(){ if(!SVO_AUTO) SVO_AUTO = buildLR0(svoProdList(), 'S'); return SVO_AUTO; }
+
+function renderBottomUpPanel(){
+  const panel = document.getElementById('panel-bottomup');
+  panel.innerHTML = `
+  <section class="block">
+    <div class="block-head">
+      <div class="eyebrow">Part 3 · Build Up From The Words</div>
+      <h2>⬆️ Bottom-Up & Shift-Reduce Parsing</h2>
+      <p>Bottom-up parsing looks at the actual words first and combines them upward into bigger and bigger pieces, until the whole thing collapses into <b>S</b>. Every single step is either a <b>SHIFT</b> or a <b>REDUCE</b> — that's the entire algorithm.</p>
+    </div>
+    <div class="card">
+      <div class="grid2">
+        <div class="logicbox"><b>SHIFT</b> — take the next word from the input and push it onto the stack.</div>
+        <div class="logicbox"><b>REDUCE</b> — if the top of the stack matches a rule's right side, pop those symbols and push the rule's left side instead.</div>
+      </div>
+      <p class="note" style="margin-top:8px;">Repeat SHIFT/REDUCE until the input is empty <i>and</i> the stack holds just <b>S</b> — that means ACCEPT.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">Same grammar as top-down</div><h2>Manual shift-reduce trace, stack-format</h2></div>
+    <div class="card">
+      <div class="pillrow" id="bu-preset-pills"></div>
+      <div id="bu-stepper" style="margin-top:14px;"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">Try it yourself</div><h2>Type a sentence and watch every SHIFT / REDUCE decision</h2></div>
+    <div class="card">
+      <div class="inputrow">
+        <input type="text" id="bu-input" placeholder='e.g. "a dog sees boy"' value="the ball chased cat">
+        <button class="btn btn-mint" id="bu-run">▶ Run Shift-Reduce</button>
+      </div>
+      <div id="bu-result" style="margin-top:14px;"></div>
+    </div>
+  </section>`;
+
+  const pillrow = document.getElementById('bu-preset-pills');
+  const presets = [
+    {label:'✓ the cat chased ball', s:'the cat chased ball'},
+    {label:'✓ the ball chased cat', s:'the ball chased cat'},
+    {label:'✓ a dog sees boy', s:'a dog sees boy'},
+  ];
+  presets.forEach(p=>{
+    const b = el('button','examplebtn accept', esc(p.label));
+    b.onclick = ()=> runBottomUpDemo(p.s, 'bu-stepper');
+    pillrow.appendChild(b);
+  });
+  runBottomUpDemo(presets[0].s, 'bu-stepper');
+
+  document.getElementById('bu-run').onclick = ()=>{
+    const s = document.getElementById('bu-input').value.trim();
+    if(!s) return;
+    document.getElementById('bu-result').innerHTML = '';
+    runBottomUpDemo(s, 'bu-result', true);
+  };
+}
+
+function runBottomUpDemo(sentence, mountId, standalone){
+  const tokens = sentence.split(/\s+/);
+  const bad = tokens.filter(t=>!SVO_TERMS.has(t));
+  const container = document.getElementById(mountId);
+  if(bad.length){
+    container.innerHTML = `<div class="logicbox conflict"><b>✗ Unknown word(s):</b> ${bad.map(esc).join(', ')} — not in this grammar's vocabulary.</div>`;
+    return;
+  }
+  const trace = shiftReduceTrace(getSvoAuto(), tokens);
+  mountStepper(container, trace.steps, (i, step)=>{
+    const remaining = step.remaining.length? step.remaining.join('  ') : '(empty)';
+    let cls = step.kind==='reject'?'conflict':(step.kind==='accept'?'accept':'');
+    return `
+      <div class="machine">
+        <div>
+          <div class="stacklabel">Stack</div>
+          <div class="stackzone">${step.stack.map(s=>`<div class="stacktoken ${SVO_TERMS.has(s)?'term':'nonterm'}">${esc(s)}</div>`).reverse().join('')}</div>
+        </div>
+        <div>
+          <div class="stacklabel">Remaining Input</div>
+          <div class="tapezone">${step.remaining.length? step.remaining.map((w,idx)=>`<div class="tapetoken${idx===0?' next':''}">${esc(w)}</div>`).join('') : '<span class="note">(empty)</span>'}</div>
+        </div>
+      </div>
+      <div class="logicbox ${cls}"><b>Action:</b> ${esc(step.action)}</div>
+    `;
+  });
+  if(standalone){
+    const head = el('div','logicbox '+(trace.accepted?'accept':'conflict'), `<b>${trace.accepted?'✓ ACCEPT':'✗ REJECT'}</b> — "${esc(sentence)}" ${trace.accepted? 'reduces all the way to [S] with empty input.' : 'never reaches a clean [S] / empty-input state.'}`);
+    container.prepend(head);
+  }
+}
+
+/* ============================================================
+   LR PANEL — sub-navigation + three sub-sections
+   ============================================================ */
+function renderLRPanel(){
+  const panel = document.getElementById('panel-lr');
+  panel.innerHTML = `
+  <section class="block">
+    <div class="block-head">
+      <div class="eyebrow">Part 4-7 · The Whole LR(0) Story</div>
+      <h2>🧩 LR(0) Parsing — Items, Tables, and a Working Parser</h2>
+      <p>An LR(0) item is a grammar rule with a dot • marking exactly how far we've matched. <b>CLOSURE</b> predicts what could come next; <b>GOTO</b> is the only place a symbol actually gets consumed. Together they build every state of the automaton — and the automaton becomes a table the parser can follow blindly.</p>
+    </div>
+    <div class="pillrow" id="lr-subnav"></div>
+  </section>
+  <div id="lr-sub-content"></div>`;
+
+  const tabs = [
+    {id:'fund', label:'① CLOSURE & GOTO Basics'},
+    {id:'examples', label:'② 3 Worked Examples'},
+    {id:'build', label:'③ Build & Parse a Grammar'},
+  ];
+  const nav = document.getElementById('lr-subnav');
+  tabs.forEach(t=>{
+    const b = el('button','gpick'+(t.id==='fund'?' active':''), esc(t.label));
+    b.dataset.sub = t.id;
+    b.onclick = ()=>{
+      Array.from(nav.children).forEach(c=>c.classList.remove('active'));
+      b.classList.add('active');
+      showLRSub(t.id);
+    };
+    nav.appendChild(b);
+  });
+  showLRSub('fund');
+}
+
+function showLRSub(id){
+  const content = document.getElementById('lr-sub-content');
+  if(id==='fund') renderLRFundamentals(content);
+  if(id==='examples') renderLRExamples(content);
+  if(id==='build') renderLRBuild(content);
+}
+
+/* ---------- SUB 1: Fundamentals ---------- */
+const CLOSURE_EXAMPLES = [
+  {title:'closure({S′ → •S})', body:'S is right after the dot → add S → •NP VP.', result:'{S′→•S, S→•NP VP}'},
+  {title:'closure({NP → •Det NBar})', body:'Det is a TERMINAL, not a non-terminal — nothing to expand.', result:'{NP→•Det NBar} (unchanged)'},
+  {title:'closure({S → NP•VP})', body:'VP is right after the dot → add VP→•Verb and VP→•Verb NP.', result:'3 items total'},
+  {title:'closure({VP → Verb•NP})', body:'NP is right after the dot → add NP→•Det NBar. Det is terminal, so we stop there.', result:'2 items'},
+  {title:'closure({NP → Det•NBar})', body:'NBar is right after the dot → add all 3 NBar rules: →•Adj, →•Noun, →•Adj Noun.', result:'4 items total'},
+];
+const GOTO_EXAMPLES = [
+  {title:'GOTO({S′→•S}, S)', body:'Move dot past S → S′→S•. Nothing to close (end of augmenting rule).', result:'One item, complete'},
+  {title:'GOTO({S→•NP VP}, NP)', body:'Move dot past NP → S→NP•VP. Closure adds VP\'s rules since VP is now after the dot.', result:'S→NP•VP, VP→•Verb, VP→•Verb NP'},
+  {title:'GOTO({NP→•Det NBar}, Det)', body:'Move dot past Det → NP→Det•NBar. Closure adds NBar\'s 3 rules.', result:'4 items'},
+  {title:'GOTO({NBar→•Adj, NBar→•Adj Noun}, Adj)', body:'Both items have Adj after the dot → NBar→Adj• and NBar→Adj•Noun.', result:'2 items'},
+  {title:'GOTO({VP→Verb•NP, NP→•Det NBar}, Det)', body:'Only the NP item has Det after the dot → NP→Det•NBar, then closure adds NBar\'s rules.', result:'NP→Det•NBar + 3 NBar rules'},
+];
+
+function renderLRFundamentals(mount){
+  mount.innerHTML = `
+  <section class="block">
+    <div class="grid2">
+      <div class="card">
+        <b>① CLOSURE(I) — "What else must I be expecting?"</b>
+        <p class="note">Start with the items already in I. If A → α • B β is in the set and B is a non-terminal, add B → • γ for EVERY production B → γ. Repeat until nothing new can be added. If the symbol after the dot is a TERMINAL — stop.</p>
+      </div>
+      <div class="card">
+        <b>② GOTO(I, X) — "Where do I land after reading X?"</b>
+        <p class="note">Take every item A → α • X β in I (dot right before X). Move the dot one step past X: A → α X • β. GOTO(I, X) = CLOSURE(that new set).</p>
+      </div>
+    </div>
+    <div class="logicbox" style="margin-top:14px;"><b>Building the collection:</b> start at I₀ = CLOSURE({S′→•S}). Compute GOTO for every symbol after a dot in every state. Every NEW resulting set becomes a new numbered state — repeat until nothing new appears.</div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">5 worked examples</div><h2>CLOSURE in Action</h2></div>
+    <div id="lr-closure-ex" class="card"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">5 worked examples</div><h2>GOTO in Action</h2></div>
+    <div id="lr-goto-ex" class="card"></div>
+  </section>`;
+
+  mountStepper(document.getElementById('lr-closure-ex'), CLOSURE_EXAMPLES, (i,s)=> `
+    <div class="itemset-card" style="min-width:0;">
+      <div class="stateid">${i+1}️⃣ ${esc(s.title)}</div>
+      <div class="itemline">${esc(s.body)}</div>
+    </div>
+    <div class="logicbox accept" style="margin-top:10px;"><b>Result:</b> ${esc(s.result)}</div>
+  `);
+  mountStepper(document.getElementById('lr-goto-ex'), GOTO_EXAMPLES, (i,s)=> `
+    <div class="itemset-card" style="min-width:0;">
+      <div class="stateid">${i+1}️⃣ ${esc(s.title)}</div>
+      <div class="itemline">${esc(s.body)}</div>
+    </div>
+    <div class="logicbox accept" style="margin-top:10px;"><b>Result:</b> ${esc(s.result)}</div>
+  `);
+}
+
+/* ---------- SUB 2: 3 Worked Examples ---------- */
+const WORKED_EXAMPLES = {
+  ex1: {
+    label:'Ex.1  S → A B', productions:[{lhs:'S',rhs:['A','B']},{lhs:'A',rhs:['a']},{lhs:'B',rhs:['b']}], start:'S',
+    blurb:'The simplest case — no recursion, no shared prefixes. 6 states total.'
+  },
+  ex2: {
+    label:'Ex.2  S → A B, B → b C', productions:[{lhs:'S',rhs:['A','B']},{lhs:'A',rhs:['a']},{lhs:'B',rhs:['b','C']},{lhs:'C',rhs:['c']}], start:'S',
+    blurb:'One extra production deep — B now expands to b C instead of just b. 8 states total.'
+  },
+  ex3: {
+    label:'Ex.3  S → A A (recursive)', productions:[{lhs:'S',rhs:['A','A']},{lhs:'A',rhs:['a','A']},{lhs:'A',rhs:['b']}], start:'S',
+    blurb:'The classic recursive case — watch state I₃ loop back into itself on \'a\'. 7 states total.'
+  }
+};
+
+function renderLRExamples(mount){
+  mount.innerHTML = `
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">Three grammars, worked by hand</div><h2>LR(0) Items — Closure, GOTO, and the Canonical Collection</h2></div>
+    <div class="pillrow" id="ex-pick"></div>
+    <div class="card" id="ex-grammar" style="margin-top:12px;"></div>
+  </section>
+  <section class="block">
+    <div class="block-head"><h3 style="font-size:18px;">State-by-state construction</h3></div>
+    <div class="card" id="ex-stepper"></div>
+  </section>
+  <section class="block">
+    <div class="block-head"><h3 style="font-size:18px;">Item creation graph</h3></div>
+    <div class="graphwrap" id="ex-graph"></div>
+  </section>`;
+
+  const pick = document.getElementById('ex-pick');
+  Object.entries(WORKED_EXAMPLES).forEach(([key,ex],i)=>{
+    const b = el('button','gpick'+(i===0?' active':''), esc(ex.label));
+    b.onclick = ()=>{ Array.from(pick.children).forEach(c=>c.classList.remove('active')); b.classList.add('active'); loadExample(key); };
+    pick.appendChild(b);
+  });
+  loadExample('ex1');
+
+  function loadExample(key){
+    const ex = WORKED_EXAMPLES[key];
+    const auto = buildLR0(ex.productions, ex.start);
+    document.getElementById('ex-grammar').innerHTML = `<p>${esc(ex.blurb)}</p>${buildRuleListHTML(auto)}`;
+    const stepperMount = document.getElementById('ex-stepper');
+    mountStepper(stepperMount, auto.states.map((_,i)=>i), (i)=>{
+      const newKeys = new Set();
+      // figure which transition created this state (for "why")
+      let why = i===0 ? 'Seed state — CLOSURE({S′→•S}), the augmented start item.' : 'Reached via GOTO from an earlier state on some symbol, then closed.';
+      let fromInfo = '';
+      for(let s=0;s<auto.states.length;s++){
+        Object.entries(auto.transitions[s]).forEach(([sym,t])=>{
+          if(t===i && s!==i) fromInfo = `GOTO(I${s}, ${sym}) = I${i}`;
+        });
+      }
+      const isAccept = auto.states[i].some(it=>auto.allProds[it.p].lhs===auto.augStart && it.dot===1);
+      const isReduce = auto.states[i].some(it=>it.dot===auto.allProds[it.p].rhs.length && auto.allProds[it.p].lhs!==auto.augStart);
+      let outgoing = Object.entries(auto.transitions[i]).map(([sym,t])=>`${sym}→I${t}`).join(',  ') || '(none — terminal state)';
+      return `
+        ${itemsetCardHTML(auto,i)}
+        <div class="logicbox ${isAccept?'accept':(isReduce?'':'')}">
+          <b>Why this state exists:</b> ${fromInfo? esc(fromInfo) : esc(why)}<br>
+          <b>Where it leads:</b> ${esc(outgoing)}
+          ${isAccept? '<br><b>This is the ACCEPT state.</b>' : ''}
+          ${isReduce? '<br><b>⚡ Complete item present → this is a REDUCE state.</b>' : ''}
+        </div>`;
+    }, {onRender:(i)=>{ document.getElementById('ex-graph').innerHTML = buildGraphSVG(auto, {current:i}); }});
+    document.getElementById('ex-graph').innerHTML = buildGraphSVG(auto, {current:0});
+  }
+}
+
+/* ---------- SUB 3: Build & Parse any grammar ---------- */
+function renderLRBuild(mount){
+  mount.innerHTML = `
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">Pick a grammar</div><h2>4-5 Grammars — Including English — Fully Computed Live</h2></div>
+    <div class="pillrow" id="g-pick"></div>
+    <div class="card" id="g-info" style="margin-top:12px;"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h3 style="font-size:18px;">Building the LR(0) item sets — WHY / WHAT / WHERE, one state at a time</h3></div>
+    <div class="card" id="g-stepper"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h3 style="font-size:18px;">Item creation graph</h3></div>
+    <div class="graphwrap" id="g-graph"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h3 style="font-size:18px;">The Complete LR(0) Table</h3><p>Terminals and non-terminals side by side. "Si" = shift to state i. "rN" = reduce using rule N (see numbering below). Conflicts are highlighted.</p></div>
+    <div class="card">
+      <div id="g-rules"></div>
+      <div id="g-table" style="margin-top:12px;"></div>
+      <div id="g-conflicts" style="margin-top:12px;"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><h3 style="font-size:18px;">Parse a Statement With This Table</h3></div>
+    <div class="card">
+      <div class="pillrow" id="g-preset-pills"></div>
+      <div class="inputrow">
+        <input type="text" id="g-input" placeholder="type your own sentence...">
+        <button class="btn btn-grape" id="g-run">▶ Parse With LR(0) Table</button>
+      </div>
+      <div id="g-parse-result" style="margin-top:14px;"></div>
+    </div>
+  </section>`;
+
+  const pick = document.getElementById('g-pick');
+  let currentGrammarKey = 'english';
+  Object.values(GRAMMARS).forEach((g,i)=>{
+    const b = el('button','gpick'+(g.key==='english'?' active':''), `${g.flag} ${esc(g.name)}`);
+    b.onclick = ()=>{ Array.from(pick.children).forEach(c=>c.classList.remove('active')); b.classList.add('active'); loadGrammar(g.key); };
+    pick.appendChild(b);
+  });
+  loadGrammar('english');
+
+  function loadGrammar(key){
+    currentGrammarKey = key;
+    const g = GRAMMARS[key];
+    const auto = buildLR0(g.productions, g.start);
+    document.getElementById('g-info').innerHTML = `<p>${esc(g.blurb)}</p>${buildRuleListHTML(auto)}<p class="note">Total states: <b>${auto.states.length}</b> &nbsp;·&nbsp; Conflicts: <b>${auto.conflicts.length}</b></p>`;
+
+    // item-set stepper
+    const stepperMount = document.getElementById('g-stepper');
+    mountStepper(stepperMount, auto.states.map((_,i)=>i), (i)=>{
+      let fromInfo = '';
+      for(let s=0;s<auto.states.length;s++){
+        Object.entries(auto.transitions[s]).forEach(([sym,t])=>{ if(t===i && s!==i) fromInfo = `GOTO(I${s}, ${esc(sym)}) = I${i}`; });
+      }
+      const isAccept = auto.states[i].some(it=>auto.allProds[it.p].lhs===auto.augStart && it.dot===1);
+      const isReduce = auto.states[i].some(it=>it.dot===auto.allProds[it.p].rhs.length && auto.allProds[it.p].lhs!==auto.augStart);
+      const outgoing = Object.entries(auto.transitions[i]).map(([sym,t])=>`${sym}→I${t}`).join(',  ') || '(terminal state — no outgoing transitions)';
+      const isConflict = auto.conflicts.some(c=>c.state===i);
+      return `
+        ${itemsetCardHTML(auto,i)}
+        <div class="logicbox ${isConflict?'conflict':(isAccept?'accept':'')}">
+          <b>WHY:</b> ${i===0? 'the augmented start state — every automaton begins here.' : (fromInfo? esc(fromInfo) : 'reached by GOTO from an earlier state.')}<br>
+          <b>WHERE it leads:</b> ${esc(outgoing)}
+          ${isAccept? '<br><b>✓ This is the ACCEPT state.</b>' : ''}
+          ${isReduce? '<br><b>⚡ Complete item → REDUCE state.</b>' : ''}
+          ${isConflict? '<br><b>⚠ CONFLICT here</b> — LR(0) alone can\'t decide; see the table below.' : ''}
+        </div>`;
+    }, {onRender:(i)=>{ document.getElementById('g-graph').innerHTML = buildGraphSVG(auto, {current:i}); }});
+    document.getElementById('g-graph').innerHTML = buildGraphSVG(auto, {current:0});
+
+    // table
+    document.getElementById('g-rules').innerHTML = buildRuleListHTML(auto);
+    document.getElementById('g-table').innerHTML = buildLRTableHTML(auto);
+    const cHtml = auto.conflicts.length
+      ? `<div class="logicbox conflict"><b>⚠ ${auto.conflicts.length} conflict(s) found:</b> ` + auto.conflicts.map(c=>`I${c.state} on "${esc(c.symbol)}" (${c.actions.map(a=>a.type).join(' vs ')})`).join('; ') + `. LR(0) has zero lookahead, so when a state both wants to shift AND has a complete item, it can't decide alone — this is exactly why SLR(1)/LALR(1)/LR(1) exist.</div>`
+      : `<div class="logicbox accept"><b>✓ No conflicts</b> — this grammar is fully LR(0)-parseable, no ambiguity at all.</div>`;
+    document.getElementById('g-conflicts').innerHTML = cHtml;
+
+    // presets
+    const pp = document.getElementById('g-preset-pills');
+    pp.innerHTML = '';
+    g.presets.forEach(p=>{
+      const isAccept = /ACCEPT/.test(p.label);
+      const b = el('button', 'examplebtn '+(isAccept?'accept':'reject'), esc(p.label));
+      b.onclick = ()=> runGrammarParse(g, auto, p);
+      pp.appendChild(b);
+    });
+    document.getElementById('g-input').value='';
+    document.getElementById('g-parse-result').innerHTML='';
+    if(g.presets[0]) runGrammarParse(g, auto, g.presets[0]);
+
+    document.getElementById('g-run').onclick = ()=>{
+      const sentence = document.getElementById('g-input').value.trim();
+      if(!sentence) return;
+      const {words, tokens} = tokenizeWithVocab(sentence, g, auto);
+      if(tokens.includes(null)){
+        document.getElementById('g-parse-result').innerHTML = `<div class="logicbox conflict"><b>✗ Can't tokenize:</b> word(s) not in this grammar's vocabulary: ${words.filter((w,i)=>tokens[i]===null).map(esc).join(', ')}</div>`;
+        return;
+      }
+      runGrammarParse(g, auto, {label:sentence, words, tokens});
+    };
+  }
+
+  function runGrammarParse(g, auto, preset){
+    const words = preset.words || preset.sentence.split(/\s+/);
+    let tokens = preset.tokens;
+    if(!tokens){
+      const r = tokenizeWithVocab(preset.sentence, g, auto);
+      tokens = r.tokens;
+    }
+    const result = document.getElementById('g-parse-result');
+    if(tokens.includes(null)){
+      result.innerHTML = `<div class="logicbox conflict"><b>✗ Can't tokenize this preset.</b></div>`;
+      return;
+    }
+    const r = parseWithLR0(auto, tokens);
+    result.innerHTML = `<div class="logicbox ${r.accepted?'accept':'conflict'}"><b>${r.accepted?'✓ ACCEPT':'✗ REJECT'}</b> — "${esc(words.join(' '))}"</div><div id="g-parse-stepper" style="margin-top:10px;"></div>`;
+    const stepMount = document.getElementById('g-parse-stepper');
+    mountStepper(stepMount, r.steps, (i, step)=>{
+      const stackPairs = [];
+      for(let k=0;k<step.stackState.length;k++){
+        stackPairs.push(`I${step.stackState[k]}`);
+        if(step.stackSym[k]!==undefined) stackPairs.push(step.stackSym[k]);
+      }
+      const remainingWords = words.slice(words.length - (step.remaining? step.remaining.length:0));
+      let actionText = '';
+      if(step.type==='shift') actionText = `SHIFT "${step.word}" → push it and state I${step.target}. ACTION[I${step.state}, ${esc(step.word)}] said shift.`;
+      if(step.type==='reduce') actionText = `REDUCE using rule ${step.prod}: ${esc(prodToString(auto, step.prod))}. Pop ${step.poppedSym.length} state(s)+symbol(s), push "${esc(step.lhs)}", then GOTO(I${step.under}, ${esc(step.lhs)}) = I${step.gotoTarget}.`;
+      if(step.type==='accept') actionText = `ACCEPT — the augmented item is complete and input is exhausted. Parse succeeds!`;
+      if(step.type==='reject') actionText = `REJECT — ${step.reason}`;
+      const hi = (step.type==='shift'||step.type==='reduce') ? {state:step.state, symbol: step.type==='reduce'? step.word : step.word} : null;
+      return `
+        <div class="machine">
+          <div>
+            <div class="stacklabel">Stack (state / symbol pairs)</div>
+            <div class="stackzone">${stackPairs.map(s=>{
+              const isState = /^I\d+$/.test(s);
+              return `<div class="stacktoken ${isState?'state':(auto.nonterminals.has(s)?'nonterm':'term')}">${esc(s)}</div>`;
+            }).reverse().join('')}</div>
+          </div>
+          <div>
+            <div class="stacklabel">Remaining Input</div>
+            <div class="tapezone">${remainingWords.length? remainingWords.map((w,idx)=>`<div class="tapetoken${idx===0?' next':''}">${esc(w)}</div>`).join('') : '<span class="note">(empty)</span>'}</div>
+          </div>
+        </div>
+        <div class="logicbox ${step.type==='reject'?'conflict':(step.type==='accept'?'accept':'')}"><b>Action:</b> ${actionText}${step.conflict? ' <br><b>⚠ This cell had a conflict</b> — the table lists multiple legal actions; classic LR(0) defaults to shift-over-reduce here, which is exactly the kind of ambiguity SLR/LALR/LR(1) are built to resolve.' : ''}</div>
+        ${buildLRTableHTML(auto, {highlight: hi})}
+      `;
+    });
+  }
+}
+
+/* ============================================================
+   BOOTSTRAP — main tab wiring
+   ============================================================ */
+(function(){
+  const tabbar = document.getElementById('tabbar');
+  const panels = {
+    topdown: document.getElementById('panel-topdown'),
+    bottomup: document.getElementById('panel-bottomup'),
+    lr: document.getElementById('panel-lr'),
+  };
+  let built = { topdown:false, bottomup:false, lr:false };
+
+  function showTab(key){
+    Array.from(tabbar.children).forEach(b=> b.classList.toggle('active', b.dataset.tab===key));
+    Object.entries(panels).forEach(([k,p])=> p.classList.toggle('active', k===key));
+    if(!built[key]){
+      if(key==='topdown') renderTopDownPanel();
+      if(key==='bottomup') renderBottomUpPanel();
+      if(key==='lr') renderLRPanel();
+      built[key] = true;
+    }
+  }
+
+  Array.from(tabbar.children).forEach(btn=>{
+    btn.addEventListener('click', ()=> showTab(btn.dataset.tab));
+  });
+
+  showTab('topdown');
+})();
+
+</script>
+</body>
+</html>
