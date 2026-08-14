@@ -8,21 +8,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --cream:#FFFDF7; --card:#FFFFFF; --ink:#4A4368; --ink-soft:#8B84A6;
-  --coral:#FFB4B4; --coral-d:#E8637A; --coral-bg:#FFE9EC;
-  --sun:#FFE29A; --sun-d:#D98B1F; --sun-bg:#FFF6DF;
-  --sky:#AEE6F5; --sky-d:#2A93B0; --sky-bg:#E7F9FF;
-  --grape:#D3C6FF; --grape-d:#8467E0; --grape-bg:#F2ECFF;
-  --mint:#B9F3D8; --mint-d:#2FAE7C; --mint-bg:#E6FDF2;
-  --line:#F0E9FB; --shadow-ink: rgba(180,160,220,0.28);
-  --border:#E7DFF7;
+  --cream:#FFFCF5; --card:#FFFFFF; --ink:#3D2E5C; --ink-soft:#7A6C9E;
+  --coral:#FF7A94; --coral-d:#E8365F; --coral-bg:#FFE1E9;
+  --sun:#FFCB3D; --sun-d:#C97800; --sun-bg:#FFF2CC;
+  --sky:#4FD9F0; --sky-d:#0E8FAE; --sky-bg:#D8F9FF;
+  --grape:#B79BFF; --grape-d:#7A3FE0; --grape-bg:#EEE3FF;
+  --mint:#5DECA8; --mint-d:#0D9A5F; --mint-bg:#DBFCEC;
+  --line:#F0E9FB; --shadow-ink: rgba(122,63,224,0.22);
+  --border:#EAD9FF;
 }
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 body{margin:0;
   background:
-    radial-gradient(circle at 8% 10%, var(--sky-bg) 0%, transparent 40%),
-    radial-gradient(circle at 92% 6%, var(--coral-bg) 0%, transparent 38%),
+    radial-gradient(circle at 8% 10%, var(--sky-bg) 0%, transparent 42%),
+    radial-gradient(circle at 92% 6%, var(--coral-bg) 0%, transparent 40%),
     radial-gradient(circle at 50% 95%, var(--mint-bg) 0%, transparent 42%),
     var(--cream);
   color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;}
@@ -65,7 +65,8 @@ section.block{padding:26px 0;}
 .block-head h2{font-size:25px;margin:0 0 6px;}
 .block-head p{color:var(--ink-soft);font-size:14.5px;margin:0;max-width:80ch;}
 
-.card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:22px;box-shadow:0 10px 26px var(--shadow-ink);}
+.card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding:22px;box-shadow:0 10px 26px var(--shadow-ink);transition:transform .25s ease, box-shadow .25s ease;}
+.card:hover{transform:translateY(-2px) rotate(-0.2deg);box-shadow:0 14px 32px var(--shadow-ink);}
 .card + .card{margin-top:16px;}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
@@ -221,14 +222,14 @@ footer{padding:34px 0;text-align:center;color:var(--ink-soft);font-size:12.5px;b
 @keyframes floatIn{from{transform:translateY(-14px) scale(.94);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
 
 /* ---------- ACCUMULATING ITEM-SET LIST + SIDE GRAPH ---------- */
-.accgrid2{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start;}
+.accgrid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
 @media(max-width:900px){.accgrid2{grid-template-columns:1fr;}}
 .acclist-scroll{max-height:560px;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:2px 6px 2px 2px;}
 .acc-item{transition:.3s ease;}
 .acc-item.item-done{opacity:.68;transform:scale(.99);}
 .acc-item.item-now{animation:rowIn .4s ease;}
 .acc-right{position:sticky;top:78px;display:flex;flex-direction:column;gap:12px;}
-.acc-graph .graphwrap{padding:6px;}
+.acc-graph .graphwrap{padding:6px;max-height:480px;overflow-y:auto;}
 .slidehelp{
   background:var(--grape-bg);border:2px dashed var(--grape-d);border-radius:16px;padding:12px 16px;
   max-height:230px;overflow-y:auto;font-size:12.5px;
@@ -246,11 +247,23 @@ footer{padding:34px 0;text-align:center;color:var(--ink-soft);font-size:12.5px;b
 .itag{font-family:'JetBrains Mono',monospace;font-size:9.5px;padding:1px 6px;border-radius:6px;margin-left:6px;vertical-align:middle;}
 .itag-seed{background:var(--coral-bg);color:var(--coral-d);}
 .itag-closure{background:var(--sky-bg);color:var(--sky-d);}
+.callbox{
+  margin-top:6px;background:var(--grape-bg);border:1.5px dashed var(--grape-d);border-radius:12px;
+  padding:8px 12px;font-size:12px;
+}
+.callbox .helpline{border-top:none;padding:2px 0;}
+.callbox .helpline.now{background:transparent;box-shadow:none;margin:0;padding:0;}
 .ruletext{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--ink-soft);font-weight:500;display:block;line-height:1.3;}
 .acc-row.errorrow td{background:var(--coral-bg) !important;}
 .acc-row.okrow td{background:var(--mint-bg) !important;}
 .acc-row.conflictrow td{background:var(--sky-bg) !important;}
 .altpath{margin-top:10px;}
+.calc-select, .calc-textarea{
+  width:100%;font-family:'Space Mono',monospace;font-size:13px;border:1.5px solid var(--border);
+  border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink);
+}
+.calc-textarea{resize:vertical;line-height:1.5;}
+.calc-select{font-family:'Inter',sans-serif;padding:9px 10px;}
 </style>
 </head>
 <body>
@@ -262,23 +275,33 @@ footer{padding:34px 0;text-align:center;color:var(--ink-soft);font-size:12.5px;b
       <button class="tabbtn active" data-tab="topdown">⬇️ Top-Down</button>
       <button class="tabbtn" data-tab="bottomup">⬆️ Bottom-Up</button>
       <button class="tabbtn" data-tab="lr">🧩 LR Parser</button>
+      <button class="tabbtn" data-tab="sandbox">🛠️ Your Own Grammar</button>
     </div>
   </div>
 </div>
 
 <div class="hero wrap">
   <span class="kicker">syntax analysis · blackboard mode · click your way through</span>
-  <h1>Parsers, But You're <span class="hl">Driving</span></h1>
-  <p>Every step below is generated live by an actual parsing algorithm running in your browser — not a pre-recorded gif. Click through slowly, type your own sentences, and watch exactly where a parser says yes, where it says no, and why.</p>
+  <h1>Every sentence has a <span class="hl">plot twist waiting</span> to be diagrammed.</h1>
+  <p>You know that one movie moment where the villain drops the mic with a line so clean the whole theater goes silent? That line didn't just <i>sound</i> right — it was <i>built</i> right, word slotting into word like a grammar rule clicking into place. That's syntax analysis: is this sentence legal, and if so, how did it get built? Below, you get to be the parser. Every step is generated live by an actual algorithm running in your browser — not a gif, not a screenshot. Click through slowly, type your own sentences (or grammars), and watch exactly where it says yes, where it says no, and why.</p>
 </div>
 
 <div class="wrap">
   <div id="panel-topdown" class="panel active"></div>
   <div id="panel-bottomup" class="panel"></div>
   <div id="panel-lr" class="panel"></div>
+  <div id="panel-sandbox" class="panel"></div>
 </div>
 
-<footer>Built for Syntax Analysis · LR Parsing &middot; runs entirely client-side, no data leaves your browser</footer>
+<footer>
+  <div style="max-width:640px;margin:0 auto;">
+    <div style="font-weight:800;font-family:'Baloo 2',sans-serif;color:var(--ink);font-size:14px;margin-bottom:4px;">SARVAJANIK UNIVERSITY</div>
+    <div>Sarvajanik College of Engineering and Technology · Bachelor of Technology</div>
+    <div style="margin:6px 0;">Year: B.Tech IV (Semester VII) &nbsp;·&nbsp; Subject: Natural Language Processing &nbsp;·&nbsp; Code: BTIT14706</div>
+    <div style="margin-top:10px;">Conceptualised &amp; taught by <b>Prof. Bhumika Shah</b> — <a href="https://bhumikaa7981.github.io/meet-bhumika/" target="_blank" rel="noopener">know more about her →</a></div>
+    <div style="margin-top:14px;opacity:.75;">Built for Syntax Analysis · LR Parsing &middot; runs entirely client-side, no data leaves your browser</div>
+  </div>
+</footer>
 
 <script>
 /* ============================================================
@@ -747,6 +770,18 @@ function tokenizeWithVocab(sentence, grammar, auto){
   return {words, tokens};
 }
 
+/* Friendly explainer for a failed tokenize — shown instead of a bare error */
+function vocabHelpHTML(grammar, auto){
+  if(grammar.vocab){
+    const rows = Object.entries(grammar.vocab).map(([cat,list])=>
+      `<div style="margin-bottom:4px;"><b class="mono">${esc(cat)}</b> → ${list.map(w=>`<span class="mono" style="background:var(--mint-bg);color:var(--mint-d);padding:1px 7px;border-radius:6px;margin:1px;display:inline-block;">${esc(w)}</span>`).join(' ')}</div>`
+    ).join('');
+    return `<div style="margin-top:8px;">This grammar only recognizes these words:${rows}</div>`;
+  }
+  const lits = auto.terminals.filter(t=>t!=='$');
+  return `<div style="margin-top:8px;">This grammar only recognizes these literal symbols: ${lits.map(w=>`<span class="mono" style="background:var(--mint-bg);color:var(--mint-d);padding:1px 7px;border-radius:6px;margin:1px;display:inline-block;">${esc(w)}</span>`).join(' ')}</div>`;
+}
+
 /* ============================================================
    SHARED UI HELPERS
    ============================================================ */
@@ -821,7 +856,7 @@ function mountAccTable(container, steps, opts={}){
     const errHtml = opts.errFn ? (opts.errFn(idx, steps[idx])||'') : '';
     errBox.innerHTML = errHtml ? `<div class="floaterr">${errHtml}</div>` : '';
     if(opts.onRender) opts.onRender(idx, steps[idx]);
-    requestAnimationFrame(()=>{ const last = tbody.lastElementChild; if(last) last.scrollIntoView({block:'nearest', behavior:'smooth'}); });
+    requestAnimationFrame(()=>{ const last = tbody.lastElementChild; if(last && last.scrollIntoView) last.scrollIntoView({block:'nearest', behavior:'smooth'}); });
   }
   function stop(){ if(timer){ clearInterval(timer); timer=null; play.textContent='▶ Play'; } }
   prev.onclick = ()=>{ stop(); if(idx>0){idx--; render();} };
@@ -878,7 +913,7 @@ function mountAccList(container, steps, opts={}){
     prev.disabled = idx===0;
     next.disabled = idx===steps.length-1;
     if(opts.onRender) opts.onRender(idx, steps[idx]);
-    requestAnimationFrame(()=>{ const last = leftCol.lastElementChild; if(last) last.scrollIntoView({block:'nearest', behavior:'smooth'}); });
+    requestAnimationFrame(()=>{ const last = leftCol.lastElementChild; if(last && last.scrollIntoView) last.scrollIntoView({block:'nearest', behavior:'smooth'}); });
   }
   function stop(){ if(timer){ clearInterval(timer); timer=null; play.textContent='▶ Play'; } }
   prev.onclick = ()=>{ stop(); if(idx>0){idx--; render();} };
@@ -896,6 +931,125 @@ function mountAccList(container, steps, opts={}){
 
 /* Build ACTION+GOTO table HTML for an LR(0) automaton, with rule numbering,
    Si / rN notation, and optional cell highlight {state, symbol}. */
+/* ---------- Step-by-step LR(0) TABLE BUILDER ----------
+   Renders an empty table skeleton, then fills one entry at a time on click,
+   explaining each fill underneath. Returns a controller so other UI (the
+   parse-trace stepper) can jump straight to "fully filled" and just
+   highlight a cell without disturbing the DOM structure. */
+function mountTableBuilder(container, auto, opts={}){
+  opts = Object.assign({numeric:true, showRuleText:true}, opts);
+  const termCols = [...auto.terminals.filter(t=>t!=='$'), '$'].filter((v,i,a)=>a.indexOf(v)===i);
+  const nonterms = Array.from(auto.nonterminals).filter(n=>n!==auto.augStart);
+  const lbl = i => opts.numeric ? String(i) : ('I'+i);
+
+  const steps = [];
+  auto.states.forEach((items,i)=>{
+    termCols.forEach(c=>{
+      const acts = auto.actionTable[i][c];
+      if(acts && acts.length) acts.forEach(a=> steps.push({state:i, col:c, isGoto:false, action:a}));
+    });
+    nonterms.forEach(n=>{
+      const g = auto.gotoTable[i][n];
+      if(g!==undefined) steps.push({state:i, col:n, isGoto:true, target:g});
+    });
+  });
+
+  container.innerHTML = '';
+  const bar = el('div','stepbar');
+  const prev = el('button','btn small','\u2b05 Prev');
+  const play = el('button','btn small btn-sun','\u25b6 Play');
+  const next = el('button','btn small','Next \u27a1');
+  const skip = el('button','btn small','Fill Rest \u23ed');
+  const dots = el('div','progressdots');
+  const counter = el('div','counter');
+  steps.forEach(()=>dots.appendChild(el('span','pdot')));
+  bar.append(prev, play, skip, dots, counter, next);
+
+  const tableWrap = el('div','tablewrap');
+  const table = document.createElement('table');
+  table.className = 'lrtable';
+  let theadHtml = `<thead><tr><th>${opts.numeric?'#':'State'}</th>`;
+  termCols.forEach(c=> theadHtml += `<th>${esc(c)}</th>`);
+  nonterms.forEach(n=> theadHtml += `<th>${esc(n)}</th>`);
+  theadHtml += `</tr></thead>`;
+  let tbodyHtml = `<tbody>`;
+  auto.states.forEach((_,i)=>{
+    tbodyHtml += `<tr><td class="statecol">${esc(lbl(i))}</td>`;
+    termCols.forEach(c=> tbodyHtml += `<td data-state="${i}" data-col="${esc(c)}">\u2014</td>`);
+    nonterms.forEach(n=> tbodyHtml += `<td data-state="${i}" data-col="${esc(n)}">\u2014</td>`);
+    tbodyHtml += `</tr>`;
+  });
+  tbodyHtml += `</tbody>`;
+  table.innerHTML = theadHtml + tbodyHtml;
+  tableWrap.appendChild(table);
+  const explainBox = el('div','logicbox', `\ud83d\udc49 Click <b>Next</b> to fill the first table entry\u2026`);
+  container.append(bar, tableWrap, explainBox);
+
+  function findTd(state, col){
+    return table.querySelector(`td[data-state="${state}"][data-col="${(window.CSS && CSS.escape)?CSS.escape(col):col}"]`);
+  }
+  function cellHtmlFor(step){
+    if(step.isGoto) return `<span class="mono" style="font-weight:800;">${esc(lbl(step.target))}</span>`;
+    const a = step.action;
+    if(a.type==='shift') return `<span class="shiftcell">S${esc(lbl(a.target))}</span>`;
+    if(a.type==='reduce') return `<span class="reducecell">r${a.prod}${opts.showRuleText?`<br><small class="ruletext">${esc(prodToString(auto,a.prod))}</small>`:''}</span>`;
+    if(a.type==='accept') return `<span class="acceptcell">ACC \ud83c\udfc1</span>`;
+    return '\u2014';
+  }
+  function explainFor(step, i){
+    if(step.isGoto) return `\ud83d\udccd <b>Entry ${i+1}:</b> after a <span class="mono">${esc(step.col)}</span> is fully recognized in state ${esc(lbl(step.state))}, control moves to GOTO(${esc(lbl(step.state))}, ${esc(step.col)}) = <b>${esc(lbl(step.target))}</b>. Non-terminal transitions live in the GOTO half \u2014 no S/R prefix needed.`;
+    const a = step.action;
+    if(a.type==='shift') return `\ud83d\udccd <b>Entry ${i+1}:</b> some item in ${esc(lbl(step.state))} has the dot sitting right before terminal "<span class="mono">${esc(step.col)}</span>" \u2192 <b>SHIFT</b>, move to ${esc(lbl(a.target))}. Written as <span class="mono">S${esc(lbl(a.target))}</span>.`;
+    if(a.type==='reduce') return `\ud83d\udccd <b>Entry ${i+1}:</b> ${esc(lbl(step.state))} contains the complete item <span class="mono">${esc(prodToString(auto,a.prod))}</span> \u2192 <b>REDUCE</b> using rule r${a.prod} whenever "<span class="mono">${esc(step.col)}</span>" is next. Written as <span class="mono">r${a.prod}</span>.`;
+    if(a.type==='accept') return `\ud83d\udccd <b>Entry ${i+1}:</b> ${esc(lbl(step.state))} holds the augmented item with the dot at the very end, on "$" \u2192 <b>ACCEPT</b>. That's the finish line!`;
+    return '';
+  }
+
+  let idx = -1, timer = null;
+  function paint(){
+    table.querySelectorAll('td[data-state]').forEach(td=>{ td.innerHTML='\u2014'; td.removeAttribute('data-filled'); td.classList.remove('conflictcell','cellhi'); });
+    for(let k=0;k<=idx;k++){
+      const s = steps[k];
+      const td = findTd(s.state, s.col);
+      if(!td) continue;
+      const html = cellHtmlFor(s);
+      if(td.dataset.filled==='1'){ td.innerHTML += ' / ' + html; td.classList.add('conflictcell'); }
+      else { td.innerHTML = html; td.dataset.filled='1'; }
+    }
+    if(idx>=0){
+      const s = steps[idx];
+      const td = findTd(s.state, s.col);
+      if(td){ td.classList.add('cellhi'); requestAnimationFrame(()=>{ if(td.scrollIntoView) td.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'}); }); }
+      explainBox.className = 'logicbox';
+      explainBox.innerHTML = explainFor(s, idx);
+    } else {
+      explainBox.innerHTML = `\ud83d\udc49 Click <b>Next</b> to fill the first table entry\u2026`;
+    }
+    counter.textContent = steps.length ? `Entry ${Math.max(idx+1,0)} / ${steps.length}` : 'No entries';
+    Array.from(dots.children).forEach((d,i)=>{ d.className='pdot'+(i<idx?' done':'')+(i===idx?' now':''); });
+    prev.disabled = idx<=0;
+    next.disabled = idx>=steps.length-1;
+  }
+  function stop(){ if(timer){ clearInterval(timer); timer=null; play.textContent='\u25b6 Play'; } }
+  prev.onclick = ()=>{ stop(); if(idx>0){ idx--; paint(); } else if(idx===0){ idx=-1; paint(); } };
+  next.onclick = ()=>{ stop(); if(idx<steps.length-1){ idx++; paint(); } };
+  skip.onclick = ()=>{ stop(); idx=steps.length-1; paint(); };
+  play.onclick = ()=>{
+    if(timer){ stop(); return; }
+    play.textContent = '\u23f8 Pause';
+    timer = setInterval(()=>{ if(idx<steps.length-1){ idx++; paint(); } else { stop(); } }, 650);
+  };
+  paint();
+  return {
+    completeAll(){ stop(); if(idx<steps.length-1){ idx=steps.length-1; paint(); } table.querySelectorAll('td[data-state]').forEach(td=>td.classList.remove('cellhi')); },
+    highlightCell(state, col){
+      table.querySelectorAll('td[data-state]').forEach(td=>td.classList.remove('cellhi'));
+      const td = findTd(state, col);
+      if(td) td.classList.add('cellhi');
+    }
+  };
+}
+
 function buildLRTableHTML(auto, opts={}){
   const terms = auto.terminals.filter(t=>t!=='$' ? true : true);
   const cols = [...auto.terminals, '$'].filter((v,i,a)=>a.indexOf(v)===i);
@@ -1004,8 +1158,7 @@ function buildGraphSVG(auto, opts={}){
     const pop = i===upTo ? ' style="animation:pop .5s ease"' : '';
     nodes += `<g class="gnode ${cls}"${pop}><circle cx="${p.x}" cy="${p.y}" r="20"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle">${lbl(i)}</text></g>`;
   });
-  return `<svg viewBox="0 0 ${width} ${Math.max(height,200)}" xmlns="http://www.w3.org/2000/svg" style="min-width:${width}px">
-    <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8B84A6"/></marker></defs>
+  return `<svg viewBox="0 0 ${width} ${Math.max(height,200)}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">    <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#8B84A6"/></marker></defs>
     ${edges}${nodes}
   </svg>`;
 }
@@ -1320,7 +1473,7 @@ function renderLRPanel(){
 
   const tabs = [
     {id:'fund', label:'① CLOSURE & GOTO Basics'},
-    {id:'examples', label:'② 3 Worked Examples'},
+    {id:'examples', label:'② 5 Worked Examples'},
     {id:'build', label:'③ Grammar Lab 🧪 — Build, Table & Parse'},
   ];
   const nav = document.getElementById('lr-subnav');
@@ -1360,6 +1513,55 @@ const GOTO_EXAMPLES = [
   {title:'GOTO({VP→Verb•NP, NP→•Det NBar}, Det)', body:'Only the NP item has Det after the dot → NP→Det•NBar, then closure adds NBar\'s rules.', result:'NP→Det•NBar + 3 NBar rules'},
 ];
 
+/* Parse a user-typed grammar, one rule per line: "LHS -> sym sym | sym sym"
+   Optional "start: X" line overrides the default (first LHS seen). */
+function parseGrammarText(text){
+  const lines = text.split('\n').map(l=>l.replace(/#.*/,'').trim()).filter(Boolean);
+  let startOverride = null;
+  const productions = [];
+  for(const line of lines){
+    const startMatch = line.match(/^start\s*:\s*(\S+)$/i);
+    if(startMatch){ startOverride = startMatch[1]; continue; }
+    const m = line.match(/^(\S+)\s*(?:->|\u2192|::=)\s*(.+)$/);
+    if(!m) return {error:`Couldn't read this line \u2014 use "LHS -> symbol symbol | symbol": "${esc(line)}"`};
+    const lhs = m[1];
+    const alts = m[2].split('|').map(a=>a.trim()).filter(Boolean);
+    if(!alts.length) return {error:`No right-hand side found for "${esc(lhs)}".`};
+    alts.forEach(alt=>{
+      const rhs = alt.split(/\s+/).filter(Boolean);
+      productions.push({lhs, rhs});
+    });
+  }
+  if(!productions.length) return {error:'No production rules found yet. Try something like: <span class="mono">S -&gt; N V N</span>'};
+  if(productions.length>40) return {error:"That's a lot of rules! Keep it under ~40 productions so the automaton stays snappy in your browser."};
+  const start = startOverride || productions[0].lhs;
+  const nonterms = new Set(productions.map(p=>p.lhs));
+  if(!nonterms.has(start)) return {error:`Start symbol "${esc(start)}" never appears as a left-hand side of any rule.`};
+  return {productions, start};
+}
+
+/* Parse user-typed LR(0) items against an already-built automaton, e.g.
+   "S -> . NP VP"  (the lone "." marks the dot position). Multiple items
+   can be separated by newlines or semicolons \u2014 that's a kernel set. */
+function parseItemsText(auto, text){
+  const lines = text.split(/\n|;/).map(s=>s.trim()).filter(Boolean);
+  if(!lines.length) return {error:'Enter at least one item, e.g. "S -> . NP VP"'};
+  const items = [];
+  for(const line of lines){
+    const m = line.match(/^(\S+)\s*(?:->|\u2192)\s*(.*)$/);
+    if(!m) return {error:`Couldn't read "${esc(line)}" \u2014 use LHS -> sym sym . sym (the lone "." marks the dot).`};
+    const lhs = m[1];
+    const toks = m[2].split(/\s+/).filter(Boolean);
+    const dotIdx = toks.indexOf('.');
+    if(dotIdx===-1) return {error:`No dot found in "${esc(line)}" \u2014 mark the position with a lone "." like "S -> . NP VP".`};
+    const rhs = toks.filter(t=>t!=='.');
+    const prodIdx = auto.allProds.findIndex(p=> p.lhs===lhs && p.rhs.length===rhs.length && p.rhs.every((s,i)=>s===rhs[i]));
+    if(prodIdx===-1) return {error:`No rule "${esc(lhs)} \u2192 ${esc(rhs.join(' ')||'\u03b5')}" exists in this grammar (check spelling, spacing, and symbol order).`};
+    items.push({p:prodIdx, dot:dotIdx});
+  }
+  return {items};
+}
+
 function renderLRFundamentals(mount){
   mount.innerHTML = `
   <section class="block">
@@ -1384,6 +1586,11 @@ function renderLRFundamentals(mount){
   <section class="block">
     <div class="block-head"><div class="eyebrow">5 worked examples</div><h2>GOTO in Action</h2></div>
     <div id="lr-goto-ex" class="card"></div>
+  </section>
+
+  <section class="block">
+    <div class="block-head"><div class="eyebrow">🧮 Your turn</div><h2>CLOSURE / GOTO Calculator — Type Your Own Item</h2><p>Pick a grammar, type any item you like (kernel or not), and watch CLOSURE build it out step by why-explained-step. Then push it through GOTO on any symbol.</p></div>
+    <div class="card" id="lr-calc-sandbox"></div>
   </section>`;
 
   mountStepper(document.getElementById('lr-closure-ex'), CLOSURE_EXAMPLES, (i,s)=> `
@@ -1400,6 +1607,106 @@ function renderLRFundamentals(mount){
     </div>
     <div class="logicbox accept" style="margin-top:10px;"><b>Result:</b> ${esc(s.result)}</div>
   `);
+
+  /* ---------- Roll-your-own CLOSURE / GOTO calculator ---------- */
+  const sandboxHost = document.getElementById('lr-calc-sandbox');
+  const grammarChoices = Object.assign({}, GRAMMARS, Object.fromEntries(Object.entries(WORKED_EXAMPLES).map(([k,v])=>[k,{key:k,name:v.label,productions:v.productions,start:v.start}])));
+  let calcAuto = buildLR0(GRAMMARS.svo.productions, GRAMMARS.svo.start);
+  let calcGrammarKey = 'svo';
+  let lastClosureItems = null;
+
+  sandboxHost.innerHTML = `
+    <div class="grid2">
+      <div>
+        <label class="note" style="display:block;margin-bottom:4px;">Pick a grammar to calculate against</label>
+        <select id="calc-grammar" class="calc-select"></select>
+        <div id="calc-rules" style="margin-top:10px;"></div>
+      </div>
+      <div class="callbox" style="margin-top:0;">
+        <b>✍️ Syntax to type:</b>
+        <div style="margin-top:6px;">One item per line — <span class="mono">LHS -> sym sym . sym</span>, where the lone <span class="mono">.</span> marks the dot. Multiple lines = a kernel set (they'll all be closed together).</div>
+        <div style="margin-top:6px;">Example: <span class="mono">S -> . NP VP</span></div>
+        <div style="margin-top:6px;">Example kernel (2 items): <span class="mono">NBar -> Adj .<br>NBar -> Adj . Noun</span></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;">
+      <label class="note" style="display:block;margin-bottom:4px;">Enter kernel item(s)</label>
+      <textarea id="calc-items" class="calc-textarea" rows="3" placeholder="S -> . NP VP"></textarea>
+      <div class="inputrow" style="margin-top:8px;">
+        <button class="btn btn-grape" id="calc-closure-btn">🔍 Compute CLOSURE</button>
+        <select id="calc-goto-sym"></select>
+        <button class="btn" id="calc-goto-btn">➡️ Compute GOTO on this symbol</button>
+      </div>
+    </div>
+    <div id="calc-result" style="margin-top:14px;"></div>
+  `;
+
+  const gsel = document.getElementById('calc-grammar');
+  Object.values(grammarChoices).forEach(g=>{
+    const opt = document.createElement('option');
+    opt.value = g.key; opt.textContent = (g.flag?g.flag+' ':'') + g.name;
+    gsel.appendChild(opt);
+  });
+  gsel.value = calcGrammarKey;
+
+  function refreshCalcGrammar(){
+    calcGrammarKey = gsel.value;
+    const g = grammarChoices[calcGrammarKey];
+    calcAuto = buildLR0(g.productions, g.start);
+    document.getElementById('calc-rules').innerHTML = buildRuleListHTML(calcAuto);
+    const symSel = document.getElementById('calc-goto-sym');
+    symSel.innerHTML = '';
+    const allSyms = [...calcAuto.terminals.filter(t=>t!=='$'), ...Array.from(calcAuto.nonterminals).filter(n=>n!==calcAuto.augStart)];
+    allSyms.forEach(s=>{ const o=document.createElement('option'); o.value=s; o.textContent=s; symSel.appendChild(o); });
+    document.getElementById('calc-result').innerHTML = '';
+    lastClosureItems = null;
+  }
+  gsel.onchange = refreshCalcGrammar;
+  refreshCalcGrammar();
+
+  document.getElementById('calc-closure-btn').onclick = ()=>{
+    const text = document.getElementById('calc-items').value.trim();
+    const parsed = parseItemsText(calcAuto, text);
+    const resultBox = document.getElementById('calc-result');
+    if(parsed.error){
+      resultBox.innerHTML = `<div class="floaterr">😅 <b>Hmm, that didn't parse.</b> ${parsed.error}</div>`;
+      lastClosureItems = null;
+      return;
+    }
+    const closed = calcAuto.closureSteps(parsed.items);
+    lastClosureItems = closed.result;
+    let logHtml = closed.log.length
+      ? closed.log.map(l=>`<div style="padding:3px 0;">↳ <span class="mono">${esc(l.addedBecauseOf)}</span> has a non-terminal after the dot → add <span class="mono">${esc(itemToString(calcAuto,l.added))}</span></div>`).join('')
+      : `<div>Nothing to add — every dot here is already at the end, or followed by a terminal.</div>`;
+    resultBox.innerHTML = `
+      <div class="itemset-card"><div class="stateid">CLOSURE result</div>
+        ${closed.result.map(it=>`<div class="itemline">${esc(itemToString(calcAuto,it))}</div>`).join('')}
+      </div>
+      <div class="slidehelp" style="margin-top:10px;max-height:180px;"><div class="slidehelp-title">🧭 Why each item got added</div>${logHtml}</div>`;
+  };
+
+  document.getElementById('calc-goto-btn').onclick = ()=>{
+    const resultBox = document.getElementById('calc-result');
+    if(!lastClosureItems){
+      resultBox.innerHTML = `<div class="floaterr">🙋 <b>Compute a CLOSURE first</b> — GOTO needs a starting item set to move the dot inside.</div>`;
+      return;
+    }
+    const X = document.getElementById('calc-goto-sym').value;
+    const moved = [];
+    lastClosureItems.forEach(it=>{
+      const prod = calcAuto.allProds[it.p];
+      if(prod.rhs[it.dot]===X) moved.push({p:it.p, dot:it.dot+1});
+    });
+    if(!moved.length){
+      resultBox.innerHTML += `<div class="floaterr">🚫 <b>No item has the dot right before "${esc(X)}"</b> — GOTO(I, ${esc(X)}) is undefined for this set. Try a different symbol.</div>`;
+      return;
+    }
+    const closed = calcAuto.closureSteps(moved);
+    resultBox.innerHTML += `
+      <div class="itemset-card" style="margin-top:10px;border-color:var(--sun-d);"><div class="stateid">GOTO(I, ${esc(X)}) result</div>
+        ${closed.result.map(it=>`<div class="itemline">${esc(itemToString(calcAuto,it))}</div>`).join('')}
+      </div>`;
+  };
 }
 
 /* ---------- SUB 2: 3 Worked Examples ---------- */
@@ -1415,13 +1722,21 @@ const WORKED_EXAMPLES = {
   ex3: {
     label:'Ex.3  S → A A (recursive)', productions:[{lhs:'S',rhs:['A','A']},{lhs:'A',rhs:['a','A']},{lhs:'A',rhs:['b']}], start:'S',
     blurb:'The classic recursive case — watch state I₃ loop back into itself on \'a\'. 7 states total.'
+  },
+  ex4: {
+    label:'Ex.4  E → E+E | id (conflict!)', productions:[{lhs:'E',rhs:['E','+','E']},{lhs:'E',rhs:['id']}], start:'E',
+    blurb:'Deliberately ambiguous — this genuinely creates a shift/reduce conflict on \'+\'. Perfect for seeing WHY LR(0) alone isn\'t always enough.'
+  },
+  ex5: {
+    label:'Ex.5  L → L,id | id (comma list)', productions:[{lhs:'L',rhs:['L',',','id']},{lhs:'L',rhs:['id']}], start:'L',
+    blurb:'A pattern you\'ve actually used — comma-separated lists, like function arguments. Notice it loops back through ONE state instead of growing forever.'
   }
 };
 
 function renderLRExamples(mount){
   mount.innerHTML = `
   <section class="block">
-    <div class="block-head"><div class="eyebrow">Three grammars, worked by hand</div><h2>LR(0) Items — Closure, GOTO, and the Canonical Collection</h2></div>
+    <div class="block-head"><div class="eyebrow">Five grammars, worked by hand</div><h2>LR(0) Items — Closure, GOTO, and the Canonical Collection</h2></div>
     <div class="pillrow" id="ex-pick"></div>
     <div class="card" id="ex-grammar" style="margin-top:12px;"></div>
   </section>
@@ -1450,6 +1765,7 @@ function renderLRExamples(mount){
         const outgoing = Object.entries(auto.transitions[i]).map(([sym,t])=>`${esc(sym)}→I${t}`).join(',  &nbsp; ') || '(none — terminal state)';
         return `
           ${itemsetCardHTML(auto,i,{current:isNow})}
+          <div class="callbox">${stateHelpLineHTML(auto, i, {}, true)}</div>
           <div class="logicbox ${isAccept?'accept':''}" style="margin-top:8px;">
             <b>Where I${i} leads:</b> ${outgoing}
             ${isAccept? '<br>🏁 <b>This is the ACCEPT state.</b>' : ''}
@@ -1463,6 +1779,88 @@ function renderLRExamples(mount){
 }
 
 /* ---------- SUB 3: Build & Parse any grammar ---------- */
+function describeAlternateAction(auto, step){
+  if(!step.conflict || !step.allActions || step.allActions.length<2) return '';
+  const alt = step.allActions.find(a=> a.type !== step.type) || step.allActions[1];
+  if(!alt) return '';
+  if(alt.type==='shift'){
+    return `🌱 <b>Path not taken — SHIFT:</b> push "${esc(step.word)}" and jump to state ${alt.target}. The parser would keep swallowing input instead of collapsing anything yet — could easily lead it down a dead end later.`;
+  }
+  if(alt.type==='reduce'){
+    const prod = auto.allProds[alt.prod];
+    const d = prod.rhs.length;
+    const stateStack = step.stackState;
+    const under = stateStack[stateStack.length-1-d] !== undefined ? stateStack[stateStack.length-1-d] : stateStack[0];
+    const gotoTarget = auto.gotoTable[under] ? auto.gotoTable[under][prod.lhs] : undefined;
+    return `🌱 <b>Path not taken — REDUCE:</b> ${esc(prodToString(auto,alt.prod))} — pop ${d} symbol(s), push "${esc(prod.lhs)}", then GOTO(${under}, ${esc(prod.lhs)}) = ${gotoTarget!==undefined?gotoTarget:'undefined ⚠️ (dead end)'}.`;
+  }
+  if(alt.type==='accept') return `🌱 <b>Path not taken — ACCEPT:</b> parsing would simply stop here.`;
+  return '';
+}
+
+/* Growing parse-trace table shared by Grammar Lab AND the custom-grammar sandbox.
+   opts.tableCtrl (optional): the mountTableBuilder controller for the reference
+   table above, so the current cell can light up as the trace advances. */
+function mountParseTrace(container, auto, words, tokens, opts={}){
+  const r = parseWithLR0(auto, tokens);
+  container.innerHTML = '';
+  const head = el('div','logicbox '+(r.accepted?'accept':''), `🚦 Parsing <span class="mono"><b>"${esc(words.join(' '))}"</b></span> — click <b>Next</b> to advance one SHIFT/REDUCE at a time.${opts.tableCtrl?' Watch the table above light up.':''}`);
+  container.appendChild(head);
+  const tableMount = el('div');
+  container.appendChild(tableMount);
+
+  mountAccTable(tableMount, r.steps, {
+    columns: ['Step','Stack (state · symbol)','Remaining Input','Action'],
+    rowFn: (i, step)=>{
+      const stackPairs = [];
+      for(let k=0;k<step.stackState.length;k++){
+        const isTopState = k===step.stackState.length-1;
+        stackPairs.push({v:String(step.stackState[k]), state:true, hi: isTopState && (step.type==='shift'||step.type==='reduce')});
+        if(step.stackSym[k]!==undefined) stackPairs.push({v:step.stackSym[k], state:false, hi:false});
+      }
+      const stackHtml = stackPairs.map(s=>{
+        const bg = s.hi ? 'var(--sun)' : (s.state ? 'var(--ink)' : (auto.nonterminals.has(s.v)?'var(--grape-bg)':'var(--sky-bg)'));
+        const fg = s.hi ? 'var(--sun-d)' : (s.state ? '#fff' : (auto.nonterminals.has(s.v)?'var(--grape-d)':'var(--sky-d)'));
+        return `<span class="mono" style="display:inline-block;padding:2px 8px;margin:1px;border-radius:8px;background:${bg};color:${fg};font-weight:800;${s.hi?'box-shadow:0 0 0 2px var(--sun-d);':''}">${esc(s.v)}</span>`;
+      }).join(' ');
+      const remainingWords = words.slice(words.length - (step.remaining? step.remaining.length:0));
+      const remHtml = remainingWords.length ? remainingWords.map((w,idx)=>`<span class="mono" style="display:inline-block;padding:2px 8px;margin:1px;border-radius:8px;border:1.5px dashed ${idx===0?'var(--coral-d)':'var(--ink-soft)'};color:${idx===0?'var(--coral-d)':'var(--ink-soft)'};${idx===0?'background:var(--coral-bg);font-weight:800;':''}">${esc(w)}</span>`).join(' ') : '<span class="note">(empty)</span>';
+      let actionText = '';
+      if(step.type==='shift') actionText = `⬅️ <b>SHIFT</b> "${esc(step.word)}" → push it, move to state <b>${step.target}</b>. <span class="mono">ACTION[${step.state}, ${esc(step.word)}]</span> said shift.`;
+      if(step.type==='reduce') actionText = `🔁 <b>REDUCE</b> r${step.prod}: <span class="mono">${esc(prodToString(auto, step.prod))}</span>. Pop ${step.poppedSym.length}, push "${esc(step.lhs)}", GOTO(${step.under}, ${esc(step.lhs)}) = ${step.gotoTarget}.`;
+      if(step.type==='accept') actionText = `🏁 <b>ACCEPT</b> — augmented item complete, input exhausted. Parse succeeds!`;
+      if(step.type==='reject') actionText = `🚧 <b>REJECT</b> — ${esc(step.reason||'')}`;
+      if(step.conflict) actionText += ` <span class="itag" style="background:var(--coral-bg);color:var(--coral-d);">⚠ conflict cell</span>`;
+      return [ String(i+1), stackHtml, remHtml, actionText ];
+    },
+    rowClass: (i, step)=> step.type==='reject' ? 'errorrow' : (step.type==='accept' ? 'okrow' : (step.conflict ? 'conflictrow' : '')),
+    errFn: (i, step)=>{
+      if(step.type!=='reject') return '';
+      return `😬 <b>Dead end.</b> ${esc(step.reason||'No legal action here.')} — that means this sentence isn't in the language this grammar defines (or the grammar itself is ambiguous at this point).`;
+    },
+    onRender: (i, step)=>{
+      if(opts.tableCtrl){
+        opts.tableCtrl.completeAll();
+        const hi = (step.type==='shift'||step.type==='reduce') ? {state:step.state, symbol: step.word} : null;
+        if(hi) opts.tableCtrl.highlightCell(hi.state, hi.symbol);
+      }
+      if(step.type==='accept'){ head.className='logicbox accept'; head.innerHTML = `🎉 <b>ACCEPT!</b> <span class="mono">"${esc(words.join(' '))}"</span> is valid in this grammar.`; }
+      else if(i===r.steps.length-1 && step.type==='reject'){ head.className='logicbox conflict'; head.innerHTML = `🚧 <b>REJECT</b> — <span class="mono">"${esc(words.join(' '))}"</span> isn't derivable. See the floating note below.`; }
+      else { head.className='logicbox'; head.innerHTML = `🚦 Parsing <span class="mono"><b>"${esc(words.join(' '))}"</b></span> — click <b>Next</b> to advance one SHIFT/REDUCE at a time.${opts.tableCtrl?' Watch the table above light up.':''}`; }
+      let altBox = tableMount.querySelector('.altpath');
+      if(altBox) altBox.remove();
+      if(step.conflict){
+        const altText = describeAlternateAction(auto, step);
+        if(altText){
+          const box = el('div','logicbox conflict altpath', `⚔️ <b>Shift/Reduce conflict at this cell!</b> Classic LR(0) defaults to <b>${step.type.toUpperCase()}</b> here (shift wins by convention). ${altText}`);
+          tableMount.appendChild(box);
+        }
+      }
+    }
+  });
+  return r;
+}
+
 function renderLRBuild(mount){
   mount.innerHTML = `
   <section class="block">
@@ -1476,12 +1874,12 @@ function renderLRBuild(mount){
   </section>
 
   <section class="block">
-    <div class="block-head"><h3 style="font-size:18px;">🧩 Building the LR(0) item sets — WHY / WHAT / WHERE, one state at a time</h3><p>Each click grows the pile below by one new state — its twin, the state diagram, grows right along with it on the right. The dashed box tracks every CLOSURE/GOTO call as it happens.</p></div>
+    <div class="block-head"><h3 style="font-size:18px;">🧩 Building the LR(0) item sets — WHY / WHAT / WHERE, one state at a time</h3><p>Each click grows the pile below by one new state (labeled I0, I1, I2… in the order it was born) — its twin, the state diagram, grows right along with it, 50/50, on the right. The function call that created it sits right underneath, highlighted.</p></div>
     <div class="card" id="g-stepper"></div>
   </section>
 
   <section class="block">
-    <div class="block-head"><h3 style="font-size:18px;">📋 The Complete LR(0) Table</h3><p>Rows are numbered states (0, 1, 2…) instead of I0/I1 — same states, plainer labels. "S3" = shift to state 3. "r1" = reduce with rule 1 (full rule printed in tiny type right under it). Conflicts glow coral.</p></div>
+    <div class="block-head"><h3 style="font-size:18px;">📋 Filling In the LR(0) Table — Entry by Entry</h3><p>Rows are numbered plainly (0, 1, 2…) instead of I0/I1. Click through and watch each cell get filled live, with the reasoning underneath — "S3" = shift to state 3, "r1" = reduce with rule 1 (full rule in tiny type right under it). Conflicts glow coral.</p></div>
     <div class="card">
       <div id="g-rules"></div>
       <div id="g-table" style="margin-top:12px;"></div>
@@ -1501,6 +1899,8 @@ function renderLRBuild(mount){
     </div>
   </section>`;
 
+  let tableCtrl = null;
+
   const pick = document.getElementById('g-pick');
   let currentGrammarKey = 'english';
   Object.values(GRAMMARS).forEach((g,i)=>{
@@ -1516,30 +1916,31 @@ function renderLRBuild(mount){
     const auto = buildLR0(g.productions, g.start);
     document.getElementById('g-info').innerHTML = `<p>${esc(g.blurb)}</p>${buildRuleListHTML(auto)}<p class="note">Total states: <b>${auto.states.length}</b> &nbsp;·&nbsp; Conflicts: <b>${auto.conflicts.length}</b></p>`;
 
-    // item-set stepper — grows downward, numeric state ids, graph + help box beside it
+    // item-set stepper — grows downward, I0/I1/I2... labels (creation order), graph + inline function-call beside/below it
     const stepperMount = document.getElementById('g-stepper');
     mountAccList(stepperMount, auto.states.map((_,i)=>i), {
       rowFn: (i, _step, isNow)=>{
         const isAccept = auto.states[i].some(it=>auto.allProds[it.p].lhs===auto.augStart && it.dot===1);
         const isReduce = auto.states[i].some(it=>it.dot===auto.allProds[it.p].rhs.length && auto.allProds[it.p].lhs!==auto.augStart);
-        const outgoing = Object.entries(auto.transitions[i]).map(([sym,t])=>`${esc(sym)}→${t}`).join(',  &nbsp; ') || '(terminal state — no outgoing transitions)';
+        const outgoing = Object.entries(auto.transitions[i]).map(([sym,t])=>`${esc(sym)}→I${t}`).join(',  &nbsp; ') || '(terminal state — no outgoing transitions)';
         const isConflict = auto.conflicts.some(c=>c.state===i);
         return `
-          ${itemsetCardHTML(auto,i,{numeric:true, current:isNow})}
+          ${itemsetCardHTML(auto,i,{current:isNow})}
+          <div class="callbox">${stateHelpLineHTML(auto, i, {}, true)}</div>
           <div class="logicbox ${isConflict?'conflict':(isAccept?'accept':'')}" style="margin-top:8px;">
-            <b>Where state ${i} leads:</b> ${outgoing}
+            <b>Where I${i} leads:</b> ${outgoing}
             ${isAccept? '<br>🏁 <b>ACCEPT state.</b>' : ''}
             ${isReduce? '<br>⚡ <b>Complete item → REDUCE state.</b>' : ''}
             ${isConflict? '<br>⚠️ <b>Conflict here</b> — LR(0) can\'t decide alone; see the table below.' : ''}
           </div>`;
       },
-      sideFn: (idx)=> `<div class="graphwrap">${buildGraphSVG(auto, {current:idx, upTo:idx, numeric:true})}</div>`,
-      helpFn: (i, _step, isNow)=> stateHelpLineHTML(auto, i, {numeric:true}, isNow)
+      sideFn: (idx)=> `<div class="graphwrap">${buildGraphSVG(auto, {current:idx, upTo:idx})}</div>`,
+      helpFn: (i, _step, isNow)=> stateHelpLineHTML(auto, i, {}, isNow)
     });
 
-    // table — numeric row ids + small full-rule text under every reduce cell
+    // table — plain numeric row ids (0,1,2…) + small full-rule text under every reduce cell, built step-by-step below
     document.getElementById('g-rules').innerHTML = buildRuleListHTML(auto);
-    document.getElementById('g-table').innerHTML = buildLRTableHTML(auto, {numeric:true, showRuleText:true});
+    tableCtrl = mountTableBuilder(document.getElementById('g-table'), auto, {numeric:true, showRuleText:true});
     const cHtml = auto.conflicts.length
       ? `<div class="logicbox conflict">⚠️ <b>${auto.conflicts.length} conflict(s) found:</b> ` + auto.conflicts.map(c=>`state ${c.state} on "${esc(c.symbol)}" (${c.actions.map(a=>a.type).join(' vs ')})`).join('; ') + `. LR(0) has zero lookahead, so when a state both wants to shift AND has a complete item, it can't decide alone — this is exactly why SLR(1)/LALR(1)/LR(1) exist.</div>`
       : `<div class="logicbox accept">✅ <b>No conflicts</b> — this grammar is fully LR(0)-parseable, no ambiguity at all.</div>`;
@@ -1555,38 +1956,19 @@ function renderLRBuild(mount){
       pp.appendChild(b);
     });
     document.getElementById('g-input').value='';
-    document.getElementById('g-parse-result').innerHTML='';
-    if(g.presets[0]) runGrammarParse(g, auto, g.presets[0]);
+    document.getElementById('g-parse-result').innerHTML = `<div class="logicbox">👆 Pick a preset above, or type your own sentence, whenever you're ready — the table above will fill itself in completely the moment you do (so make sure you've clicked through its construction first if you want to see that part step by step!).</div>`;
 
     document.getElementById('g-run').onclick = ()=>{
       const sentence = document.getElementById('g-input').value.trim();
       if(!sentence) return;
       const {words, tokens} = tokenizeWithVocab(sentence, g, auto);
       if(tokens.includes(null)){
-        document.getElementById('g-parse-result').innerHTML = `<div class="logicbox conflict"><b>✗ Can't tokenize:</b> word(s) not in this grammar's vocabulary: ${words.filter((w,i)=>tokens[i]===null).map(esc).join(', ')}</div>`;
+        const bad = words.filter((w,i)=>tokens[i]===null);
+        document.getElementById('g-parse-result').innerHTML = `<div class="logicbox conflict">🙈 <b>Can't tokenize:</b> "${bad.map(esc).join('", "')}" ${bad.length>1?"aren't words":"isn't a word"} this grammar knows about. A grammar can only recognize the exact vocabulary it was given — think of it as a strict bouncer checking a fixed guest list, not a general dictionary.${vocabHelpHTML(g, auto)}</div>`;
         return;
       }
       runGrammarParse(g, auto, {label:sentence, words, tokens});
     };
-  }
-
-  function describeAlternateAction(auto, step){
-    if(!step.conflict || !step.allActions || step.allActions.length<2) return '';
-    const alt = step.allActions.find(a=> a.type !== step.type) || step.allActions[1];
-    if(!alt) return '';
-    if(alt.type==='shift'){
-      return `🌱 <b>Path not taken — SHIFT:</b> push "${esc(step.word)}" and jump to state ${alt.target}. The parser would keep swallowing input instead of collapsing anything yet — could easily lead it down a dead end later.`;
-    }
-    if(alt.type==='reduce'){
-      const prod = auto.allProds[alt.prod];
-      const d = prod.rhs.length;
-      const stateStack = step.stackState;
-      const under = stateStack[stateStack.length-1-d] !== undefined ? stateStack[stateStack.length-1-d] : stateStack[0];
-      const gotoTarget = auto.gotoTable[under] ? auto.gotoTable[under][prod.lhs] : undefined;
-      return `🌱 <b>Path not taken — REDUCE:</b> ${esc(prodToString(auto,alt.prod))} — pop ${d} symbol(s), push "${esc(prod.lhs)}", then GOTO(${under}, ${esc(prod.lhs)}) = ${gotoTarget!==undefined?gotoTarget:'undefined ⚠️ (dead end)'}.`;
-    }
-    if(alt.type==='accept') return `🌱 <b>Path not taken — ACCEPT:</b> parsing would simply stop here.`;
-    return '';
   }
 
   function runGrammarParse(g, auto, preset){
@@ -1601,61 +1983,140 @@ function renderLRBuild(mount){
       result.innerHTML = `<div class="logicbox conflict">🙈 <b>Can't tokenize this preset.</b></div>`;
       return;
     }
-    const r = parseWithLR0(auto, tokens);
-    result.innerHTML = '';
-    const head = el('div','logicbox '+(r.accepted?'accept':''), `🚦 Parsing <span class="mono"><b>"${esc(words.join(' '))}"</b></span> — click <b>Next</b> to advance one SHIFT/REDUCE at a time. Watch the table above light up.`);
-    result.appendChild(head);
-    const tableMount = el('div');
-    result.appendChild(tableMount);
+    mountParseTrace(result, auto, words, tokens, {tableCtrl});
+  }
+}
 
-    mountAccTable(tableMount, r.steps, {
-      columns: ['Step','Stack (state · symbol)','Remaining Input','Action'],
-      rowFn: (i, step)=>{
-        const stackPairs = [];
-        for(let k=0;k<step.stackState.length;k++){
-          const isTopState = k===step.stackState.length-1;
-          stackPairs.push({v:String(step.stackState[k]), state:true, hi: isTopState && (step.type==='shift'||step.type==='reduce')});
-          if(step.stackSym[k]!==undefined) stackPairs.push({v:step.stackSym[k], state:false, hi:false});
-        }
-        const stackHtml = stackPairs.map(s=>{
-          const bg = s.hi ? 'var(--sun)' : (s.state ? 'var(--ink)' : (auto.nonterminals.has(s.v)?'var(--grape-bg)':'var(--sky-bg)'));
-          const fg = s.hi ? 'var(--sun-d)' : (s.state ? '#fff' : (auto.nonterminals.has(s.v)?'var(--grape-d)':'var(--sky-d)'));
-          return `<span class="mono" style="display:inline-block;padding:2px 8px;margin:1px;border-radius:8px;background:${bg};color:${fg};font-weight:800;${s.hi?'box-shadow:0 0 0 2px var(--sun-d);':''}">${esc(s.v)}</span>`;
-        }).join(' ');
-        const remainingWords = words.slice(words.length - (step.remaining? step.remaining.length:0));
-        const remHtml = remainingWords.length ? remainingWords.map((w,idx)=>`<span class="mono" style="display:inline-block;padding:2px 8px;margin:1px;border-radius:8px;border:1.5px dashed ${idx===0?'var(--coral-d)':'var(--ink-soft)'};color:${idx===0?'var(--coral-d)':'var(--ink-soft)'};${idx===0?'background:var(--coral-bg);font-weight:800;':''}">${esc(w)}</span>`).join(' ') : '<span class="note">(empty)</span>';
-        let actionText = '';
-        if(step.type==='shift') actionText = `⬅️ <b>SHIFT</b> "${esc(step.word)}" → push it, move to state <b>${step.target}</b>. <span class="mono">ACTION[${step.state}, ${esc(step.word)}]</span> said shift.`;
-        if(step.type==='reduce') actionText = `🔁 <b>REDUCE</b> r${step.prod}: <span class="mono">${esc(prodToString(auto, step.prod))}</span>. Pop ${step.poppedSym.length}, push "${esc(step.lhs)}", GOTO(${step.under}, ${esc(step.lhs)}) = ${step.gotoTarget}.`;
-        if(step.type==='accept') actionText = `🏁 <b>ACCEPT</b> — augmented item complete, input exhausted. Parse succeeds!`;
-        if(step.type==='reject') actionText = `🚧 <b>REJECT</b> — ${esc(step.reason||'')}`;
-        if(step.conflict) actionText += ` <span class="itag" style="background:var(--coral-bg);color:var(--coral-d);">⚠ conflict cell</span>`;
-        return [ String(i+1), stackHtml, remHtml, actionText ];
+const SANDBOX_PLACEHOLDER = `S -> N V N
+N -> the cat | a dog | the ball
+V -> chased | likes | sees
+
+# lines starting with # are ignored
+# add "start: S" on its own line if your first rule
+# isn't the one you want as the start symbol`;
+
+function renderSandboxPanel(){
+  const mount = document.getElementById('panel-sandbox');
+  mount.innerHTML = `
+  <section class="block">
+    <div class="block-head">
+      <div class="eyebrow">🛠️ Your Sandbox</div>
+      <h2>Type Any Grammar You Like — We'll Build the Whole Thing Live</h2>
+      <p>One rule per line. Same engine as everywhere else on this page — CLOSURE, GOTO, the table, and a working parser, all generated from whatever you type below.</p>
+    </div>
+    <div class="grid2">
+      <div>
+        <label class="note" style="display:block;margin-bottom:4px;">Your grammar</label>
+        <textarea id="sb-grammar" class="calc-textarea" rows="7">${esc(SANDBOX_PLACEHOLDER)}</textarea>
+        <button class="btn btn-primary" id="sb-build" style="margin-top:10px;">⚡ Build This Grammar</button>
+      </div>
+      <div class="callbox" style="margin-top:0;">
+        <b>✍️ Syntax to type:</b>
+        <div style="margin-top:6px;">One rule per line: <span class="mono">LHS -&gt; symbol symbol</span></div>
+        <div style="margin-top:6px;">Alternatives with <span class="mono">|</span>: <span class="mono">N -&gt; the cat | a dog</span></div>
+        <div style="margin-top:6px;">Any word starting with a capital letter and used as an LHS becomes a non-terminal automatically; everything else (lowercase words, +, (, ), etc.) is a literal terminal your sentence must match exactly.</div>
+        <div style="margin-top:6px;">Optional: <span class="mono">start: X</span> on its own line to force the start symbol (default = first rule's LHS).</div>
+        <div style="margin-top:6px;">Lines starting with <span class="mono">#</span> are comments.</div>
+      </div>
+    </div>
+    <div id="sb-error"></div>
+  </section>
+  <div id="sb-output"></div>`;
+
+  document.getElementById('sb-build').onclick = buildSandbox;
+  buildSandbox(); // build the placeholder grammar immediately so the page isn't empty
+
+  function buildSandbox(){
+    const text = document.getElementById('sb-grammar').value;
+    const parsed = parseGrammarText(text);
+    const errBox = document.getElementById('sb-error');
+    const outBox = document.getElementById('sb-output');
+    if(parsed.error){
+      errBox.innerHTML = `<div class="floaterr">😅 <b>Whoops!</b> ${parsed.error}</div>`;
+      outBox.innerHTML = '';
+      return;
+    }
+    errBox.innerHTML = '';
+    let auto;
+    try{
+      auto = buildLR0(parsed.productions, parsed.start);
+    } catch(e){
+      errBox.innerHTML = `<div class="floaterr">🤯 <b>This grammar broke the automaton builder:</b> ${esc(String(e.message||e))}. Try simplifying it — check for typos in symbol names.</div>`;
+      outBox.innerHTML = '';
+      return;
+    }
+    if(auto.states.length>60){
+      errBox.innerHTML = `<div class="floaterr">🐘 <b>That grammar builds ${auto.states.length} states</b> — a lot to render at once. Try trimming it down for a smoother demo.</div>`;
+    }
+
+    outBox.innerHTML = `
+      <section class="block">
+        <div class="block-head"><h3 style="font-size:18px;">📖 Your grammar, augmented</h3><p>Start symbol: <b class="mono">${esc(parsed.start)}</b> &nbsp;·&nbsp; <b>${auto.states.length}</b> states &nbsp;·&nbsp; <b>${auto.conflicts.length}</b> conflict(s)</p></div>
+        <div class="card" id="sb-rules"></div>
+      </section>
+      <section class="block">
+        <div class="block-head"><h3 style="font-size:18px;">🧩 Building the item sets — one state at a time</h3><p>Same growing pile + live 50/50 diagram + inline function calls you've seen elsewhere on this page.</p></div>
+        <div class="card" id="sb-stepper"></div>
+      </section>
+      <section class="block">
+        <div class="block-head"><h3 style="font-size:18px;">📋 Filling in the table — entry by entry</h3></div>
+        <div class="card">
+          <div id="sb-table"></div>
+          <div id="sb-conflicts" style="margin-top:12px;"></div>
+        </div>
+      </section>
+      <section class="block">
+        <div class="block-head"><h3 style="font-size:18px;">🚦 Parse your own sentence with it</h3><p>Type words using your grammar's literal terminals (lowercase words / symbols exactly as written above).</p></div>
+        <div class="card">
+          <div class="inputrow">
+            <input type="text" id="sb-input" placeholder="type a sentence in your grammar's vocabulary...">
+            <button class="btn btn-grape" id="sb-run">▶ Parse It</button>
+          </div>
+          <div id="sb-parse-result" style="margin-top:14px;"></div>
+        </div>
+      </section>`;
+
+    document.getElementById('sb-rules').innerHTML = buildRuleListHTML(auto);
+
+    const stepperMount = document.getElementById('sb-stepper');
+    mountAccList(stepperMount, auto.states.map((_,i)=>i), {
+      rowFn: (i, _step, isNow)=>{
+        const isAccept = auto.states[i].some(it=>auto.allProds[it.p].lhs===auto.augStart && it.dot===1);
+        const isReduce = auto.states[i].some(it=>it.dot===auto.allProds[it.p].rhs.length && auto.allProds[it.p].lhs!==auto.augStart);
+        const outgoing = Object.entries(auto.transitions[i]).map(([sym,t])=>`${esc(sym)}→I${t}`).join(',  &nbsp; ') || '(terminal state — no outgoing transitions)';
+        const isConflict = auto.conflicts.some(c=>c.state===i);
+        return `
+          ${itemsetCardHTML(auto,i,{current:isNow})}
+          <div class="callbox">${stateHelpLineHTML(auto, i, {}, true)}</div>
+          <div class="logicbox ${isConflict?'conflict':(isAccept?'accept':'')}" style="margin-top:8px;">
+            <b>Where I${i} leads:</b> ${outgoing}
+            ${isAccept? '<br>🏁 <b>ACCEPT state.</b>' : ''}
+            ${isReduce? '<br>⚡ <b>Complete item → REDUCE state.</b>' : ''}
+            ${isConflict? '<br>⚠️ <b>Conflict here</b> — see the table below.' : ''}
+          </div>`;
       },
-      rowClass: (i, step)=> step.type==='reject' ? 'errorrow' : (step.type==='accept' ? 'okrow' : (step.conflict ? 'conflictrow' : '')),
-      errFn: (i, step)=>{
-        if(step.type!=='reject') return '';
-        return `😬 <b>Dead end.</b> ${esc(step.reason||'No legal action here.')} — that means this sentence isn't in the language this grammar defines (or the grammar itself is ambiguous at this point).`;
-      },
-      onRender: (i, step)=>{
-        const hi = (step.type==='shift'||step.type==='reduce') ? {state:step.state, symbol: step.word} : null;
-        document.getElementById('g-table').innerHTML = buildLRTableHTML(auto, {numeric:true, showRuleText:true, highlight:hi});
-        if(step.accepted !== undefined) return;
-        if(step.type==='accept'){ head.className='logicbox accept'; head.innerHTML = `🎉 <b>ACCEPT!</b> <span class="mono">"${esc(words.join(' '))}"</span> is valid in this grammar.`; }
-        else if(i===r.steps.length-1 && step.type==='reject'){ head.className='logicbox conflict'; head.innerHTML = `🚧 <b>REJECT</b> — <span class="mono">"${esc(words.join(' '))}"</span> isn't derivable. See the floating note below.`; }
-        else { head.className='logicbox'; head.innerHTML = `🚦 Parsing <span class="mono"><b>"${esc(words.join(' '))}"</b></span> — click <b>Next</b> to advance one SHIFT/REDUCE at a time. Watch the table above light up.`; }
-        // conflict "what if the other path had been taken" explainer, floating below the table
-        let altBox = tableMount.querySelector('.altpath');
-        if(altBox) altBox.remove();
-        if(step.conflict){
-          const altText = describeAlternateAction(auto, step);
-          if(altText){
-            const box = el('div','logicbox conflict altpath', `⚔️ <b>Shift/Reduce conflict at this cell!</b> Classic LR(0) defaults to <b>${step.type.toUpperCase()}</b> here (shift wins by convention). ${altText}`);
-            tableMount.appendChild(box);
-          }
-        }
-      }
+      sideFn: (idx)=> `<div class="graphwrap">${buildGraphSVG(auto, {current:idx, upTo:idx})}</div>`,
+      helpFn: (i, _step, isNow)=> stateHelpLineHTML(auto, i, {}, isNow)
     });
+
+    const tableCtrl = mountTableBuilder(document.getElementById('sb-table'), auto, {numeric:true, showRuleText:true});
+    document.getElementById('sb-conflicts').innerHTML = auto.conflicts.length
+      ? `<div class="logicbox conflict">⚠️ <b>${auto.conflicts.length} conflict(s) found:</b> ` + auto.conflicts.map(c=>`state ${c.state} on "${esc(c.symbol)}" (${c.actions.map(a=>a.type).join(' vs ')})`).join('; ') + `. Zero lookahead strikes again.</div>`
+      : `<div class="logicbox accept">✅ <b>No conflicts</b> — your grammar is fully LR(0)-parseable.</div>`;
+
+    document.getElementById('sb-run').onclick = ()=>{
+      const sentence = document.getElementById('sb-input').value.trim();
+      if(!sentence) return;
+      const fakeGrammar = {}; // no vocab categories — sandbox grammars use literal terminals directly
+      const {words, tokens} = tokenizeWithVocab(sentence, fakeGrammar, auto);
+      const resultBox = document.getElementById('sb-parse-result');
+      if(tokens.includes(null)){
+        const bad = words.filter((w,i)=>tokens[i]===null);
+        resultBox.innerHTML = `<div class="logicbox conflict">🙈 <b>Can't tokenize:</b> "${bad.map(esc).join('", "')}" ${bad.length>1?"aren't symbols":"isn't a symbol"} your grammar defines.${vocabHelpHTML(fakeGrammar, auto)}</div>`;
+        return;
+      }
+      mountParseTrace(resultBox, auto, words, tokens, {tableCtrl});
+    };
   }
 }
 
@@ -1668,8 +2129,9 @@ function renderLRBuild(mount){
     topdown: document.getElementById('panel-topdown'),
     bottomup: document.getElementById('panel-bottomup'),
     lr: document.getElementById('panel-lr'),
+    sandbox: document.getElementById('panel-sandbox'),
   };
-  let built = { topdown:false, bottomup:false, lr:false };
+  let built = { topdown:false, bottomup:false, lr:false, sandbox:false };
 
   function showTab(key){
     Array.from(tabbar.children).forEach(b=> b.classList.toggle('active', b.dataset.tab===key));
@@ -1678,6 +2140,7 @@ function renderLRBuild(mount){
       if(key==='topdown') renderTopDownPanel();
       if(key==='bottomup') renderBottomUpPanel();
       if(key==='lr') renderLRPanel();
+      if(key==='sandbox') renderSandboxPanel();
       built[key] = true;
     }
   }
