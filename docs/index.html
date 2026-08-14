@@ -200,6 +200,8 @@
   .unit-go.secondary{ margin-top:0; color:var(--paper); display:inline-flex; align-items:center; gap:6px; }
   .unit-go.secondary::before{ content:'✦'; font-size:10px; color:var(--u-accent); }
   .unit-go.secondary:hover{ color:var(--u-accent); }
+  .unit-go.disabled{ margin-top:0; color:var(--muted); display:inline-flex; align-items:center; gap:6px; cursor:default; opacity:.7; }
+  .unit-go.disabled::before{ content:'⏳'; font-size:10px; }
 
   /* ---------- BOOKS ---------- */
   .books-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px;}
@@ -374,23 +376,31 @@
         </div>
       </div>
 
-      <a href="unit2.html" class="unit-card locked" style="--u-accent:var(--cyan); --u-glow:radial-gradient(circle at 90% 0%, rgba(0,227,255,.14), transparent 60%);">
-        <div class="unit-top"><div class="unit-icon">📝</div><div class="unit-status soon">Coming soon</div></div>
+      <div class="unit-card" style="--u-accent:var(--cyan); --u-glow:radial-gradient(circle at 90% 0%, rgba(0,227,255,.14), transparent 60%);">
+        <div class="unit-top"><div class="unit-icon">📝</div><div class="unit-status live">Live now</div></div>
         <div class="unit-n">Unit 02 · 06 hrs</div>
         <h3>Text Pre-processing</h3>
         <div class="tag">Clean the data before any intelligence begins.</div>
         <div class="unit-topics">Character / language / corpus / application dependence · Tokenization · Sentence segmentation</div>
-        <div class="unit-go">Notify me →</div>
-      </a>
+        <div class="unit-links">
+          <a href="https://drive.google.com/file/d/160M8On35OLc3qcenK-d896W5qQUwcW4_/view?usp=sharing" class="unit-go secondary" target="_blank" rel="noopener">Text Preprocessing · Lecture Notes →</a>
+          <a href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/unit02/textprep/" class="unit-go secondary" target="_blank" rel="noopener">Text Preprocessing · Learn More →</a>
+          <a href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/unit02/letstokenize/" class="unit-go" target="_blank" rel="noopener">🔍 Let's Tokenize! · Live Demo →</a>
+        </div>
+      </div>
 
-      <a href="unit3.html" class="unit-card locked" style="--u-accent:var(--violet-soft); --u-glow:radial-gradient(circle at 90% 0%, rgba(255,62,201,.14), transparent 60%);">
+      <div class="unit-card" style="--u-accent:var(--violet-soft); --u-glow:radial-gradient(circle at 90% 0%, rgba(255,62,201,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🧩</div><div class="unit-status soon">Coming soon</div></div>
         <div class="unit-n">Unit 03 · 07 hrs</div>
         <h3>Lexical & Syntactic Analysis</h3>
         <div class="tag">Teaching grammar to something that has never had a teacher.</div>
         <div class="unit-topics">Finite state morphology · LR parsing · POS tagging · Constraint-based grammars</div>
-        <div class="unit-go">Notify me →</div>
-      </a>
+        <div class="unit-links">
+          <a href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/unit03/Lexical/" class="unit-go secondary" target="_blank" rel="noopener">🔬 Lex It Out! · Lexical Analysis Demo →</a>
+          <a href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/unit3/syntaxanalysis/" class="unit-go secondary" target="_blank" rel="noopener">🌳 Parse the Sentence · Syntax Analysis Demo →</a>
+          <span class="unit-go disabled">Lecture Notes · Coming soon!</span>
+        </div>
+      </div>
 
       <a href="unit4.html" class="unit-card locked" style="--u-accent:var(--butter); --u-glow:radial-gradient(circle at 90% 0%, rgba(255,199,0,.14), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">🧠</div><div class="unit-status soon">Coming soon</div></div>
