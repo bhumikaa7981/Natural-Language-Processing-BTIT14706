@@ -1,1 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minimum Edit Distance · Click-and-Learn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lav:#B9A6F0; --lav-l:#EFE9FD; --lav-d:#6E52C9;
+  --mint:#6FDFC0; --mint-l:#E4FBF3; --mint-d:#1E9C79;
+  --peach:#FFAE8A; --peach-l:#FFEFE6; --peach-d:#E06B3E;
+  --sun:#FFD65C; --sun-l:#FFF6DA; --sun-d:#C98F00;
+  --sky:#7FD0FF; --sky-l:#E9F7FF; --sky-d:#1387B8;
+  --pink:#FF9BC4; --pink-l:#FFEAF3; --pink-d:#D95C93;
+  --ink:#332C4B; --ink-2:#4A4269; --muted:#8A82A6;
+  --paper:#FFFCF6; --card:#FFFFFF;
+  --display:'Baloo 2', sans-serif; --body:'Poppins', sans-serif; --mono:'Space Mono', monospace;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{ background:var(--paper); color:var(--ink); font-family:var(--body); line-height:1.6; overflow-x:hidden; }
+a{color:inherit;}
+.wrap{ max-width:1000px; margin:0 auto; padding:0 22px; position:relative; z-index:2; }
+img{max-width:100%;}
+::selection{ background:var(--sun); color:var(--ink); }
+
+/* floating pastel blobs */
+.blob{ position:absolute; border-radius:50%; filter:blur(2px); opacity:.55; z-index:0; pointer-events:none; }
+
+/* ---------- NAV ---------- */
+.nav{ position:sticky; top:0; z-index:60; background:rgba(255,252,246,0.88); backdrop-filter:blur(8px); border-bottom:1px solid rgba(51,44,75,0.08); }
+.nav-inner{ max-width:1000px; margin:0 auto; padding:12px 22px; display:flex; align-items:center; justify-content:space-between; }
+.brand{ font-family:var(--display); font-weight:700; font-size:16px; display:flex; align-items:center; gap:8px; }
+.brand .dot{ width:10px; height:10px; border-radius:50%; background:var(--pink); }
+.navlinks{ display:flex; gap:20px; font-size:13.5px; font-weight:600; color:var(--ink-2); }
+.navlinks a:hover{ color:var(--lav-d); }
+@media(max-width:720px){ .navlinks{ display:none; } }
+
+/* ---------- HERO ---------- */
+.hero{ position:relative; padding:64px 0 42px; overflow:hidden; }
+.eyebrow{ display:inline-block; font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--lav-d); background:var(--lav-l); padding:7px 14px; border-radius:100px; margin-bottom:16px; }
+.hero h1{ font-family:var(--display); font-weight:800; font-size:clamp(30px,5.4vw,50px); line-height:1.1; color:var(--ink); }
+.hero h1 span{ background:linear-gradient(95deg, var(--pink-d), var(--lav-d)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.hero p.sub{ font-size:17px; color:var(--ink-2); max-width:620px; margin-top:14px; }
+.hero-ctas{ display:flex; gap:12px; flex-wrap:wrap; margin-top:26px; }
+.btn{ font-family:var(--display); font-weight:700; font-size:14.5px; padding:12px 22px; border-radius:100px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px; transition:transform .15s ease, box-shadow .15s ease; }
+.btn-pink{ background:var(--pink); color:#fff; box-shadow:0 8px 18px -8px rgba(217,92,147,.6); }
+.btn-lav{ background:var(--lav); color:#fff; box-shadow:0 8px 18px -8px rgba(110,82,201,.6); }
+.btn-mint{ background:var(--mint); color:#0b4a3a; box-shadow:0 8px 18px -8px rgba(30,156,121,.5); }
+.btn-ghost{ background:#fff; color:var(--ink); border:2px solid var(--ink); }
+.btn:hover{ transform:translateY(-2px); }
+.btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
+
+/* ---------- SECTION SHARED ---------- */
+section{ padding:56px 0; position:relative; }
+.sec-eyebrow{ font-family:var(--mono); font-size:11.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--pink-d); margin-bottom:8px; }
+.sec-h2{ font-family:var(--display); font-weight:700; font-size:clamp(22px,3.2vw,30px); color:var(--ink); }
+.sec-p{ color:var(--muted); font-size:15px; margin-top:8px; max-width:640px; }
+
+/* ---------- MOVES ---------- */
+.moves-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-top:26px; }
+.move-card{ background:var(--card); border-radius:20px; padding:20px; box-shadow:0 10px 24px -14px rgba(51,44,75,.25); border:1px solid rgba(51,44,75,.06); }
+.move-card .icon{ font-size:26px; }
+.move-card h3{ font-family:var(--display); font-size:18px; margin:10px 0 6px; }
+.move-demo{ font-family:var(--mono); font-size:15px; background:var(--ink); color:#fff; border-radius:10px; padding:10px 12px; margin:10px 0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.move-demo .old{ opacity:.55; text-decoration:line-through; }
+.move-demo .new{ color:var(--sun); font-weight:700; }
+.move-card p{ font-size:13.5px; color:var(--muted); }
+
+/* ---------- GRAFFE DEMO ---------- */
+#graffe{ background:var(--lav-l); border-radius:32px; margin:0 22px; }
+#graffe .wrap{ max-width:1000px; }
+.graffe-target{ font-family:var(--display); font-weight:700; font-size:22px; margin:18px 0 6px; }
+.graffe-target span{ background:#fff; padding:6px 14px; border-radius:12px; box-shadow:0 4px 0 var(--lav); }
+.chip-row{ display:flex; flex-wrap:wrap; gap:12px; margin-top:22px; }
+.g-chip{ background:#fff; border-radius:16px; padding:14px 18px; min-width:150px; box-shadow:0 8px 20px -12px rgba(51,44,75,.35); position:relative; transition:transform .25s ease, box-shadow .25s ease; }
+.g-chip .w{ font-family:var(--mono); font-weight:700; font-size:16px; }
+.g-chip .bar-track{ height:8px; background:var(--lav-l); border-radius:100px; margin-top:10px; overflow:hidden; }
+.g-chip .bar{ height:100%; width:0%; background:var(--peach); border-radius:100px; transition:width .6s ease; }
+.g-chip .num{ font-family:var(--mono); font-size:13px; color:var(--muted); margin-top:6px; display:block; }
+.g-chip.winner{ box-shadow:0 0 0 3px var(--sun), 0 10px 24px -12px rgba(201,143,0,.5); transform:translateY(-4px); }
+.g-chip.winner .bar{ background:var(--mint); }
+.g-chip.winner::after{ content:'🏆 closest!'; position:absolute; top:-12px; right:10px; background:var(--sun); font-family:var(--display); font-size:11px; font-weight:700; padding:4px 9px; border-radius:100px; }
+
+/* ---------- TABS ---------- */
+.tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-top:22px; }
+.tab-btn{ font-family:var(--display); font-weight:700; font-size:13px; padding:9px 16px; border-radius:100px; border:2px solid transparent; background:var(--card); color:var(--ink-2); cursor:pointer; box-shadow:0 4px 10px -6px rgba(51,44,75,.25); }
+.tab-btn.active{ background:var(--ink); color:#fff; }
+.tab-panel{ display:none; margin-top:22px; }
+.tab-panel.active{ display:block; }
+
+/* ---------- DP DEMO ---------- */
+.dp-blurb{ font-size:15px; color:var(--ink-2); background:var(--sun-l); border-radius:14px; padding:12px 16px; margin-bottom:14px; }
+details.dp-formula{ margin-bottom:14px; background:#fff; border-radius:14px; padding:10px 16px; border:1px solid rgba(51,44,75,.08); }
+details.dp-formula summary{ cursor:pointer; font-family:var(--display); font-weight:700; font-size:13.5px; color:var(--lav-d); }
+details.dp-formula .fbody{ font-family:var(--mono); font-size:12.5px; color:var(--ink-2); margin-top:10px; line-height:1.9; }
+.dp-controls{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+.dp-btn{ font-family:var(--display); font-weight:700; font-size:13px; padding:9px 16px; border-radius:100px; border:none; cursor:pointer; background:var(--lav); color:#fff; }
+.dp-btn.dp-reset{ background:#fff; color:var(--ink); border:2px solid var(--ink); }
+.dp-btn.dp-backtrace{ background:var(--peach); color:#4a2712; }
+.dp-progress{ font-family:var(--mono); font-size:12px; color:var(--muted); margin-left:auto; }
+.dp-legend{ display:flex; gap:14px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-bottom:14px; }
+.dp-leg{ display:flex; align-items:center; gap:6px; }
+.sw{ width:12px; height:12px; border-radius:4px; display:inline-block; }
+.sw-diag{ background:var(--lav); } .sw-up{ background:var(--peach); } .sw-left{ background:var(--mint); }
+.dp-table-scroll{ overflow-x:auto; padding-bottom:6px; }
+table.dp-table{ border-collapse:separate; border-spacing:4px; }
+table.dp-table th, table.dp-table td{ width:42px; height:38px; text-align:center; font-family:var(--mono); font-size:14px; border-radius:8px; }
+table.dp-table th{ background:var(--lav-l); color:var(--lav-d); font-weight:700; }
+table.dp-table th.dp-corner{ background:transparent; }
+td.dp-cell{ background:#f2eff9; color:var(--muted); cursor:default; transition:transform .15s ease, box-shadow .15s ease; }
+td.dp-cell.dp-base{ background:var(--mint-l); color:var(--mint-d); font-weight:700; cursor:pointer; }
+td.dp-cell.dp-hidden{ background:#F1EEF8; color:transparent; }
+td.dp-cell.dp-frontier{ background:var(--sun-l); box-shadow:0 0 0 2px var(--sun); cursor:pointer; animation:pulse 1.1s ease-in-out infinite; }
+td.dp-cell.dp-filled{ background:#fff; color:var(--ink); font-weight:700; cursor:pointer; box-shadow:0 3px 8px -4px rgba(51,44,75,.3); }
+td.dp-cell.dp-filled:hover{ transform:translateY(-2px); }
+td.dp-cell.dp-final{ background:var(--sun); color:#5a3d00; }
+td.dp-cell.dp-path{ box-shadow:0 0 0 3px var(--pink-d); }
+@keyframes pulse{ 0%,100%{ box-shadow:0 0 0 2px var(--sun);} 50%{ box-shadow:0 0 0 6px var(--sun);} }
+.hl-diag{ outline:3px solid var(--lav-d); outline-offset:-2px; }
+.hl-up{ outline:3px solid var(--peach-d); outline-offset:-2px; }
+.hl-left{ outline:3px solid var(--mint-d); outline-offset:-2px; }
+.hl-target{ outline:3px solid var(--pink-d); outline-offset:-2px; }
+
+.dp-explain{ background:var(--card); border-radius:18px; padding:18px 20px; margin-top:16px; box-shadow:0 10px 24px -16px rgba(51,44,75,.3); min-height:70px; }
+.dp-explain-placeholder{ color:var(--muted); font-size:14px; }
+.dp-explain-title{ font-family:var(--display); font-weight:700; font-size:14.5px; margin-bottom:10px; }
+.dp-explain-grid{ display:grid; gap:8px; }
+.dp-eline{ font-size:13.5px; padding:9px 12px; border-radius:10px; background:#F7F5FC; }
+.dp-eline.hl-swatch-diag{ border-left:5px solid var(--lav); }
+.dp-eline.hl-swatch-up{ border-left:5px solid var(--peach); }
+.dp-eline.hl-swatch-left{ border-left:5px solid var(--mint); }
+.dp-verdict{ margin-top:12px; font-size:14.5px; background:var(--mint-l); color:var(--mint-d); padding:10px 14px; border-radius:10px; font-weight:600; }
+.dp-final-callout{ margin-top:12px; background:var(--sun-l); color:var(--sun-d); padding:12px 14px; border-radius:10px; font-size:14.5px; font-weight:600; }
+
+.dp-backtrace-panel{ margin-top:14px; }
+.dp-bt-list{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.dp-bt-list li{ font-family:var(--mono); font-size:13.5px; padding:9px 14px; border-radius:10px; background:#fff; box-shadow:0 4px 10px -6px rgba(51,44,75,.25); }
+.dp-bt-match{ border-left:5px solid var(--mint); }
+.dp-bt-substitute{ border-left:5px solid var(--lav); }
+.dp-bt-delete{ border-left:5px solid var(--peach); }
+.dp-bt-insert{ border-left:5px solid var(--sky); }
+.dp-bt-total{ margin-top:10px; font-weight:700; font-family:var(--display); color:var(--ink); }
+
+/* ---------- PLAYGROUND ---------- */
+#playground{ background:var(--mint-l); border-radius:32px; margin:0 22px; }
+.pg-form{ background:#fff; border-radius:22px; padding:22px; margin-top:22px; box-shadow:0 12px 28px -18px rgba(51,44,75,.35); }
+.pg-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+.pg-field{ display:flex; flex-direction:column; gap:6px; }
+.pg-field label{ font-family:var(--display); font-weight:700; font-size:12.5px; color:var(--ink-2); }
+.pg-field input{ font-family:var(--mono); font-size:16px; padding:11px 14px; border-radius:12px; border:2px solid #e4dff5; width:190px; text-transform:uppercase; }
+.pg-field input:focus{ outline:2px solid var(--lav); border-color:var(--lav); }
+.mode-toggle{ display:flex; gap:6px; background:#F4F1FB; padding:4px; border-radius:100px; }
+.mode-btn{ font-family:var(--display); font-weight:700; font-size:12.5px; padding:9px 14px; border-radius:100px; border:none; background:transparent; cursor:pointer; color:var(--muted); }
+.mode-btn.active{ background:var(--lav); color:#fff; }
+.pg-actions{ display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; align-items:center; }
+.pg-error{ color:var(--peach-d); font-size:13px; font-weight:600; margin-top:8px; display:none; }
+#pg-result{ margin-top:26px; }
+
+/* ---------- BONUS: stemming ---------- */
+#bonus{ }
+.stem-row{ display:flex; flex-wrap:wrap; gap:10px; margin-top:20px; align-items:center; }
+.stem-chip{ font-family:var(--mono); font-weight:700; font-size:13.5px; padding:10px 16px; border-radius:100px; background:var(--sky-l); color:var(--sky-d); transition:all .5s ease; }
+.stem-chip.collapsed{ background:var(--mint); color:#fff; transform:scale(1.06); }
+.stem-arrow{ font-size:18px; color:var(--muted); }
+
+/* ---------- FOOTER ---------- */
+footer{ text-align:center; padding:40px 22px 60px; }
+footer .name{ font-family:var(--display); font-weight:700; }
+footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(--muted); margin-top:4px; }
+
+.reveal{ opacity:0; transform:translateY(14px); transition:opacity .5s ease, transform .5s ease; }
+.reveal.in{ opacity:1; transform:none; }
+</style>
+</head>
+<body>
+
+<div class="blob" style="width:340px;height:340px;background:var(--sun-l);top:-120px;right:-100px;"></div>
+<div class="blob" style="width:260px;height:260px;background:var(--sky-l);top:520px;left:-120px;"></div>
+<div class="blob" style="width:300px;height:300px;background:var(--pink-l);bottom:200px;right:-140px;"></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span> Edit Distance · Click & Learn</div>
+    <div class="navlinks">
+      <a href="#moves">The 3 Moves</a>
+      <a href="#graffe">Graffe?!</a>
+      <a href="#build">Watch It Build</a>
+      <a href="#playground">Your Turn</a>
+      <a href="#bonus">Bonus</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">🧮 Unit 5 · Text Similarity</span>
+    <h1>Minimum Edit Distance,<br><span>explained by clicking stuff.</span></h1>
+    <p class="sub">Forget the wall of theory. Click a cell, see exactly why it got that number, then build your <em>own</em> table with your own words. That's the whole plan.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-pink" onclick="document.getElementById('build').scrollIntoView({behavior:'smooth'})">▶ Watch a Table Fill In</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('playground').scrollIntoView({behavior:'smooth'})">✍️ Try My Own Words</button>
+    </div>
+  </div>
+</header>
+
+<!-- THE 3 MOVES -->
+<section id="moves">
+  <div class="wrap reveal">
+    <div class="sec-eyebrow">Rule #1</div>
+    <h2 class="sec-h2">There are only 3 moves. That's it.</h2>
+    <p class="sec-p">Every single edit — no matter how fancy the words are — boils down to one of these three tiny moves.</p>
+    <div class="moves-grid">
+      <div class="move-card">
+        <div class="icon">➕</div>
+        <h3>Insert</h3>
+        <div class="move-demo">cat → c<span class="new">a</span>rt</div>
+        <p>Sneak in a missing letter. <b>cat → cart</b>: insert "r".</p>
+      </div>
+      <div class="move-card">
+        <div class="icon">✂️</div>
+        <h3>Delete</h3>
+        <div class="move-demo">ca<span class="old">r</span>t → cat</div>
+        <p>Kick out a letter that shouldn't be there. <b>cart → cat</b>: delete "r".</p>
+      </div>
+      <div class="move-card">
+        <div class="icon">🔁</div>
+        <h3>Substitute</h3>
+        <div class="move-demo">c<span class="old">a</span><span class="new">o</span>t</div>
+        <p>Swap one letter for another. <b>cat → cot</b>: substitute "a" → "o".</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GRAFFE -->
+<section id="graffe">
+  <div class="wrap reveal">
+    <div class="sec-eyebrow">Real talk</div>
+    <h2 class="sec-h2">Why does your phone think "graffe" = "giraffe"?</h2>
+    <p class="sec-p">Your phone doesn't know spelling. It just quietly counts edits against every word it knows, and picks whoever needs the fewest.</p>
+    <div class="graffe-target">You typed: <span>graffe</span></div>
+    <button class="btn btn-mint" id="graffe-btn">🔢 Count the Edits</button>
+    <div class="chip-row" id="graffe-chips"></div>
+  </div>
+</section>
+
+<!-- WATCH IT BUILD -->
+<section id="build">
+  <div class="wrap reveal">
+    <div class="sec-eyebrow">The main event</div>
+    <h2 class="sec-h2">Watch a Dynamic Programming table fill in — one click at a time</h2>
+    <p class="sec-p">Every cell only ever looks at <b>3 neighbours</b> (the one above, the one to the left, and the one diagonally above-left) and picks whichever is cheapest. Click <b>Next Cell</b>, hit <b>Play</b>, or tap the glowing cell yourself.</p>
+    <details class="dp-formula">
+      <summary>🤓 Show me the actual formula (optional, nerds only)</summary>
+      <div class="fbody">
+        D(i,0) = i &nbsp;&nbsp; D(0,j) = j<br>
+        D(i,j) = min( D(i-1,j)+1, &nbsp; D(i,j-1)+1, &nbsp; D(i-1,j-1) + cost )<br>
+        cost = 0 if letters match, else 1 (unit-cost) or 2 (Levenshtein)
+      </div>
+    </details>
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="t1">intention → execution</button>
+      <button class="tab-btn" data-tab="t2">same words, Levenshtein</button>
+      <button class="tab-btn" data-tab="t3">PART → SPARTAN</button>
+      <button class="tab-btn" data-tab="t4">KITTEN → SITTING</button>
+      <button class="tab-btn" data-tab="t5">RECIEVE → RECEIVE</button>
+    </div>
+    <div class="tab-panel active" id="t1"></div>
+    <div class="tab-panel" id="t2"></div>
+    <div class="tab-panel" id="t3"></div>
+    <div class="tab-panel" id="t4"></div>
+    <div class="tab-panel" id="t5"></div>
+  </div>
+</section>
+
+<!-- PLAYGROUND -->
+<section id="playground">
+  <div class="wrap reveal">
+    <div class="sec-eyebrow">Your turn</div>
+    <h2 class="sec-h2">Type two words. We'll build the table together.</h2>
+    <p class="sec-p">Try your name vs. your bestie's name. Try a typo you actually made last week. Anything goes (letters only, up to 12 characters each).</p>
+    <div class="pg-form">
+      <div class="pg-row">
+        <div class="pg-field">
+          <label>Word A</label>
+          <input id="pg-a" maxlength="12" placeholder="e.g. KITTEN">
+        </div>
+        <div class="pg-field">
+          <label>Word B</label>
+          <input id="pg-b" maxlength="12" placeholder="e.g. SITTING">
+        </div>
+        <div class="pg-field">
+          <label>Costing rule</label>
+          <div class="mode-toggle">
+            <button class="mode-btn active" data-mode="1">Unit-cost</button>
+            <button class="mode-btn" data-mode="2">Levenshtein</button>
+          </div>
+        </div>
+      </div>
+      <div class="pg-actions">
+        <button class="btn btn-lav" id="pg-build">🚀 Build My Table</button>
+        <button class="btn btn-ghost" id="pg-surprise">🎲 Surprise Me</button>
+      </div>
+      <div class="pg-error" id="pg-error">Please type at least one letter in each box 🙂</div>
+    </div>
+    <div id="pg-result"></div>
+  </div>
+</section>
+
+<!-- BONUS: STEMMING -->
+<section id="bonus">
+  <div class="wrap reveal">
+    <div class="sec-eyebrow">Bonus round · 10 seconds</div>
+    <h2 class="sec-h2">A cousin idea: Stemming</h2>
+    <p class="sec-p">Edit distance measures how far apart two spellings are. Stemming just makes spelling variants disappear before you even compare them. Watch:</p>
+    <div class="stem-row" id="stem-row">
+      <span class="stem-chip" data-word="CONNECT">CONNECT</span>
+      <span class="stem-chip" data-word="CONNECTED">CONNECTED</span>
+      <span class="stem-chip" data-word="CONNECTING">CONNECTING</span>
+      <span class="stem-chip" data-word="CONNECTION">CONNECTION</span>
+      <span class="stem-chip" data-word="CONNECTIONS">CONNECTIONS</span>
+    </div>
+    <div style="margin-top:16px;">
+      <button class="btn btn-mint" id="stem-btn">🌱 Strip the Suffixes</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="name">Prof. Bhumika Shah</div>
+  <div class="role">Assistant Professor · Department of Information Technology</div>
+  <div class="made">Built for Unit 5 · Text Similarity & Minimum Edit Distance</div>
+</footer>
+
+<script>
+/* ============================================================
+   CORE DP ENGINE
+   ============================================================ */
+function computeDP(a, b, subCost){
+  const n = a.length, m = b.length;
+  const D = Array.from({length:n+1}, () => new Array(m+1).fill(0));
+  for(let i=0;i<=n;i++) D[i][0] = i;
+  for(let j=0;j<=m;j++) D[0][j] = j;
+  const info = Array.from({length:n+1}, () => new Array(m+1).fill(null));
+  for(let i=1;i<=n;i++){
+    for(let j=1;j<=m;j++){
+      const match = a[i-1] === b[j-1];
+      const diagCost = match ? 0 : subCost;
+      const diagVal = D[i-1][j-1] + diagCost;
+      const upVal = D[i-1][j] + 1;
+      const leftVal = D[i][j-1] + 1;
+      const best = Math.min(diagVal, upVal, leftVal);
+      const chosen = [];
+      if(diagVal === best) chosen.push('diag');
+      if(upVal === best) chosen.push('up');
+      if(leftVal === best) chosen.push('left');
+      D[i][j] = best;
+      info[i][j] = { diagVal, upVal, leftVal, diagCost, match, chosen, best };
+    }
+  }
+  return { D, info, n, m };
+}
+
+/* ============================================================
+   DP TABLE DEMO COMPONENT
+   ============================================================ */
+let dpUidCounter = 0;
+function mountDPDemo(container, opts){
+  const a = opts.a.toUpperCase();
+  const b = opts.b.toUpperCase();
+  const subCost = opts.subCost;
+  const blurb = opts.blurb || '';
+  const uid = 'dp' + (dpUidCounter++);
+  const { D, info, n, m } = computeDP(a, b, subCost);
+
+  const cellsOrder = [];
+  for(let i=1;i<=n;i++) for(let j=1;j<=m;j++) cellsOrder.push([i,j]);
+  let pointer = 0;
+  let playing = false, timer = null;
+  const revealed = Array.from({length:n+1}, () => new Array(m+1).fill(false));
+  for(let i=0;i<=n;i++) revealed[i][0] = true;
+  for(let j=0;j<=m;j++) revealed[0][j] = true;
+
+  container.innerHTML = `
+    ${blurb ? `<p class="dp-blurb">${blurb}</p>` : ''}
+    <div class="dp-controls">
+      <button class="dp-btn dp-play">▶ Play</button>
+      <button class="dp-btn dp-next">⏭ Next Cell</button>
+      <button class="dp-btn dp-reset">↺ Reset</button>
+      <span class="dp-progress">0 / ${cellsOrder.length} cells filled</span>
+    </div>
+    <div class="dp-legend">
+      <span class="dp-leg"><i class="sw sw-diag"></i> diagonal = match / substitute</span>
+      <span class="dp-leg"><i class="sw sw-up"></i> top = delete</span>
+      <span class="dp-leg"><i class="sw sw-left"></i> left = insert</span>
+    </div>
+    <div class="dp-table-scroll"><table class="dp-table" id="${uid}-table"></table></div>
+    <div class="dp-explain" id="${uid}-explain"><p class="dp-explain-placeholder">👉 Click <b>Next Cell</b>, hit <b>Play</b>, or click the glowing gold cell to see the math.</p></div>
+    <button class="dp-btn dp-backtrace" style="display:none;">🧵 Reveal the Edit Path</button>
+    <div class="dp-backtrace-panel"></div>
+  `;
+
+  const tableEl = container.querySelector(`#${uid}-table`);
+  let thead = '<tr><th class="dp-corner"></th><th class="dp-corner">#</th>';
+  for(let j=0;j<m;j++) thead += `<th class="dp-colhead">${b[j]}</th>`;
+  thead += '</tr>';
+  let rows = '';
+  for(let i=0;i<=n;i++){
+    rows += '<tr>';
+    rows += i === 0 ? '<th class="dp-corner"></th>' : `<th class="dp-rowhead">${a[i-1]}</th>`;
+    for(let j=0;j<=m;j++){
+      rows += `<td class="dp-cell" data-i="${i}" data-j="${j}" id="${uid}-c-${i}-${j}"></td>`;
+    }
+    rows += '</tr>';
+  }
+  tableEl.innerHTML = thead + rows;
+
+  const cellEl = (i,j) => container.querySelector(`#${uid}-c-${i}-${j}`);
+  const explainEl = () => container.querySelector(`#${uid}-explain`);
+
+  function paintCell(i,j){
+    const el = cellEl(i,j);
+    el.classList.remove('dp-hidden','dp-frontier','dp-base','dp-filled','dp-final');
+    if(i===0 || j===0){
+      el.classList.add('dp-base');
+      el.textContent = D[i][j];
+    } else if(revealed[i][j]){
+      el.classList.add('dp-filled');
+      el.textContent = D[i][j];
+      if(i===n && j===m) el.classList.add('dp-final');
+    } else {
+      el.classList.add('dp-hidden');
+      el.textContent = '';
+    }
+  }
+  function paintAll(){
+    for(let i=0;i<=n;i++) for(let j=0;j<=m;j++) paintCell(i,j);
+    markFrontier();
+  }
+  function markFrontier(){
+    container.querySelectorAll('.dp-frontier').forEach(el => el.classList.remove('dp-frontier'));
+    if(pointer < cellsOrder.length){
+      const [fi,fj] = cellsOrder[pointer];
+      cellEl(fi,fj).classList.add('dp-frontier');
+    }
+  }
+  function clearHighlights(){
+    container.querySelectorAll('.hl-diag,.hl-up,.hl-left,.hl-target').forEach(el=>{
+      el.classList.remove('hl-diag','hl-up','hl-left','hl-target');
+    });
+  }
+
+  function explainCell(i,j){
+    clearHighlights();
+    const ee = explainEl();
+    if(i===0 && j===0){
+      cellEl(0,0).classList.add('hl-target');
+      ee.innerHTML = `<p>🌱 <b>The starting point.</b> Two empty strings are already identical — zero edits needed.</p>`;
+      return;
+    }
+    if(i===0){
+      cellEl(0,j).classList.add('hl-target');
+      ee.innerHTML = `<p>📥 <b>Base case:</b> D(0,${j}) = ${j}. Turning nothing into "<b>${b.slice(0,j)}</b>" just needs ${j} insert${j>1?'s':''}. No shortcuts here!</p>`;
+      return;
+    }
+    if(j===0){
+      cellEl(i,0).classList.add('hl-target');
+      ee.innerHTML = `<p>📤 <b>Base case:</b> D(${i},0) = ${i}. Turning "<b>${a.slice(0,i)}</b>" into nothing just needs ${i} delete${i>1?'s':''}.</p>`;
+      return;
+    }
+    const inf = info[i][j];
+    cellEl(i-1,j-1).classList.add('hl-diag');
+    cellEl(i-1,j).classList.add('hl-up');
+    cellEl(i,j-1).classList.add('hl-left');
+    cellEl(i,j).classList.add('hl-target');
+    const letterA = a[i-1], letterB = b[j-1];
+    const diagWord = inf.match
+      ? `“${letterA}” already equals “${letterB}” → free!`
+      : `“${letterA}” ≠ “${letterB}” → substitute, costs ${subCost}`;
+    const nameMap = { diag:'Diagonal', up:'Top (delete)', left:'Left (insert)' };
+    const chosenNames = inf.chosen.map(c => nameMap[c]).join(' & ');
+    let verdict;
+    if(inf.chosen.includes('diag') && inf.match) verdict = 'Same letter, zero effort. Free pass! ✨';
+    else if(inf.chosen[0]==='diag') verdict = 'Cheapest fix: swap the letter (substitute). 🔁';
+    else if(inf.chosen[0]==='up') verdict = 'Cheapest fix: delete and move on. ✂️';
+    else verdict = 'Cheapest fix: insert the missing letter. ➕';
+
+    ee.innerHTML = `
+      <p class="dp-explain-title">Comparing "<b>${a.slice(0,i)}</b>" vs "<b>${b.slice(0,j)}</b>" — filling D(${i},${j})</p>
+      <div class="dp-explain-grid">
+        <div class="dp-eline hl-swatch-diag"><b>↖ Diagonal:</b> D(${i-1},${j-1})=${D[i-1][j-1]} → ${diagWord} → total <b>${inf.diagVal}</b></div>
+        <div class="dp-eline hl-swatch-up"><b>⬆ Top:</b> D(${i-1},${j})=${D[i-1][j]} + 1 (delete “${letterA}”) → total <b>${inf.upVal}</b></div>
+        <div class="dp-eline hl-swatch-left"><b>⬅ Left:</b> D(${i},${j-1})=${D[i][j-1]} + 1 (insert “${letterB}”) → total <b>${inf.leftVal}</b></div>
+      </div>
+      <p class="dp-verdict">✅ Cheapest option: <b>${chosenNames}</b> = <b>${inf.best}</b>. ${verdict}</p>
+    `;
+  }
+
+  function revealNext(){
+    if(pointer >= cellsOrder.length) return false;
+    const [i,j] = cellsOrder[pointer];
+    revealed[i][j] = true;
+    paintCell(i,j);
+    pointer++;
+    markFrontier();
+    explainCell(i,j);
+    container.querySelector('.dp-progress').textContent = `${pointer} / ${cellsOrder.length} cells filled`;
+    if(pointer >= cellsOrder.length){
+      stopPlaying();
+      container.querySelector('.dp-backtrace').style.display = 'inline-flex';
+      const callout = document.createElement('p');
+      callout.className = 'dp-final-callout';
+      callout.innerHTML = `🎉 <b>Done!</b> The bottom-right cell says it all: <b>D(${n},${m}) = ${D[n][m]}</b> — that's the Minimum Edit Distance.`;
+      explainEl().appendChild(callout);
+    }
+    return true;
+  }
+  function stopPlaying(){
+    playing = false;
+    clearInterval(timer);
+    container.querySelector('.dp-play').textContent = '▶ Play';
+  }
+
+  container.querySelector('.dp-play').addEventListener('click', () => {
+    if(playing){ stopPlaying(); return; }
+    if(pointer >= cellsOrder.length) return;
+    playing = true;
+    container.querySelector('.dp-play').textContent = '⏸ Pause';
+    timer = setInterval(() => { if(!revealNext()) stopPlaying(); }, 850);
+  });
+  container.querySelector('.dp-next').addEventListener('click', () => { stopPlaying(); revealNext(); });
+  container.querySelector('.dp-reset').addEventListener('click', () => {
+    stopPlaying();
+    pointer = 0;
+    for(let i=1;i<=n;i++) for(let j=1;j<=m;j++) revealed[i][j] = false;
+    paintAll();
+    clearHighlights();
+    explainEl().innerHTML = `<p class="dp-explain-placeholder">👉 Click <b>Next Cell</b>, hit <b>Play</b>, or click the glowing gold cell to see the math.</p>`;
+    container.querySelector('.dp-progress').textContent = `0 / ${cellsOrder.length} cells filled`;
+    container.querySelector('.dp-backtrace').style.display = 'none';
+    container.querySelector('.dp-backtrace-panel').innerHTML = '';
+    container.querySelectorAll('.dp-path').forEach(el => el.classList.remove('dp-path'));
+  });
+
+  tableEl.addEventListener('click', (e) => {
+    const td = e.target.closest('td.dp-cell');
+    if(!td) return;
+    const i = +td.dataset.i, j = +td.dataset.j;
+    if(i===0 || j===0){ explainCell(i,j); return; }
+    if(revealed[i][j]){ explainCell(i,j); return; }
+    if(td.classList.contains('dp-frontier')){ stopPlaying(); revealNext(); }
+  });
+
+  container.querySelector('.dp-backtrace').addEventListener('click', () => {
+    const panel = container.querySelector('.dp-backtrace-panel');
+    let i = n, j = m; const path = [];
+    while(i>0 || j>0){
+      if(i===0){ path.push({op:'insert', i, j}); j--; continue; }
+      if(j===0){ path.push({op:'delete', i, j}); i--; continue; }
+      const inf = info[i][j];
+      if(inf.chosen.includes('diag')){ path.push({op: inf.match?'match':'substitute', i, j}); i--; j--; }
+      else if(inf.chosen.includes('up')){ path.push({op:'delete', i, j}); i--; }
+      else { path.push({op:'insert', i, j}); j--; }
+    }
+    path.reverse();
+    container.querySelectorAll('.dp-path').forEach(el => el.classList.remove('dp-path'));
+    panel.innerHTML = `<ol class="dp-bt-list"></ol><p class="dp-bt-total"></p>`;
+    const list = panel.querySelector('.dp-bt-list');
+    const labels = {
+      match: (p) => `✅ Match — “${a[p.i-1]}” = “${b[p.j-1]}”, nothing to do`,
+      substitute: (p) => `🔁 Substitute “${a[p.i-1]}” → “${b[p.j-1]}”`,
+      delete: (p) => `✂️ Delete “${a[p.i-1]}”`,
+      insert: (p) => `➕ Insert “${b[p.j-1]}”`,
+    };
+    let idx = 0;
+    (function step(){
+      if(idx >= path.length){
+        panel.querySelector('.dp-bt-total').innerHTML = `🏁 Total = <b>${D[n][m]} edit${D[n][m]===1?'':'s'}</b>. That's your Minimum Edit Distance!`;
+        return;
+      }
+      const p = path[idx];
+      const el = cellEl(p.i, p.j);
+      if(el) el.classList.add('dp-path');
+      const li = document.createElement('li');
+      li.textContent = labels[p.op](p);
+      li.className = 'dp-bt-' + p.op;
+      list.appendChild(li);
+      idx++;
+      setTimeout(step, 480);
+    })();
+  });
+
+  paintAll();
+}
+
+/* ============================================================
+   PRESET DP DEMOS
+   ============================================================ */
+mountDPDemo(document.getElementById('t1'), {
+  a:'intention', b:'execution', subCost:1,
+  blurb:'💡 Our running example. Every insert, delete, and substitute costs exactly 1 point.'
+});
+mountDPDemo(document.getElementById('t2'), {
+  a:'intention', b:'execution', subCost:2,
+  blurb:'💡 Same two words — but now a substitute costs 2 (like a delete + insert bundled together). Watch the answer climb from 5 to 8.'
+});
+mountDPDemo(document.getElementById('t3'), {
+  a:'spartan', b:'part', subCost:1,
+  blurb:'💡 PART is fully hiding inside SPARTAN. Expect a small distance — mostly just inserting the extra S, A, N.'
+});
+mountDPDemo(document.getElementById('t4'), {
+  a:'kitten', b:'sitting', subCost:1,
+  blurb:'💡 The classic CS-class example. Try predicting the answer before you press Play!'
+});
+mountDPDemo(document.getElementById('t5'), {
+  a:'recieve', b:'receive', subCost:1,
+  blurb:'💡 The "i before e" typo. It LOOKS like just swapping two letters — but with only insert/delete/substitute (no "swap" move allowed), it actually costs 2, not 1. Sneaky!'
+});
+
+/* tabs */
+document.getElementById('tabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(btn.dataset.tab).classList.add('active');
+});
+
+/* ============================================================
+   GRAFFE DEMO
+   ============================================================ */
+(function(){
+  const target = 'GRAFFE';
+  const candidates = ['GRAF','GRAFT','GRAIL','GIRAFFE'];
+  const dists = candidates.map(c => computeDP(target, c, 1).D[target.length][c.length]);
+  const maxD = Math.max(...dists);
+  const chipRow = document.getElementById('graffe-chips');
+  chipRow.innerHTML = candidates.map((c,idx) => `
+    <div class="g-chip" data-dist="${dists[idx]}">
+      <div class="w">${c}</div>
+      <div class="bar-track"><div class="bar"></div></div>
+      <span class="num">— edits</span>
+    </div>
+  `).join('');
+  document.getElementById('graffe-btn').addEventListener('click', function(){
+    this.disabled = true;
+    const chips = [...chipRow.children];
+    chips.forEach((chip, idx) => {
+      setTimeout(() => {
+        const d = dists[idx];
+        chip.querySelector('.bar').style.width = (d / maxD * 100) + '%';
+        chip.querySelector('.num').textContent = d + ' edit' + (d===1?'':'s') + ' away';
+        if(candidates[idx] === 'GIRAFFE'){
+          setTimeout(() => chip.classList.add('winner'), 500);
+        }
+      }, idx * 350);
+    });
+    setTimeout(() => { this.disabled = false; this.textContent = '🔁 Count Again'; }, candidates.length*350 + 300);
+  });
+})();
+
+/* ============================================================
+   PLAYGROUND
+   ============================================================ */
+(function(){
+  let mode = 1;
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      mode = +btn.dataset.mode;
+    });
+  });
+
+  const surprises = [
+    ['PIZZA','PASTA'], ['MANGO','TANGO'], ['NOODLE','POODLE'], ['CHAI','CHAT'],
+    ['PYTHON','JAVA'], ['COLOR','COLOUR'], ['LAPTOP','LAPPY'], ['BESTIE','BEASTIE']
+  ];
+  document.getElementById('pg-surprise').addEventListener('click', () => {
+    const pair = surprises[Math.floor(Math.random()*surprises.length)];
+    document.getElementById('pg-a').value = pair[0];
+    document.getElementById('pg-b').value = pair[1];
+  });
+
+  document.getElementById('pg-build').addEventListener('click', () => {
+    const rawA = document.getElementById('pg-a').value.replace(/[^a-zA-Z]/g,'').slice(0,12);
+    const rawB = document.getElementById('pg-b').value.replace(/[^a-zA-Z]/g,'').slice(0,12);
+    const err = document.getElementById('pg-error');
+    if(!rawA || !rawB){ err.style.display='block'; return; }
+    err.style.display = 'none';
+    const result = document.getElementById('pg-result');
+    result.innerHTML = '';
+    const box = document.createElement('div');
+    result.appendChild(box);
+    mountDPDemo(box, {
+      a: rawA, b: rawB, subCost: mode,
+      blurb: `💡 Your table: <b>${rawA.toUpperCase()}</b> → <b>${rawB.toUpperCase()}</b>, ${mode===1?'unit-cost':'Levenshtein'} rule.`
+    });
+    result.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+})();
+
+/* ============================================================
+   BONUS: STEMMING
+   ============================================================ */
+document.getElementById('stem-btn').addEventListener('click', function(){
+  document.querySelectorAll('.stem-chip').forEach((chip, idx) => {
+    setTimeout(() => {
+      chip.textContent = 'CONNECT';
+      chip.classList.add('collapsed');
+    }, idx * 220);
+  });
+  this.disabled = true;
+  this.textContent = '🌱 Stripped!';
+});
+
+/* ============================================================
+   REVEAL ON SCROLL
+   ============================================================ */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('in'); });
+}, {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>
 
