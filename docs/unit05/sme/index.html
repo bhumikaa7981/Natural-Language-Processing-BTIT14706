@@ -210,6 +210,50 @@ td.dp-cell.dp-path{ box-shadow:0 0 0 3px var(--pink-d); }
 .stem-chip.collapsed{ background:var(--mint); color:#fff; transform:scale(1.06); }
 .stem-arrow{ font-size:18px; color:var(--muted); }
 
+/* ---------- PORTER STEMMER (Extra Reading) ---------- */
+#porter{ background:var(--peach-l); border-radius:32px; margin:0 22px; }
+.porter-steps-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-top:22px; }
+.porter-step-card{ background:#fff; border-radius:18px; padding:16px 18px; box-shadow:0 10px 22px -14px rgba(51,44,75,.3); border-top:5px solid var(--c); }
+.porter-step-card .num{ font-family:var(--mono); font-size:11.5px; font-weight:700; color:var(--c); letter-spacing:.04em; }
+.porter-step-card h4{ font-family:var(--display); font-size:15px; margin:5px 0 8px; }
+.porter-step-card .rule{ font-family:var(--mono); font-size:11.5px; background:#F7F5FC; padding:7px 9px; border-radius:8px; word-break:break-word; }
+.porter-step-card .example{ font-size:12.5px; color:var(--muted); margin-top:8px; }
+.porter-step-card .example b{ color:var(--ink-2); }
+
+.porter-info-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; margin-top:22px; }
+.porter-info-card{ background:#fff; border-radius:20px; padding:20px 22px; box-shadow:0 10px 24px -16px rgba(51,44,75,.3); }
+.porter-info-card h3{ font-family:var(--display); font-weight:700; font-size:16px; margin-bottom:8px; }
+.porter-info-card ul{ margin:8px 0 0 18px; }
+.porter-info-card li{ font-size:13.5px; color:var(--ink-2); margin-bottom:6px; }
+
+.porter-chain{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:13px; margin-top:8px; }
+.porter-chain .pc-word{ background:#F7F5FC; padding:6px 10px; border-radius:8px; }
+.porter-chain .pc-word.pc-final{ background:var(--mint); color:#0b4a3a; font-weight:700; }
+.porter-chain .pc-arrow{ color:var(--muted); }
+
+.porter-examples-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin-top:22px; }
+.porter-example{ background:#fff; border-radius:16px; padding:16px 18px; box-shadow:0 8px 20px -14px rgba(51,44,75,.3); }
+.porter-example summary{ cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:10px; font-family:var(--display); font-weight:700; font-size:14px; }
+.porter-example summary::-webkit-details-marker{ display:none; }
+.porter-example summary .arrow{ font-size:12px; color:var(--muted); transition:transform .2s ease; }
+.porter-example[open] summary .arrow{ transform:rotate(90deg); }
+.porter-example .porter-trace{ margin-top:12px; display:flex; flex-direction:column; gap:6px; }
+.porter-trace-row{ font-size:12.5px; padding:8px 10px; border-radius:9px; background:#F7F5FC; border-left:4px solid #e4dff5; }
+.porter-trace-row.pt-active{ background:var(--sun-l); }
+.porter-trace-row b.pt-label{ font-family:var(--display); font-size:11.5px; }
+.porter-trace-row .pt-rule{ font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:3px; }
+
+.porter-form{ background:#fff; border-radius:22px; padding:22px; margin-top:22px; box-shadow:0 12px 28px -18px rgba(51,44,75,.35); }
+.porter-row{ display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+.porter-field{ display:flex; flex-direction:column; gap:6px; }
+.porter-field label{ font-family:var(--display); font-weight:700; font-size:12.5px; color:var(--ink-2); }
+.porter-field input{ font-family:var(--mono); font-size:16px; padding:11px 14px; border-radius:12px; border:2px solid #ffd9c4; width:220px; text-transform:uppercase; }
+.porter-field input:focus{ outline:2px solid var(--peach); border-color:var(--peach); }
+.porter-error{ color:var(--peach-d); font-size:13px; font-weight:600; margin-top:10px; display:none; }
+#porter-result{ margin-top:22px; }
+.porter-result-card{ background:var(--card); border-radius:18px; padding:18px 20px; box-shadow:0 10px 24px -16px rgba(51,44,75,.3); }
+.porter-result-final{ margin-top:12px; background:var(--mint-l); color:var(--mint-d); padding:10px 14px; border-radius:10px; font-weight:600; font-size:14.5px; }
+
 /* ---------- FOOTER ---------- */
 footer{ text-align:center; padding:40px 22px 60px; }
 footer .name{ font-family:var(--display); font-weight:700; }
@@ -234,6 +278,7 @@ footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(-
       <a href="#build">Watch It Build</a>
       <a href="#playground">Your Turn</a>
       <a href="#bonus">Bonus</a>
+      <a href="#porter">Porter Stemmer</a>
     </div>
   </div>
 </nav>
@@ -404,6 +449,56 @@ footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(-
     <div style="margin-top:16px;">
       <button class="btn btn-mint" id="stem-btn">🌱 Strip the Suffixes</button>
     </div>
+  </div>
+</section>
+
+<!-- EXTRA READING: PORTER, 1980 -->
+<section id="porter">
+  <div class="wrap reveal">
+    <div class="sec-eyebrow">📖 Extra Reading · Porter, 1980</div>
+    <h2 class="sec-h2">How Porter's Algorithm Works</h2>
+    <p class="sec-p">The stemming chip above just melts every "CONNECT-" variant down to one word — but it never showed you <i>how</i>. Martin Porter's 1980 algorithm is the classic recipe for that: a fixed pipeline of <b>5 sequential steps</b>, each one stripping a bit more off the end of the word, applied in a strict order so the result is always predictable.</p>
+
+    <div class="porter-steps-grid" id="porter-steps-grid"></div>
+
+    <div class="porter-info-grid">
+      <div class="porter-info-card">
+        <h3>🧩 The logic behind it</h3>
+        <ul>
+          <li><b>Suffix-stripping, not dictionary lookup.</b> There's no giant list of "correct" root words — just pattern-matching rules on the letters at the end of a word.</li>
+          <li><b>A "measure" (m) gatekeeps every rule.</b> m roughly counts the vowel-consonant syllable pairs in what's left of the stem, so a rule only fires if the remaining stem is "long enough" to survive losing a suffix (this is why <code>OATEN</code> loses nothing at m=0-ish endings but <code>TREES</code> style short stems stay untouched).</li>
+          <li><b>Steps run in strict order, once each.</b> Step 1 always goes first (plurals, -ED, -ING), then step 2 (derivational endings like -ATIONAL), then 3, then 4 (the big suffix-strip), then 5 (tidy the trailing E / double letter). A later step never re-triggers an earlier one.</li>
+          <li><b>Only one rule per step fires</b> — the first pattern in that step's list that matches wins, so longer/more specific suffixes are always listed before their shorter substrings.</li>
+        </ul>
+      </div>
+      <div class="porter-info-card">
+        <h3>🚀 Why it's useful</h3>
+        <ul>
+          <li><b>Fast & deterministic.</b> Pure string rules, no lookup tables or ML — runs in a single pass over the word, exactly the same way every time.</li>
+          <li><b>Shrinks vocabulary for search & retrieval.</b> CONNECT / CONNECTED / CONNECTING / CONNECTION(S) all collapse to one index term, so a search for "connect" also finds documents that only ever say "connecting."</li>
+          <li><b>Language-agnostic technique.</b> The same "strip common endings, gated by a length/measure check" idea has been ported to dozens of languages beyond English.</li>
+          <li><b>Trade-off to know:</b> it's a blunt, rule-based tool — stems aren't always real words (<code>GENERALIZATIONS → GENER</code>) and unrelated words can collide (over-stemming), which is exactly why smarter techniques like lemmatization exist for tasks that need real dictionary words.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 class="sec-h2" style="font-size:20px;margin-top:36px;">🔟 Ten Words, Fully Traced</h3>
+    <p class="sec-p">Click any card to expand the exact rule that fired at each step. Steps that didn't change the word are shown greyed-out — that's just as important to see as the ones that did.</p>
+    <div class="porter-examples-grid" id="porter-examples-grid"></div>
+
+    <h3 class="sec-h2" style="font-size:20px;margin-top:36px;">✍️ Try Your Own Word</h3>
+    <p class="sec-p">Type any English word (letters only) and watch it fall through the same 5 steps, live.</p>
+    <div class="porter-form">
+      <div class="porter-row">
+        <div class="porter-field">
+          <label>Your word</label>
+          <input id="porter-input" maxlength="24" placeholder="e.g. NATIONALIZATION">
+        </div>
+        <button class="btn btn-pink" id="porter-run">🧪 Apply the Algorithm</button>
+      </div>
+      <div class="porter-error" id="porter-error">Please type at least 3 letters 🙂</div>
+    </div>
+    <div id="porter-result"></div>
   </div>
 </section>
 
@@ -893,6 +988,277 @@ document.getElementById('stem-btn').addEventListener('click', function(){
   this.disabled = true;
   this.textContent = '🌱 Stripped!';
 });
+
+/* ============================================================
+   PORTER STEMMER (1980) — FULL ENGINE
+   Faithful implementation of the classic 5-macro-step algorithm,
+   instrumented to log exactly which micro-rule fired at each step
+   so we can show students the "why", not just the final stem.
+   ============================================================ */
+function pstIsConsonant(word, i){
+  const ch = word[i];
+  if('aeiou'.includes(ch)) return false;
+  if(ch === 'y'){
+    if(i === 0) return true;
+    return !pstIsConsonant(word, i-1);
+  }
+  return true;
+}
+function pstMeasure(stem){
+  let cv = '';
+  for(let i=0;i<stem.length;i++) cv += pstIsConsonant(stem,i) ? 'c' : 'v';
+  let collapsed = '';
+  for(const ch of cv){ if(collapsed[collapsed.length-1] !== ch) collapsed += ch; }
+  let s = collapsed;
+  if(s[0]==='c') s = s.slice(1);
+  if(s[s.length-1]==='v') s = s.slice(0,-1);
+  return s.length/2;
+}
+function pstContainsVowel(stem){
+  for(let i=0;i<stem.length;i++) if(!pstIsConsonant(stem,i)) return true;
+  return false;
+}
+function pstEndsDoubleConsonant(word){
+  const n = word.length;
+  if(n<2) return false;
+  if(word[n-1] !== word[n-2]) return false;
+  return pstIsConsonant(word, n-1) && pstIsConsonant(word, n-2);
+}
+function pstEndsCVC(word){
+  const n = word.length;
+  if(n<3) return false;
+  const c1 = pstIsConsonant(word,n-3), v = !pstIsConsonant(word,n-2), c2 = pstIsConsonant(word,n-1);
+  if(!(c1 && v && c2)) return false;
+  const last = word[n-1];
+  if(last==='w' || last==='x' || last==='y') return false;
+  return true;
+}
+function pstStep1a(word){
+  const rules = [['sses','ss'],['ies','i'],['ss','ss'],['s','']];
+  for(const [suf,rep] of rules){
+    if(word.endsWith(suf)){
+      const nw = word.slice(0, word.length-suf.length) + rep;
+      const noop = (suf==='ss' && rep==='ss');
+      return {word:nw, rule: noop ? null : `"${suf.toUpperCase()}" → "${rep.toUpperCase()||'∅'}"`};
+    }
+  }
+  return {word, rule:null};
+}
+function pstFinishStep1b(word, ruleText, needsCleanup){
+  if(!needsCleanup) return {word, rule:ruleText};
+  let final = word, extra = '';
+  if(word.endsWith('at') || word.endsWith('bl') || word.endsWith('iz')){
+    final = word + 'e'; extra = ` → then +E (stem ends AT/BL/IZ) → "${final}"`;
+  } else if(pstEndsDoubleConsonant(word) && !/[lsz]$/.test(word)){
+    final = word.slice(0,-1); extra = ` → then drop the doubled letter → "${final}"`;
+  } else if(pstMeasure(word)===1 && pstEndsCVC(word)){
+    final = word + 'e'; extra = ` → then +E (m=1 & ends CVC) → "${final}"`;
+  }
+  return {word: final, rule: ruleText + extra};
+}
+function pstStep1b(word){
+  if(word.endsWith('eed')){
+    const stem = word.slice(0,-3);
+    if(pstMeasure(stem)>0) return {word: stem+'ee', rule: `"EED"→"EE" (m>0 on "${stem}")`};
+    return {word, rule:null};
+  }
+  if(word.endsWith('ed')){
+    const stem = word.slice(0,-2);
+    if(pstContainsVowel(stem)) return pstFinishStep1b(stem, `"ED"→"∅" (stem "${stem}" has a vowel)`, true);
+  }
+  if(word.endsWith('ing')){
+    const stem = word.slice(0,-3);
+    if(pstContainsVowel(stem)) return pstFinishStep1b(stem, `"ING"→"∅" (stem "${stem}" has a vowel)`, true);
+  }
+  return {word, rule:null};
+}
+function pstStep1c(word){
+  if(word.endsWith('y') && word.length>1){
+    const stem = word.slice(0,-1);
+    if(pstContainsVowel(stem)) return {word: stem+'i', rule: `"Y"→"I" (stem "${stem}" has a vowel)`};
+  }
+  return {word, rule:null};
+}
+const PST_STEP2 = [
+  ['ational','ate'],['tional','tion'],['enci','ence'],['anci','ance'],['izer','ize'],
+  ['abli','able'],['alli','al'],['entli','ent'],['eli','e'],['ousli','ous'],
+  ['ization','ize'],['ation','ate'],['ator','ate'],['alism','al'],['iveness','ive'],
+  ['fulness','ful'],['ousness','ous'],['aliti','al'],['iviti','ive'],['biliti','ble']
+];
+function pstStep2(word){
+  for(const [suf,rep] of PST_STEP2){
+    if(word.endsWith(suf)){
+      const stem = word.slice(0, word.length-suf.length);
+      if(pstMeasure(stem)>0) return {word: stem+rep, rule:`"${suf.toUpperCase()}"→"${rep.toUpperCase()}" (m>0 on "${stem}")`};
+      return {word, rule:null};
+    }
+  }
+  return {word, rule:null};
+}
+const PST_STEP3 = [
+  ['icate','ic'],['ative',''],['alize','al'],['iciti','ic'],['ical','ic'],['ful',''],['ness','']
+];
+function pstStep3(word){
+  for(const [suf,rep] of PST_STEP3){
+    if(word.endsWith(suf)){
+      const stem = word.slice(0, word.length-suf.length);
+      if(pstMeasure(stem)>0) return {word: stem+rep, rule:`"${suf.toUpperCase()}"→"${rep.toUpperCase()||'∅'}" (m>0 on "${stem}")`};
+      return {word, rule:null};
+    }
+  }
+  return {word, rule:null};
+}
+const PST_STEP4 = ['al','ance','ence','er','ic','able','ible','ant','ement','ment','ent','ion','ou','ism','ate','iti','ous','ive','ize'];
+function pstStep4(word){
+  for(const suf of PST_STEP4){
+    if(word.endsWith(suf)){
+      const stem = word.slice(0, word.length-suf.length);
+      if(suf==='ion' && !(stem.endsWith('s') || stem.endsWith('t'))) continue;
+      if(pstMeasure(stem)>1) return {word: stem, rule:`"${suf.toUpperCase()}"→"∅" (m>1 on "${stem}")`};
+      return {word, rule:null};
+    }
+  }
+  return {word, rule:null};
+}
+function pstStep5(word){
+  let w = word, notes = [];
+  if(w.endsWith('e')){
+    const stem = w.slice(0,-1);
+    const m = pstMeasure(stem);
+    if(m>1 || (m===1 && !pstEndsCVC(stem))){
+      notes.push(`"E"→"∅" (m${m>1?'>1':'=1 & not CVC'} on "${stem}")`);
+      w = stem;
+    }
+  }
+  if(pstMeasure(w)>1 && pstEndsDoubleConsonant(w) && w.endsWith('l')){
+    const nw = w.slice(0,-1);
+    notes.push(`"LL"→"L" (m>1 on "${w}")`);
+    w = nw;
+  }
+  return {word:w, rule: notes.length ? notes.join('; ') : null};
+}
+const PST_STEP_META = [
+  {n:1, label:'Plurals & past participles', color:'var(--lav)'},
+  {n:2, label:'Common derivational endings', color:'var(--mint)'},
+  {n:3, label:'Further suffix simplification', color:'var(--peach)'},
+  {n:4, label:'Strip remaining suffixes', color:'var(--sun)'},
+  {n:5, label:'Final tidy-up of E / doubles', color:'var(--sky)'}
+];
+function porterStem(input){
+  const clean = String(input).toLowerCase().replace(/[^a-z]/g,'');
+  if(clean.length<=2) return {original:clean, final:clean, trace: PST_STEP_META.map(m=>({...m, before:clean, after:clean, rule:null}))};
+  let w = clean;
+  const trace = [];
+  let before = w, r;
+  const sub = [];
+  r = pstStep1a(w); if(r.rule) sub.push(r.rule); w = r.word;
+  r = pstStep1b(w); if(r.rule) sub.push(r.rule); w = r.word;
+  r = pstStep1c(w); if(r.rule) sub.push(r.rule); w = r.word;
+  trace.push({...PST_STEP_META[0], before, after:w, rule: sub.length?sub.join(' · '):null});
+
+  before = w; r = pstStep2(w); w = r.word;
+  trace.push({...PST_STEP_META[1], before, after:w, rule:r.rule});
+
+  before = w; r = pstStep3(w); w = r.word;
+  trace.push({...PST_STEP_META[2], before, after:w, rule:r.rule});
+
+  before = w; r = pstStep4(w); w = r.word;
+  trace.push({...PST_STEP_META[3], before, after:w, rule:r.rule});
+
+  before = w; r = pstStep5(w); w = r.word;
+  trace.push({...PST_STEP_META[4], before, after:w, rule:r.rule});
+
+  return {original:clean, final:w, trace};
+}
+
+/* ---- render helpers ---- */
+function porterTraceHTML(result){
+  return result.trace.map(t => {
+    const changed = t.before !== t.after;
+    return `
+      <div class="porter-trace-row ${changed?'pt-active':''}" style="border-left-color:${t.color}">
+        <b class="pt-label" style="color:${t.color}">Step ${t.n} — ${t.label}</b>
+        <div>${t.before.toUpperCase()} → <b>${t.after.toUpperCase()}</b></div>
+        <div class="pt-rule">${t.rule ? '✓ ' + t.rule : '— no change this step'}</div>
+      </div>`;
+  }).join('');
+}
+function porterChainHTML(result){
+  const seen = [result.original];
+  result.trace.forEach(t => { if(t.after !== seen[seen.length-1]) seen.push(t.after); });
+  return seen.map((w,idx) => {
+    const isFinal = idx === seen.length-1;
+    const word = `<span class="pc-word ${isFinal?'pc-final':''}">${w.toUpperCase()}</span>`;
+    return idx===0 ? word : `<span class="pc-arrow">→</span>${word}`;
+  }).join('');
+}
+
+/* ---- 5-step overview cards ---- */
+(function(){
+  const grid = document.getElementById('porter-steps-grid');
+  const meta = [
+    {n:1, color:'var(--lav-d)', title:'Plurals & past participles', rule:'SSES→SS, (*v*)ED→∅', example:'caresses → caress · plastered → plaster'},
+    {n:2, color:'var(--mint-d)', title:'Common derivational endings', rule:'ATIONAL→ATE', example:'relational → relate'},
+    {n:3, color:'var(--peach-d)', title:'Further suffix simplification', rule:'ICATE→IC', example:'triplicate → triplic'},
+    {n:4, color:'var(--sun-d)', title:'Strip remaining suffixes', rule:'(m>1) MENT→∅', example:'adjustment → adjust'},
+    {n:5, color:'var(--sky-d)', title:'Final tidy-up of E / doubles', rule:'(m>1) E→∅', example:'probate → probat'}
+  ];
+  grid.innerHTML = meta.map(m => `
+    <div class="porter-step-card" style="--c:${m.color}">
+      <div class="num">STEP ${m.n}</div>
+      <h4>${m.title}</h4>
+      <div class="rule">${m.rule}</div>
+      <div class="example"><b>e.g.</b> ${m.example}</div>
+    </div>
+  `).join('');
+})();
+
+/* ---- 10 fully-traced examples ---- */
+(function(){
+  const words = [
+    'GENERALIZATIONS','NATIONALIZATION','RELATIONAL','CONFLATED','TROUBLING',
+    'HAPPINESS','BEAUTIFUL','STUDIES','CONTROLLING','CONNECTIONS'
+  ];
+  const grid = document.getElementById('porter-examples-grid');
+  grid.innerHTML = words.map((w,idx) => {
+    const r = porterStem(w);
+    return `
+      <details class="porter-example">
+        <summary>
+          <span>${w} <span style="color:var(--muted);font-weight:400;">→</span> ${r.final.toUpperCase()}</span>
+          <span class="arrow">▶</span>
+        </summary>
+        <div class="porter-chain">${porterChainHTML(r)}</div>
+        <div class="porter-trace">${porterTraceHTML(r)}</div>
+      </details>
+    `;
+  }).join('');
+})();
+
+/* ---- interactive playground ---- */
+(function(){
+  const input = document.getElementById('porter-input');
+  const btn = document.getElementById('porter-run');
+  const err = document.getElementById('porter-error');
+  const result = document.getElementById('porter-result');
+  function run(){
+    const raw = input.value.replace(/[^a-zA-Z]/g,'');
+    if(raw.length<3){ err.style.display='block'; return; }
+    err.style.display = 'none';
+    const r = porterStem(raw);
+    result.innerHTML = `
+      <div class="porter-result-card">
+        <p style="font-family:var(--display);font-weight:700;font-size:15px;">Tracing "${raw.toUpperCase()}" through all 5 steps</p>
+        <div class="porter-chain" style="margin-top:10px;">${porterChainHTML(r)}</div>
+        <div class="porter-trace" style="margin-top:10px;">${porterTraceHTML(r)}</div>
+        <div class="porter-result-final">🌱 Final stem: <b>${r.final.toUpperCase()}</b></div>
+      </div>
+    `;
+    result.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+  btn.addEventListener('click', run);
+  input.addEventListener('keydown', (e) => { if(e.key==='Enter') run(); });
+})();
 
 /* ============================================================
    REVEAL ON SCROLL
