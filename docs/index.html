@@ -197,6 +197,7 @@
   }
   .unit-status.live{ background:var(--mint); color:#0E4A36; }
   .unit-status.soon{ background:var(--panel); color:var(--ink-soft); }
+  .unit-status.progress{ background:var(--peach); color:#5C2600; }
   .unit-n{ font-family:var(--mono); font-size:11px; color:var(--u-accent); font-weight:700; margin-bottom:4px;}
   .unit-card h3{ font-family:var(--display); font-size:19px; font-weight:600; margin-bottom:6px;}
   .unit-card .tag{ font-size:13.5px; color:var(--ink-soft); margin-bottom:16px;}
@@ -226,6 +227,11 @@
   .unit-go.disabled::before{ content:'⏳'; font-size:10px; }
 
   .unit-go{ display:inline-block; margin-top:2px; font-family:var(--mono); font-size:12.5px; font-weight:700; color:var(--u-accent);}
+
+  .unit-note{
+    margin-top:14px; padding:12px 14px; border-radius:14px; background:var(--panel); border:1px dashed var(--line);
+    font-size:12.5px; color:var(--ink-soft); font-style:italic; line-height:1.5;
+  }
 
   /* ---------- BOOKS ---------- */
   .books-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; position:relative; z-index:1;}
@@ -482,14 +488,29 @@
         <div class="unit-go">Notify me →</div>
       </a>
 
-      <a href="unit5.html" class="unit-card locked" style="--u-accent:#FF4D6D; --u-glow:radial-gradient(circle at 90% 0%, rgba(255,143,174,.4), transparent 60%);">
-        <div class="unit-top"><div class="unit-icon">📊</div><div class="unit-status soon">Coming soon</div></div>
+      <!-- UNIT 5 -->
+      <div class="unit-card" style="--u-accent:#FF4D6D; --u-glow:radial-gradient(circle at 90% 0%, rgba(255,143,174,.4), transparent 60%);">
+        <div class="unit-top"><div class="unit-icon">📊</div><div class="unit-status progress">In progress</div></div>
         <div class="unit-n">Unit 05 · 07 hrs</div>
         <h3>Empirical & Statistical Approaches</h3>
         <div class="tag">Letting probability do what grammar rules alone can't.</div>
         <div class="unit-topics">Corpus & treebank creation · HMM & Viterbi · Word sense disambiguation</div>
-        <div class="unit-go">Notify me →</div>
-      </a>
+
+        <div class="link-group">
+          <div class="link-label">🎮 Demo</div>
+          <div class="link-rows">
+            <a href="https://bhumikaa7981.github.io/Natural-Language-Processing-BTIT14706/unit05/sme/" class="unit-go secondary" target="_blank" rel="noopener">Statistical Methods Explorer →</a>
+          </div>
+        </div>
+        <div class="link-group">
+          <div class="link-label">📄 Lecture notes</div>
+          <div class="link-rows">
+            <a href="https://drive.google.com/file/d/1Lc9VTuMuvXawNZNX5I_GlyZploQHyRaF/view?usp=sharing" class="unit-go secondary" target="_blank" rel="noopener">Unit 05 · Empirical & Statistical Approaches →</a>
+          </div>
+        </div>
+
+        <div class="unit-note">📦 Rest of Unit 5 is still in the oven — HMMs and Viterbi are proofing, word sense disambiguation is next in line. Check back soon.</div>
+      </div>
 
       <a href="unit6.html" class="unit-card locked" style="--u-accent:#00C48C; --u-glow:radial-gradient(circle at 90% 0%, rgba(111,224,184,.4), transparent 60%);">
         <div class="unit-top"><div class="unit-icon">💬</div><div class="unit-status soon">Coming soon</div></div>
