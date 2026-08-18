@@ -186,6 +186,7 @@ td.dp-cell.dp-path{ box-shadow:0 0 0 3px var(--pink-d); }
 .dp-bt-delete{ border-left:5px solid var(--peach); }
 .dp-bt-insert{ border-left:5px solid var(--sky); }
 .dp-bt-total{ margin-top:10px; font-weight:700; font-family:var(--display); color:var(--ink); }
+.dp-bt-tie{ font-family:var(--body); font-size:12.5px; color:var(--sun-d); background:var(--sun-l); border-left:5px dashed var(--sun-d); padding:8px 12px; border-radius:8px; margin-top:-2px; }
 
 /* ---------- PLAYGROUND ---------- */
 #playground{ background:var(--mint-l); border-radius:32px; margin:0 22px; }
@@ -485,6 +486,7 @@ function mountDPDemo(container, opts){
         <div class="bt-move-row left">← <b>Move left</b> → insertion</div>
       </div>
       <p class="bt-note">Reading these moves in reverse order gives the exact, shortest sequence of edits. Hit the button below to watch it happen and see the path light up on the table.</p>
+      <p class="bt-note" style="color:var(--ink-2); font-weight:400; margin-top:8px;">⚖️ <b>What if two or three neighbours tie for the minimum?</b> Then more than one edit sequence is equally short — ties just mean there's more than one correct path. This walkthrough breaks ties with a fixed order — <b>diagonal, then up, then left</b> — and calls out every tie it hits so you can see the other equally-valid option(s).</p>
     </div>
     <button class="dp-btn dp-backtrace" style="display:none;">🧵 Reveal the Edit Path</button>
     <div class="dp-backtrace-panel"></div>
@@ -666,12 +668,13 @@ function mountDPDemo(container, opts){
     const panel = container.querySelector('.dp-backtrace-panel');
     let i = n, j = m; const path = [];
     while(i>0 || j>0){
-      if(i===0){ path.push({op:'insert', i, j}); j--; continue; }
-      if(j===0){ path.push({op:'delete', i, j}); i--; continue; }
+      if(i===0){ path.push({op:'insert', i, j, tie:false}); j--; continue; }
+      if(j===0){ path.push({op:'delete', i, j, tie:false}); i--; continue; }
       const inf = info[i][j];
-      if(inf.chosen.includes('diag')){ path.push({op: inf.match?'match':'substitute', i, j}); i--; j--; }
-      else if(inf.chosen.includes('up')){ path.push({op:'delete', i, j}); i--; }
-      else { path.push({op:'insert', i, j}); j--; }
+      const tie = inf.chosen.length > 1;
+      if(inf.chosen.includes('diag')){ path.push({op: inf.match?'match':'substitute', i, j, tie, chosen:inf.chosen, val:inf.best}); i--; j--; }
+      else if(inf.chosen.includes('up')){ path.push({op:'delete', i, j, tie, chosen:inf.chosen, val:inf.best}); i--; }
+      else { path.push({op:'insert', i, j, tie, chosen:inf.chosen, val:inf.best}); j--; }
     }
     path.reverse();
     container.querySelectorAll('.dp-path').forEach(el => el.classList.remove('dp-path'));
@@ -683,6 +686,15 @@ function mountDPDemo(container, opts){
       delete: (p) => `↑ Up → Delete “${a[p.i-1]}”`,
       insert: (p) => `← Left → Insert “${b[p.j-1]}”`,
     };
+    function tieNote(p){
+      if(!p.tie) return null;
+      const names = p.chosen.map(c => {
+        if(c === 'diag') return p.op; // 'match' or 'substitute', whichever this cell actually was
+        return c === 'up' ? 'delete' : 'insert';
+      });
+      const followed = p.chosen.includes('diag') ? 'diagonal' : (p.chosen.includes('up') ? 'up' : 'left');
+      return `⚖️ Tie at D(${p.i},${p.j}) = ${p.val}: ${names.join(' & ')} all cost exactly the same. Any of them keeps the total at ${p.val} — this walkthrough follows the diagonal → up → left convention, so it takes <b>${followed}</b> here. The other tied move(s) would give a different, but equally short, edit list.`;
+    }
     let idx = 0;
     (function step(){
       if(idx >= path.length){
@@ -696,8 +708,15 @@ function mountDPDemo(container, opts){
       li.textContent = labels[p.op](p);
       li.className = 'dp-bt-' + p.op;
       list.appendChild(li);
+      const note = tieNote(p);
+      if(note){
+        const tieLi = document.createElement('li');
+        tieLi.className = 'dp-bt-tie';
+        tieLi.innerHTML = note;
+        list.appendChild(tieLi);
+      }
       idx++;
-      setTimeout(step, 480);
+      setTimeout(step, note ? 700 : 480);
     })();
   });
 
