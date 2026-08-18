@@ -91,6 +91,36 @@ section{ padding:56px 0; position:relative; }
 .tab-panel{ display:none; margin-top:22px; }
 .tab-panel.active{ display:block; }
 
+/* ---------- COST-METHOD TOGGLE (Unit-cost vs Levenshtein) ---------- */
+.cost-toggle{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+.cost-btn{ font-family:var(--display); font-weight:700; font-size:13.5px; padding:11px 18px; border-radius:16px; border:2px solid var(--lav-l); background:#fff; color:var(--ink-2); cursor:pointer; text-align:left; box-shadow:0 6px 14px -10px rgba(51,44,75,.35); transition:border-color .15s ease, background .15s ease, transform .15s ease; }
+.cost-btn:hover{ transform:translateY(-1px); }
+.cost-btn span.sub{ display:block; font-family:var(--mono); font-weight:400; font-size:11px; color:var(--muted); margin-top:3px; }
+.cost-btn.active{ border-color:var(--lav-d); background:var(--lav-l); color:var(--lav-d); }
+.cost-btn.active span.sub{ color:var(--lav-d); }
+.cost-btn[data-cost="2"].active{ border-color:var(--peach-d); background:var(--peach-l); color:var(--peach-d); }
+.cost-btn[data-cost="2"].active span.sub{ color:var(--peach-d); }
+.cost-panel{ }
+.cost-note{ font-family:var(--mono); font-size:12px; color:var(--muted); margin:-8px 0 16px; }
+
+/* ---------- SIMPLE RULE EXPLAINER ---------- */
+.rule-section{ background:#fff; border-radius:20px; padding:22px 24px; margin:20px 0; box-shadow:0 10px 24px -16px rgba(51,44,75,.3); border:1px solid rgba(51,44,75,.06); }
+.rule-section h3{ font-family:var(--display); font-weight:700; font-size:18px; margin-bottom:4px; }
+.rule-cases{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:14px; }
+.rule-case{ border-radius:16px; padding:16px; }
+.rule-case.same{ background:var(--mint-l); border:2px solid var(--mint); }
+.rule-case.diff{ background:var(--sun-l); border:2px solid var(--sun); }
+.rule-case .tag{ font-family:var(--display); font-weight:700; font-size:13.5px; }
+.rule-case .formula{ font-family:var(--mono); font-size:12.5px; margin-top:8px; background:rgba(255,255,255,.65); padding:9px 11px; border-radius:8px; word-break:break-word; }
+.move-pill{ display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:12px; padding:5px 10px; border-radius:100px; margin:3px 4px 0 0; }
+.move-pill.diag{ background:var(--lav-l); color:var(--lav-d); }
+.move-pill.up{ background:var(--peach-l); color:var(--peach-d); }
+.move-pill.left{ background:var(--mint-l); color:var(--mint-d); }
+.cost-cheatsheet{ width:100%; border-collapse:collapse; margin-top:16px; font-size:13.5px; }
+.cost-cheatsheet th, .cost-cheatsheet td{ padding:9px 12px; text-align:left; border-bottom:1px solid rgba(51,44,75,.08); }
+.cost-cheatsheet th{ font-family:var(--display); color:var(--ink-2); font-size:12.5px; }
+.rule-footnote{ font-size:13px; color:var(--muted); margin-top:10px; }
+
 /* ---------- DP DEMO ---------- */
 .dp-blurb{ font-size:15px; color:var(--ink-2); background:var(--sun-l); border-radius:14px; padding:12px 16px; margin-bottom:14px; }
 details.dp-formula{ margin-bottom:14px; background:#fff; border-radius:14px; padding:10px 16px; border:1px solid rgba(51,44,75,.08); }
@@ -127,6 +157,10 @@ td.dp-cell.dp-path{ box-shadow:0 0 0 3px var(--pink-d); }
 .dp-explain{ background:var(--card); border-radius:18px; padding:18px 20px; margin-top:16px; box-shadow:0 10px 24px -16px rgba(51,44,75,.3); min-height:70px; }
 .dp-explain-placeholder{ color:var(--muted); font-size:14px; }
 .dp-explain-title{ font-family:var(--display); font-weight:700; font-size:14.5px; margin-bottom:10px; }
+.dp-step{ font-size:13.5px; padding:8px 12px; border-radius:10px; background:#F7F5FC; margin-bottom:8px; }
+.dp-step b{ color:var(--ink); }
+.dp-step.dp-step-same{ background:var(--mint-l); color:var(--mint-d); }
+.dp-step.dp-step-diff{ background:var(--sun-l); color:var(--sun-d); }
 .dp-explain-grid{ display:grid; gap:8px; }
 .dp-eline{ font-size:13.5px; padding:9px 12px; border-radius:10px; background:#F7F5FC; }
 .dp-eline.hl-swatch-diag{ border-left:5px solid var(--lav); }
@@ -199,7 +233,7 @@ footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(-
   <div class="wrap">
     <span class="eyebrow">🧮 Unit 5 · Text Similarity</span>
     <h1>Minimum Edit Distance,<br><span>explained by clicking stuff.</span></h1>
-    <p class="sub">Forget the wall of theory. Click a cell, see exactly why it got that number, then build your <em>own</em> table with your own words. That's the whole plan.</p>
+    <p class="sub">Forget the wall of theory. Click a cell, see exactly why it got that number, then build your <em>own</em> table with your own words. Every example below can be solved <b>two ways</b> — Unit-cost or Levenshtein — just flip the toggle.</p>
     <div class="hero-ctas">
       <button class="btn btn-pink" onclick="document.getElementById('build').scrollIntoView({behavior:'smooth'})">▶ Watch a Table Fill In</button>
       <button class="btn btn-ghost" onclick="document.getElementById('playground').scrollIntoView({behavior:'smooth'})">✍️ Try My Own Words</button>
@@ -253,24 +287,57 @@ footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(-
   <div class="wrap reveal">
     <div class="sec-eyebrow">The main event</div>
     <h2 class="sec-h2">Watch a Dynamic Programming table fill in — one click at a time</h2>
-    <p class="sec-p">Every cell only ever looks at <b>3 neighbours</b> (the one above, the one to the left, and the one diagonally above-left) and picks whichever is cheapest. Click <b>Next Cell</b>, hit <b>Play</b>, or tap the glowing cell yourself.</p>
+    <p class="sec-p">Every cell only ever looks at <b>3 neighbours</b> (the one above, the one to the left, and the one diagonally above-left) and picks whichever is cheapest. Click <b>Next Cell</b>, hit <b>Play</b>, or tap the glowing cell yourself. Pick a word pair below, then choose <b>Unit-cost</b> or <b>Levenshtein</b> costing to see how the table — and the final answer — changes.</p>
+
+    <div class="rule-section reveal">
+      <h3>🧠 Simple Rule — how every cell gets its number</h3>
+      <p class="sec-p" style="margin-top:2px;">Before touching any formula, just answer one question: <b>are the two current letters the same, or different?</b></p>
+      <div class="rule-cases">
+        <div class="rule-case same">
+          <div class="tag">✅ SAME letters</div>
+          <p style="font-size:13.5px;margin-top:6px;">Example: comparing "I" vs "I" → they match.</p>
+          <div class="formula">D(i,j) = D(i-1,j-1) + 0</div>
+          <p class="rule-footnote">👉 Just copy the diagonal number down. No extra cost — it's a free move.</p>
+        </div>
+        <div class="rule-case diff">
+          <div class="tag">❌ DIFFERENT letters</div>
+          <p style="font-size:13.5px;margin-top:6px;">Now you compare 3 choices and take the cheapest one.</p>
+          <div class="formula">D(i,j) = MIN( ↖diag + sub, &nbsp;↑top + 1, &nbsp;←left + 1 )</div>
+          <div style="margin-top:8px;">
+            <span class="move-pill diag">↖ Diagonal = Substitute</span>
+            <span class="move-pill up">↑ Top = Delete (+1)</span>
+            <span class="move-pill left">← Left = Insert (+1)</span>
+          </div>
+        </div>
+      </div>
+
+      <table class="cost-cheatsheet">
+        <thead><tr><th>Operation</th><th>Unit-cost</th><th>Levenshtein</th></tr></thead>
+        <tbody>
+          <tr><td>Same character (↖)</td><td>+0</td><td>+0</td></tr>
+          <tr><td>Substitute (↖)</td><td>+1</td><td>+2</td></tr>
+          <tr><td>Delete (↑)</td><td>+1</td><td>+1</td></tr>
+          <tr><td>Insert (←)</td><td>+1</td><td>+1</td></tr>
+        </tbody>
+      </table>
+      <p class="rule-footnote">The DP logic never changes — only the <b>substitution price</b> changes between the two versions. That single number is the only difference between the Unit-cost and Levenshtein toggle in every example below. Open any tab, switch the toggle, and click a cell — the explainer under the table walks through this exact Same/Different rule for that cell, live.</p>
+    </div>
+
     <details class="dp-formula">
       <summary>🤓 Show me the actual formula (optional, nerds only)</summary>
       <div class="fbody">
         D(i,0) = i &nbsp;&nbsp; D(0,j) = j<br>
         D(i,j) = min( D(i-1,j)+1, &nbsp; D(i,j-1)+1, &nbsp; D(i-1,j-1) + cost )<br>
-        cost = 0 if letters match, else 1 (unit-cost) or 2 (Levenshtein)
+        cost = 0 if letters match, else <b>1</b> for Unit-cost editing, or <b>2</b> for classic Levenshtein distance (a substitution is treated as a delete + insert bundled together).
       </div>
     </details>
     <div class="tabs" id="tabs">
       <button class="tab-btn active" data-tab="t1">intention → execution</button>
-      <button class="tab-btn" data-tab="t2">same words, Levenshtein</button>
       <button class="tab-btn" data-tab="t3">PART → SPARTAN</button>
       <button class="tab-btn" data-tab="t4">KITTEN → SITTING</button>
       <button class="tab-btn" data-tab="t5">RECIEVE → RECEIVE</button>
     </div>
     <div class="tab-panel active" id="t1"></div>
-    <div class="tab-panel" id="t2"></div>
     <div class="tab-panel" id="t3"></div>
     <div class="tab-panel" id="t4"></div>
     <div class="tab-panel" id="t5"></div>
@@ -282,7 +349,7 @@ footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(-
   <div class="wrap reveal">
     <div class="sec-eyebrow">Your turn</div>
     <h2 class="sec-h2">Type two words. We'll build the table together.</h2>
-    <p class="sec-p">Try your name vs. your bestie's name. Try a typo you actually made last week. Anything goes (letters only, up to 12 characters each).</p>
+    <p class="sec-p">Try your name vs. your bestie's name. Try a typo you actually made last week. Anything goes (letters only, up to 12 characters each). Pick your costing rule before you build.</p>
     <div class="pg-form">
       <div class="pg-row">
         <div class="pg-field">
@@ -311,7 +378,7 @@ footer .role, footer .made{ font-family:var(--mono); font-size:12px; color:var(-
   </div>
 </section>
 
-<!-- BONUS: STEMMING -->
+<!-- BONUS: stemming -->
 <section id="bonus">
   <div class="wrap reveal">
     <div class="sec-eyebrow">Bonus round · 10 seconds</div>
@@ -478,24 +545,45 @@ function mountDPDemo(container, opts){
     cellEl(i,j-1).classList.add('hl-left');
     cellEl(i,j).classList.add('hl-target');
     const letterA = a[i-1], letterB = b[j-1];
-    const diagWord = inf.match
-      ? `“${letterA}” already equals “${letterB}” → free!`
-      : `“${letterA}” ≠ “${letterB}” → substitute, costs ${subCost}`;
     const nameMap = { diag:'Diagonal', up:'Top (delete)', left:'Left (insert)' };
     const chosenNames = inf.chosen.map(c => nameMap[c]).join(' & ');
-    let verdict;
-    if(inf.chosen.includes('diag') && inf.match) verdict = 'Same letter, zero effort. Free pass! ✨';
-    else if(inf.chosen[0]==='diag') verdict = 'Cheapest fix: swap the letter (substitute). 🔁';
-    else if(inf.chosen[0]==='up') verdict = 'Cheapest fix: delete and move on. ✂️';
-    else verdict = 'Cheapest fix: insert the missing letter. ➕';
+
+    let stepsHtml, gridHtml, verdict;
+
+    if(inf.match){
+      stepsHtml = `
+        <p class="dp-step dp-step-same">Step 1 — compare characters: “${letterA}” = “${letterB}” → <b>SAME</b></p>
+        <p class="dp-step dp-step-same">Step 2 — same letters → <b>diagonal + 0</b>, no extra cost. Just carry D(${i-1},${j-1}) = ${D[i-1][j-1]} straight down.</p>
+      `;
+      gridHtml = `
+        <div class="dp-explain-grid">
+          <div class="dp-eline hl-swatch-diag"><b>↖ Diagonal:</b> D(${i-1},${j-1})=${D[i-1][j-1]} + 0 (free, same letter) → total <b>${inf.diagVal}</b></div>
+          <div class="dp-eline hl-swatch-up"><b>⬆ Top:</b> D(${i-1},${j})=${D[i-1][j]} + 1 (delete “${letterA}”) → total <b>${inf.upVal}</b></div>
+          <div class="dp-eline hl-swatch-left"><b>⬅ Left:</b> D(${i},${j-1})=${D[i][j-1]} + 1 (insert “${letterB}”) → total <b>${inf.leftVal}</b></div>
+        </div>
+      `;
+      verdict = 'Same letter, zero effort. Free pass! ✨';
+    } else {
+      stepsHtml = `
+        <p class="dp-step dp-step-diff">Step 1 — compare characters: “${letterA}” ≠ “${letterB}” → <b>DIFFERENT</b></p>
+        <p class="dp-step dp-step-diff">Step 2 — different letters → check all 3 moves. Substitute costs <b>+${subCost}</b> here (Diagonal), Delete and Insert always cost <b>+1</b>. Take the smallest total.</p>
+      `;
+      gridHtml = `
+        <div class="dp-explain-grid">
+          <div class="dp-eline hl-swatch-diag"><b>↖ Diagonal:</b> D(${i-1},${j-1})=${D[i-1][j-1]} + ${subCost} (substitute “${letterA}”→“${letterB}”) → total <b>${inf.diagVal}</b></div>
+          <div class="dp-eline hl-swatch-up"><b>⬆ Top:</b> D(${i-1},${j})=${D[i-1][j]} + 1 (delete “${letterA}”) → total <b>${inf.upVal}</b></div>
+          <div class="dp-eline hl-swatch-left"><b>⬅ Left:</b> D(${i},${j-1})=${D[i][j-1]} + 1 (insert “${letterB}”) → total <b>${inf.leftVal}</b></div>
+        </div>
+      `;
+      if(inf.chosen[0]==='diag') verdict = 'Cheapest fix: swap the letter (substitute). 🔁';
+      else if(inf.chosen[0]==='up') verdict = 'Cheapest fix: delete and move on. ✂️';
+      else verdict = 'Cheapest fix: insert the missing letter. ➕';
+    }
 
     ee.innerHTML = `
       <p class="dp-explain-title">Comparing "<b>${a.slice(0,i)}</b>" vs "<b>${b.slice(0,j)}</b>" — filling D(${i},${j})</p>
-      <div class="dp-explain-grid">
-        <div class="dp-eline hl-swatch-diag"><b>↖ Diagonal:</b> D(${i-1},${j-1})=${D[i-1][j-1]} → ${diagWord} → total <b>${inf.diagVal}</b></div>
-        <div class="dp-eline hl-swatch-up"><b>⬆ Top:</b> D(${i-1},${j})=${D[i-1][j]} + 1 (delete “${letterA}”) → total <b>${inf.upVal}</b></div>
-        <div class="dp-eline hl-swatch-left"><b>⬅ Left:</b> D(${i},${j-1})=${D[i][j-1]} + 1 (insert “${letterB}”) → total <b>${inf.leftVal}</b></div>
-      </div>
+      ${stepsHtml}
+      ${gridHtml}
       <p class="dp-verdict">✅ Cheapest option: <b>${chosenNames}</b> = <b>${inf.best}</b>. ${verdict}</p>
     `;
   }
@@ -598,28 +686,66 @@ function mountDPDemo(container, opts){
 }
 
 /* ============================================================
-   PRESET DP DEMOS
+   COST-METHOD TOGGLE WRAPPER
+   Lets any word pair be solved either Unit-cost (sub=1) or
+   Levenshtein (sub=2) — same DP engine, just a different
+   substitution price. Both tables are built once and cached;
+   switching just shows/hides so nothing recomputes needlessly.
    ============================================================ */
-mountDPDemo(document.getElementById('t1'), {
-  a:'intention', b:'execution', subCost:1,
-  blurb:'💡 Our running example. Every insert, delete, and substitute costs exactly 1 point.'
-});
-mountDPDemo(document.getElementById('t2'), {
-  a:'intention', b:'execution', subCost:2,
-  blurb:'💡 Same two words — but now a substitute costs 2 (like a delete + insert bundled together). Watch the answer climb from 5 to 8.'
-});
-mountDPDemo(document.getElementById('t3'), {
-  a:'spartan', b:'part', subCost:1,
-  blurb:'💡 PART is fully hiding inside SPARTAN. Expect a small distance — mostly just inserting the extra S, A, N.'
-});
-mountDPDemo(document.getElementById('t4'), {
-  a:'kitten', b:'sitting', subCost:1,
-  blurb:'💡 The classic CS-class example. Try predicting the answer before you press Play!'
-});
-mountDPDemo(document.getElementById('t5'), {
-  a:'recieve', b:'receive', subCost:1,
-  blurb:'💡 The "i before e" typo. It LOOKS like just swapping two letters — but with only insert/delete/substitute (no "swap" move allowed), it actually costs 2, not 1. Sneaky!'
-});
+function mountCostToggleDemo(container, a, b, extraBlurb){
+  const wordsLabel = `${a.toUpperCase()} → ${b.toUpperCase()}`;
+  container.innerHTML = `
+    <div class="cost-toggle">
+      <button class="cost-btn active" data-cost="1">🔢 Unit-cost
+        <span class="sub">insert = delete = substitute = 1</span>
+      </button>
+      <button class="cost-btn" data-cost="2">📐 Levenshtein
+        <span class="sub">insert = delete = 1, substitute = 2</span>
+      </button>
+    </div>
+    <p class="cost-note">Same word pair, same DP table logic — only the price tag on "substitute" changes.</p>
+    <div class="cost-panel" data-cost="1"></div>
+    <div class="cost-panel" data-cost="2" style="display:none;"></div>
+  `;
+  const panel1 = container.querySelector('.cost-panel[data-cost="1"]');
+  const panel2 = container.querySelector('.cost-panel[data-cost="2"]');
+
+  mountDPDemo(panel1, {
+    a, b, subCost: 1,
+    blurb: `💡 <b>Unit-cost rule</b> for ${wordsLabel}: every insert, delete, and substitute costs exactly 1 point. ${extraBlurb || ''}`
+  });
+
+  let mounted2 = false;
+  container.querySelectorAll('.cost-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if(btn.classList.contains('active')) return;
+      container.querySelectorAll('.cost-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cost = btn.dataset.cost;
+      panel1.style.display = cost === '1' ? '' : 'none';
+      panel2.style.display = cost === '2' ? '' : 'none';
+      if(cost === '2' && !mounted2){
+        mounted2 = true;
+        mountDPDemo(panel2, {
+          a, b, subCost: 2,
+          blurb: `💡 <b>Levenshtein rule</b> for ${wordsLabel}: substitute now costs 2 (like a delete + insert bundled together). Insert and delete still cost 1 each — watch the final answer change.`
+        });
+      }
+    });
+  });
+}
+
+/* ============================================================
+   PRESET EXAMPLES — each gets both costing methods
+   ============================================================ */
+mountCostToggleDemo(document.getElementById('t1'), 'intention', 'execution',
+  'Our running example.');
+mountCostToggleDemo(document.getElementById('t3'), 'spartan', 'part',
+  'PART is fully hiding inside SPARTAN — expect a small distance either way.');
+mountCostToggleDemo(document.getElementById('t4'), 'kitten', 'sitting',
+  'The classic CS-class example. Try predicting each answer before you press Play!');
+mountCostToggleDemo(document.getElementById('t5'), 'recieve', 'receive',
+  'The "i before e" typo. It LOOKS like just swapping two letters — but with no dedicated "swap" move, Unit-cost still charges 2, and Levenshtein charges 3. Sneaky!');
 
 /* tabs */
 document.getElementById('tabs').addEventListener('click', (e) => {
@@ -730,4 +856,3 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
 </body>
 </html>
-
