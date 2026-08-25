@@ -1,1 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Syntax Analysis, Live — POS Tagging · Parsing · Constraint-Based Grammar</title>
+<meta property="og:title" content="Syntax Analysis, Live — POS Tagging · Parsing · Constraint-Based Grammar">
+<meta property="og:description" content="Three interactive syntax-analysis tools: POS tagging, LR(0) parsing, and constraint-based grammar — all live in your browser.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFBF2; --paper:#FFFFFF; --ink:#2E2A4D; --ink-soft:#726C93;
+  --coral:#FF7A6B; --coral-d:#E14F3F; --coral-bg:#FFE4DF;
+  --sun:#FFC24B; --sun-d:#C97800; --sun-bg:#FFF2CC;
+  --sky:#5FA8E0; --sky-d:#0E6FA6; --sky-bg:#DDF1FF;
+  --mint:#4FD1A5; --mint-d:#0D9A6E; --mint-bg:#DDFBF0;
+  --grape:#B6A6F5; --grape-d:#7A3FE0; --grape-bg:#EFE8FF;
+  --line:#F1E9D9; --shadow:0 16px 38px rgba(70,50,20,.10); --radius:26px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0; font-family:'Nunito',system-ui,sans-serif; background:var(--bg); color:var(--ink);
+  font-size:22px; line-height:1.55; overflow-x:hidden; position:relative;
+}
+h1,h2,h3,h4{ font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; }
+.mono{ font-family:'JetBrains Mono',monospace; }
+.wrap{ max-width:1180px; margin:0 auto; padding:0 26px; }
+::selection{ background:var(--sun); color:var(--ink); }
+button{ font-family:inherit; }
+
+.floaters{ position:absolute; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
+.floaters span{ position:absolute; font-size:44px; opacity:.28; animation:bob 7s ease-in-out infinite; filter:drop-shadow(0 6px 10px rgba(0,0,0,.08)); }
+@keyframes bob{ 0%,100%{ transform:translateY(0) rotate(-4deg);} 50%{ transform:translateY(-24px) rotate(6deg);} }
+.blob{ position:absolute; border-radius:50%; filter:blur(1px); opacity:.5; z-index:0; }
+@keyframes drift{ 0%,100%{ transform:translate(0,0);} 50%{ transform:translate(18px,-14px);} }
+
+.nav{ position:sticky; top:0; z-index:200; background:rgba(255,251,242,.92); backdrop-filter:blur(10px); border-bottom:2px solid var(--line); }
+.nav-inner{ max-width:1180px; margin:0 auto; padding:14px 26px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+.brand{ font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; white-space:nowrap; }
+.brand span{ color:var(--coral); }
+.navlinks{ display:flex; gap:4px; flex-wrap:wrap; margin-left:auto; }
+.navlinks a{ font-weight:700; font-size:17px; color:var(--ink-soft); text-decoration:none; padding:8px 14px; border-radius:99px; transition:.15s; cursor:pointer; }
+.navlinks a:hover{ background:var(--coral-bg); color:var(--coral-d); }
+
+.hero{ position:relative; padding:88px 0 60px; text-align:center; }
+.eyebrow{ display:inline-block; font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; letter-spacing:1px; color:#8A5CD1; background:var(--grape-bg); padding:7px 16px; border-radius:99px; margin-bottom:18px; }
+.hero h1{ font-size:clamp(39.5px,5.85vw,65px); line-height:1.12; max-width:920px; margin:0 auto 20px; position:relative; z-index:1; }
+.hero h1 .hl{ background:linear-gradient(120deg, rgba(255,122,107,.32), rgba(255,194,75,.32)); padding:0 8px; border-radius:10px; }
+.hero .sub{ font-size:22px; color:var(--ink-soft); max-width:760px; margin:0 auto; position:relative; z-index:1; }
+.hero .sub b{ color:var(--ink); }
+
+section{ padding:64px 0; position:relative; }
+.section-head{ text-align:center; max-width:760px; margin:0 auto 36px; }
+.kicker{ display:inline-block; font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:800; letter-spacing:1px; text-transform:uppercase; padding:6px 15px; border-radius:99px; margin-bottom:12px; }
+.section-head h2{ font-size:clamp(32.5px,3.9vw,44px); margin-bottom:12px; }
+.section-head p{ color:var(--ink-soft); font-size:21px; }
+
+.reveal{ opacity:0; transform:translateY(28px); transition:opacity .7s ease, transform .7s ease; }
+.reveal.in{ opacity:1; transform:none; }
+
+.pipeline{ display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap; margin:34px 0 10px; }
+.pipe-step{ background:var(--paper); border:2.5px solid var(--line); border-radius:18px; padding:14px 18px; text-align:center; min-width:120px; box-shadow:var(--shadow); font-weight:700; font-family:'Baloo 2',sans-serif; font-size:17px; }
+.pipe-step .emoji{ font-size:28px; display:block; margin-bottom:4px; }
+.pipe-step.hot{ border-color:var(--coral); background:linear-gradient(160deg,#fff,var(--coral-bg)); color:var(--coral-d); }
+.pipe-step.hot.s2{ border-color:var(--sky); background:linear-gradient(160deg,#fff,var(--sky-bg)); color:var(--sky-d); }
+.pipe-step.hot.s3{ border-color:var(--grape); background:linear-gradient(160deg,#fff,var(--grape-bg)); color:var(--grape-d); }
+.pipe-arrow{ font-size:25.5px; color:var(--ink-soft); opacity:.6; }
+@media(max-width:760px){ .pipe-arrow{ transform:rotate(90deg); } }
+
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+@media(max-width:820px){ .two-col{ grid-template-columns:1fr; } }
+.info-card{ background:var(--paper); border-radius:22px; padding:28px 30px; box-shadow:var(--shadow); border:2px solid var(--line); }
+.info-card.why{ border-top:6px solid var(--sky); }
+.info-card.real{ border-top:6px solid var(--mint); }
+.info-card h3{ font-size:22px; margin-bottom:10px; }
+.info-card p{ color:var(--ink-soft); font-size:19px; margin:0; }
+.info-card p b{ color:var(--ink); }
+
+.witty{ background:#FFF6E2; border:2px dashed #EDC26E; border-radius:20px; padding:20px 26px; font-size:19.5px; color:#6B5228; max-width:920px; margin:26px auto 0; text-align:center; }
+.witty b{ color:#8A5A00; }
+
+.doors-head{ text-align:center; max-width:760px; margin:0 auto 40px; }
+.doors-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:26px; }
+@media(max-width:980px){ .doors-grid{ grid-template-columns:1fr; max-width:520px; margin:0 auto; } }
+.door{
+  position:relative; background:var(--paper); border-radius:28px; padding:34px 28px 30px; text-align:center;
+  border:3px solid var(--line); box-shadow:var(--shadow); transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  display:flex; flex-direction:column; align-items:center;
+}
+.door:hover{ transform:translateY(-8px); box-shadow:0 26px 48px rgba(70,50,20,.16); }
+.door.d1:hover{ border-color:var(--coral); }
+.door.d2:hover{ border-color:var(--sky); }
+.door.d3:hover{ border-color:var(--grape); }
+.door-stage{ font-family:'JetBrains Mono',monospace; font-size:14.5px; font-weight:700; letter-spacing:1px; padding:5px 13px; border-radius:99px; margin-bottom:14px; }
+.door.d1 .door-stage{ background:var(--coral-bg); color:var(--coral-d); }
+.door.d2 .door-stage{ background:var(--sky-bg); color:var(--sky-d); }
+.door.d3 .door-stage{ background:var(--grape-bg); color:var(--grape-d); }
+.door-emoji{ font-size:67.5px; margin-bottom:14px; animation:doorbob 4.5s ease-in-out infinite; }
+.door.d2 .door-emoji{ animation-delay:.4s; }
+.door.d3 .door-emoji{ animation-delay:.8s; }
+@keyframes doorbob{ 0%,100%{ transform:translateY(0) rotate(0);} 50%{ transform:translateY(-8px) rotate(-3deg);} }
+.door h3{ font-size:25.5px; margin-bottom:10px; }
+.door p{ color:var(--ink-soft); font-size:18px; margin:0 0 22px; }
+.door-btn{
+  font-family:'Baloo 2',sans-serif; font-weight:800; font-size:18px; border:none; border-radius:99px; padding:14px 28px;
+  cursor:pointer; color:#fff; display:inline-flex; align-items:center; gap:8px; transition:transform .15s ease, box-shadow .15s ease;
+  box-shadow:0 10px 22px rgba(0,0,0,.16); text-decoration:none;
+}
+.door-btn:hover{ transform:translateY(-2px) scale(1.03); }
+.door.d1 .door-btn{ background:linear-gradient(120deg, var(--coral-d), #FF9F6B); }
+.door.d2 .door-btn{ background:linear-gradient(120deg, var(--sky-d), var(--sky)); }
+.door.d3 .door-btn{ background:linear-gradient(120deg, var(--grape-d), var(--coral-d)); }
+.door-note{ margin-top:14px; font-size:14px; color:var(--ink-soft); opacity:.8; }
+
+footer{ padding:50px 24px; text-align:center; color:var(--ink-soft); font-size:16px; border-top:2px solid var(--line); margin-top:20px; }
+footer b{ color:var(--ink); }
+footer a{ color:var(--coral-d); font-weight:700; text-decoration:none; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <div class="nav-inner">
+    <div class="brand">🧵 Syntax Analysis, <span>Live</span></div>
+    <div class="navlinks">
+      <a href="#overview">Overview</a>
+      <a href="pos.html">🏷️ POS Tagging</a>
+      <a href="parser.html">🌳 Parsing</a>
+      <a href="cbg.html">🧩 Constraint Grammar</a>
+    </div>
+  </div>
+</div>
+
+<section class="hero" id="overview">
+  <div class="floaters">
+    <span style="top:14%; left:8%; animation-delay:0s;">🏷️</span>
+    <span style="top:22%; right:10%; animation-delay:1.2s;">🌳</span>
+    <span style="top:62%; left:14%; animation-delay:2.1s;">🧩</span>
+    <span style="top:70%; right:16%; animation-delay:.6s;">✨</span>
+    <span style="top:40%; left:48%; animation-delay:1.8s; font-size:30px;">📐</span>
+  </div>
+  <div class="wrap">
+    <span class="eyebrow">B.Tech IV · NLP (BTIT14706) · Syntax Analysis, unpacked</span>
+    <h1>A sentence is basically a <span class="hl">cricket team</span> — everyone needs a role, a position, and to actually follow the rules.</h1>
+    <p class="sub">Before a computer can understand what you typed, it has to do three things in order: figure out <b>what each word is</b>, figure out <b>how those words fit together</b>, and check that <b>everything actually agrees</b>. That's syntax analysis. Below are three live, click-through tools — one for each step.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker" style="background:var(--grape-bg); color:var(--grape-d);">Where we are</span>
+      <h2>The NLP pipeline, zoomed into syntax</h2>
+      <p>Raw text goes through several stages before a machine can "understand" it. These three tools live back-to-back in the middle of that pipeline.</p>
+    </div>
+    <div class="pipeline reveal">
+      <div class="pipe-step">📝<span class="emoji"></span>Raw Text</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">✂️<span class="emoji"></span>Tokenization</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step hot">🏷️<span class="emoji"></span>POS Tagging</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step hot s2">🌳<span class="emoji"></span>Parsing</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step hot s3">🧩<span class="emoji"></span>Constraint Grammar</div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">💡<span class="emoji"></span>Meaning</div>
+    </div>
+    <div class="witty reveal">🏏 <b>Cricket-team version:</b> POS tagging decides who's a batsman and who's a bowler. Parsing works out the batting order and field placements. Constraint-based grammar double-checks the playing XI actually follows the rules before the umpire lets play begin.</div>
+
+    <div class="two-col reveal" style="margin-top:40px;">
+      <div class="info-card why">
+        <h3>🎯 Why syntax analysis matters</h3>
+        <p>Computers don't have a "gut feeling" for grammar. Every rule your brain applies instantly has to be made completely explicit before a machine can use it. Skip this stage, and every downstream task inherits the confusion.</p>
+      </div>
+      <div class="info-card real">
+        <h3>🌍 Where you've already met it</h3>
+        <p><b>Google Docs</b> underlining "the dogs runs" in red — that's constraint checking. <b>Siri</b> figuring out "book" is a verb vs a noun — that's POS tagging. Every code editor's <b>autocomplete</b> — that's leaning on parse structure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="doors">
+  <div class="wrap">
+    <div class="doors-head reveal">
+      <span class="kicker" style="background:var(--sun-bg); color:var(--sun-d);">Pick a door</span>
+      <h2>Three live tools, one per stage</h2>
+      <p>Each opens as its own page, with a floating control bottom-right to jump to the next stage or come back here.</p>
+    </div>
+    <div class="doors-grid reveal">
+      <div class="door d1">
+        <div class="door-stage">STAGE 1 OF 3</div>
+        <div class="door-emoji">🏷️</div>
+        <h3>POS Tagging</h3>
+        <p>Label every word — noun, verb, adjective — before anything else can happen.</p>
+        <a class="door-btn" href="pos.html">Open the Tagger →</a>
+        <div class="door-note">"Tag, You're It!"</div>
+      </div>
+      <div class="door d2">
+        <div class="door-stage">STAGE 2 OF 3</div>
+        <div class="door-emoji">🌳</div>
+        <h3>Parser Playground</h3>
+        <p>Arrange those labeled words into a structure — top-down, bottom-up, or LR(0).</p>
+        <a class="door-btn" href="parser.html">Open the Parser →</a>
+        <div class="door-note">Top-Down · Bottom-Up · LR(0)</div>
+      </div>
+      <div class="door d3">
+        <div class="door-stage">STAGE 3 OF 3</div>
+        <div class="door-emoji">🧩</div>
+        <h3>Constraint Grammar</h3>
+        <p>Check the structure actually agrees — type your own sentence and watch it live.</p>
+        <a class="door-btn" href="cbg.html">Open the Playground →</a>
+        <div class="door-note">Live unification checker</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="max-width:640px;margin:0 auto;">
+    <div style="font-weight:800;font-family:'Baloo 2',sans-serif;color:var(--ink);font-size:17.5px;margin-bottom:4px;">SARVAJANIK UNIVERSITY</div>
+    <div>Sarvajanik College of Engineering and Technology · Bachelor of Technology</div>
+    <div style="margin:6px 0;">Year: B.Tech IV (Semester VII) &nbsp;·&nbsp; Subject: Natural Language Processing &nbsp;·&nbsp; Code: BTIT14706</div>
+    <div style="margin-top:10px;">Conceptualised &amp; taught by <b>Prof. Bhumika Shah</b> — <a href="https://bhumikaa7981.github.io/meet-bhumika/" target="_blank" rel="noopener">know more about her →</a></div>
+    <div style="margin-top:14px;opacity:.75;">Three tools, one pipeline · Syntax Analysis Suite</div>
+  </div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // deep-link support: index.html#pos / #parser / #cbg jumps straight to that tool
+  const h = location.hash.replace('#','');
+  if(h === 'pos') location.href = 'pos.html';
+  if(h === 'parser') location.href = 'parser.html';
+  if(h === 'cbg') location.href = 'cbg.html';
+
+  const els = document.querySelectorAll('.reveal');
+  if(!('IntersectionObserver' in window)){ els.forEach(el=>el.classList.add('in')); return; }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+});
+</script>
+</body>
+</html>
 
